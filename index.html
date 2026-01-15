@@ -3,194 +3,244 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport"
-            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>KC SMART</title>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap"
-            rel="stylesheet">
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <title>KC SMART PREMIUM</title>
 
         <link rel="apple-touch-icon" href="KCsmart.png">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap"
+            rel="stylesheet">
 
-        <link rel="icon" type="image/png" sizes="192x192"
-            href="KCsmart.png">
-        <link rel="icon" type="image/png" sizes="512x512"
-            href="KCsmart.png">
-
-        <meta name="apple-mobile-web-app-title" content="KC SMART">
-        <meta name="mobile-web-app-capable" content="yes">
         <style>
         :root {
-            --purple: #4a148c;
-            --gold: #ffd600;
-            --white: #ffffff;
-            --glass: rgba(255, 255, 255, 0.12);
+            --primary-bg: #0a051a;
+            --accent-gold: #ffd600;
+            --glass-white: rgba(255, 255, 255, 0.1);
+            --icon-size: 72px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* --- ป้องกันทุกการกดค้างและเลือกข้อความ --- */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
 
         body {
             font-family: 'Kanit', sans-serif;
-            background: #0a051a;
-            color: var(--white);
+            background: var(--primary-bg);
+            color: #fff;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
             overflow-x: hidden;
+            /* พื้นหลังไล่เฉดสีขยับได้ */
+            background: linear-gradient(-45deg, #0a051a, #1a0a33, #4a148c, #000000);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
         }
 
-        /* --- 1. Animation Background --- */
-        .bg-animate {
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- เอฟเฟกต์ดวงไฟลอยด้านหลัง --- */
+        .bg-blobs {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #1a0a33 0%, #0a051a 100%);
-            z-index: -1;
+            z-index: -1; overflow: hidden;
+        }
+        .blob {
+            position: absolute; width: 250px; height: 250px;
+            background: radial-gradient(circle, rgba(106, 27, 154, 0.4) 0%, transparent 70%);
+            border-radius: 50%; animation: floatBlob 20s infinite alternate;
         }
 
-        .circles {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden; z-index: -1;
+        @keyframes floatBlob {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(120%, 120%); }
         }
 
-        .circles li {
-            position: absolute; display: block; list-style: none;
-            width: 20px; height: 20px; background: rgba(255, 214, 0, 0.1);
-            animation: animate 25s linear infinite; bottom: -150px;
-        }
-
-        @keyframes animate {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
-            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
-        }
-
-        /* --- 2. Header Animation --- */
+        /* --- Header Motion --- */
         header {
-            padding: 50px 20px; text-align: center;
-            animation: slideDown 1s ease-out;
+            padding: 50px 20px 30px;
+            text-align: center;
+        }
+        .logo-title {
+            font-size: 3rem; font-weight: 600; letter-spacing: 4px;
+            background: linear-gradient(to bottom, #fff 40%, var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            animation: floatLogo 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.4));
         }
 
-        header h1 {
-            font-size: 3.5rem; font-weight: 700; color: var(--gold);
-            text-shadow: 0 0 20px rgba(255, 214, 0, 0.6);
-            letter-spacing: 5px; margin-bottom: 5px;
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
         }
 
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-30px); }
+        /* --- Grid System --- */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px 12px;
+            padding: 15px;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* --- App Card Animation --- */
+        .app-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: emerge 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes emerge {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- 3. Grid & Cards --- */
-        .container {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 15px; padding: 0 20px 80px;
-            max-width: 1200px; margin: 0 auto;
+        /* --- มิติไอคอน (Glassmorphism 3D) --- */
+        .icon-container {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            border-radius: 20px;
+            position: relative;
+            background: linear-gradient(145deg, rgba(255,255,255,0.18), rgba(0,0,0,0.3));
+            box-shadow: 
+                0 12px 24px rgba(0, 0, 0, 0.5),
+                inset 0 2px 3px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 5px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .card {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 22px;
-            padding: 30px 15px;
-            text-align: center;
-            text-decoration: none;
-            color: var(--white);
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            /* แอนิเมชันตอนโหลด */
-            animation: cardAppear 0.6s backwards;
-        }
-
-        @keyframes cardAppear {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
+        .icon-container img {
+            width: 100%; height: 100%; object-fit: cover;
+            pointer-events: none;
         }
 
         /* แสงสะท้อนวิ่งผ่าน (Shine Effect) */
-        .card::after {
-            content: ''; position: absolute; top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: rotate(45deg); animation: shine 4s infinite;
+        .icon-container::after {
+            content: ''; position: absolute; top: -50%; left: -150%;
+            width: 100%; height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(30deg); transition: 0.6s;
         }
 
-        @keyframes shine {
-            0% { transform: translateX(-150%) rotate(45deg); }
-            100% { transform: translateX(150%) rotate(45deg); }
+        .app-label {
+            margin-top: 10px; font-size: 0.72rem; color: rgba(255,255,255,0.9);
+            text-align: center; font-weight: 300;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        .card:active {
-            transform: scale(0.9) rotate(2deg);
-            background: var(--gold);
-            color: var(--purple);
+        /* --- Interaction Effects --- */
+        .app-card:active .icon-container {
+            transform: scale(0.85) translateY(4px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255,255,255,0.2);
+            filter: brightness(0.7);
         }
 
-        .icon { font-size: 2.8rem; margin-bottom: 12px; }
-        .title { font-size: 1rem; font-weight: 500; }
+        .app-card:active .icon-container::after {
+            left: 150%;
+        }
 
-        /* --- 4. Staggered Delay (ทำให้ปุ่มค่อยๆ โผล่) --- */
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.15s; }
-        .card:nth-child(3) { animation-delay: 0.2s; }
-        /* ... เพิ่มเติมได้ถึง 22 ปุ่ม ... */
-
-        .footer { text-align: center; padding: 30px; opacity: 0.4; font-size: 0.8rem; }
+        /* --- Footer Dock --- */
+        .dock-container { margin-top: auto; padding: 40px 0; width: 100%; text-align: center; }
+        .dock {
+            display: inline-block; background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: 25px; padding: 12px 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
     </style>
     </head>
     <body>
 
-        <div class="bg-animate"></div>
-        <ul class="circles">
-            <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
-        </ul>
-
-        <header>
-            <h1>KC SMART</h1>
-            <p>Sadao Khanchai Kamphalanon Anusorn School</p>
-        </header>
-
-        <div class="container" id="card-container">
+        <div class="bg-blobs">
+            <div class="blob"></div>
+            <div class="blob"
+                style="right: 0; bottom: 0; animation-delay: -10s; background: radial-gradient(circle, rgba(255, 214, 0, 0.15) 0%, transparent 70%);"></div>
         </div>
 
-        <div class="footer">
-            KC SMART - Sadao Khanchai Kamphalanon Anusorn School
+        <header>
+            <div class="logo-title">KC SMART</div>
+            <p
+                style="color: var(--accent-gold); font-size: 0.7rem; letter-spacing: 2px; opacity: 0.7; margin-top: 8px;">
+                Sadao Khanchai Kamphalanon Anusorn School
+            </p>
+        </header>
+
+        <div class="app-grid" id="main-grid"></div>
+
+        <div class="dock-container">
+            <div class="dock">
+                <p
+                    style="font-size: 0.65rem; opacity: 0.6; letter-spacing: 1px;">©
+                    KC SMART | SADAO KHANCHAI</p>
+            </div>
         </div>
 
         <script>
-        const websites = [
-            { n: "ตารางเรียน", u: "https://studentskc.sadaokc.com/", i: "🎓" },
-            { n: "ตารางสอนครู", u: "https://teacherkc.sadaokc.com/", i: "👨‍🏫" },
-            { n: "ตารางสอบ", u: "https://examschedule.sadaokc.com/", i: "📅" },
-            { n: "KC Music", u: "https://script.google.com/macros/s/AKfycbyrzFJhQZWMNKXdd7D5be5zSl0SVEuGVsGbCkRRa7tUBaxq7gv6aXGfJW0vZRmCCyyD/exec", i: "📝" },
-            { n: "Portfolio", u: "https://doportkc.sadaokc.com/", i: "📂" },
-            { n: "คำนวณเกรด", u: "https://calgrade.sadaokc.com/", i: "🧮" },
-            { n: "KC LearnUp", u: "https://kclearnup.sadaokc.com/", i: "🚀" },
-            { n: "รายชื่อนักเรียน", u: "https://script.google.com/macros/s/AKfycbwjFJ_Sw9fy8ciWUqccQ9ypdJgPsgtJ_c6Ab5cB0ACz21ybMu6lPmcEbuVdVrEhW4gQ/exec", i: "📉" },
-            { n: "คู่มือนักเรียน", u: "https://script.google.com/macros/s/AKfycbwCVMLiKr2RmWXHMeohO6tdGjuaNeeASn8PGm6zGjlDqgLFwIdbyoae7hfmErAG3MulvQ/exec", i: "📊" },
-            { n: "แจ้งข่าวสาร", u: "https://script.google.com/macros/s/AKfycbz1rmB_ZaYszuwFHAvpMP6oAS7IVGr93KV2QuFhsKRqR-jrUBcE-slfzM6gXE5Nr9eu/exec", i: "📋" },
-            { n: "ห้องสมุดออนไลน์", u: "http://khanchai.vlcloud.net/", i: "☁️" },
-            { n: "ดูเกรดมัธยม", u: "http://www.dograde.online/khanchai/", i: "🏆" },
-            { n: "ภาพกิจกรรม", u: "https://script.google.com/macros/s/AKfycbz_rtqBkrrFVoDmIkGHzAldYU1BpMBjp16gTsGxLcoueiygrEAMK_0qS2eaEELNPOYW/exec", i: "📁" },
-            { n: "วารสารโรงเรียน", u: "https://khanchai.ac.th/ebook", i: "📖" },
-            { n: "ดูเกรดปวช.", u: "https://script.google.com/macros/s/AKfycbxfEjNfbTZ86Dw1ekrIkz08KO9cwie1zV2khA5GiyeqgMBqCkJ6JESREzrpaVmDYiDQfA/exec", i: "🗒️" },
-            { n: "เพจโรงเรียน", u: "https://www.facebook.com/share/1CsCUxCFTF/", i: "📢" },
-            { n: "IDEA BOX", u: "https://topickc.sadaokc.com/submit.php", i: "💡" },
-            { n: "เพจสภา", u: "https://www.facebook.com/share/1Ha43rKgzp/", i: "🎭" },
-            { n: "%มาเรียน", u: "https://search.kc-lovecare.com/", i: "🔍" },
-            { n: "โควตาเข้า ม.4", u: "https://quotam4.sadaokc.com/", i: "🎯" },
-            { n: "ผ้าอนามัยฟรี", u: "https://freepads.sadaokc.com/", i: "🌸" },
-            { n: "ค้นผลแก้ 0/ร/มผ", u: "https://script.google.com/macros/s/AKfycbyH81mDslsgy78twi-OzpJuyBtWZbTYBL2p5p_kEEKBCqgATztIzVHm3SnTyYv2rxl7/exec", i: "🌐" }
+        const apps = [
+            { n: "ตารางเรียน", u: "https://studentskc.sadaokc.com/", img: "pic1.jpg" },
+            { n: "ตารางสอน", u: "https://teacherkc.sadaokc.com/", img: "pic2.jpg" },
+            { n: "ตารางสอบ", u: "https://examschedule.sadaokc.com/", img: "pic3.jpg" },
+            { n: "KC Music", u: "https://script.google.com/macros/s/AKfycbyrzFJhQZWMNKXdd7D5be5zSl0SVEuGVsGbCkRRa7tUBaxq7gv6aXGfJW0vZRmCCyyD/exec", img: "pic4.jpg" },
+            { n: "Portfolio", u: "https://doportkc.sadaokc.com/", img: "pic5.jpg" },
+            { n: "คำนวณเกรด", u: "https://calgrade.sadaokc.com/", img: "pic6.jpg" },
+            { n: "LearnUp", u: "https://kclearnup.sadaokc.com/", img: "pic7.jpg" },
+            { n: "รายชื่อ", u: "https://script.google.com/macros/s/AKfycbwjFJ_Sw9fy8ciWUqccQ9ypdJgPsgtJ_c6Ab5cB0ACz21ybMu6lPmcEbuVdVrEhW4gQ/exec", img: "pic8.jpg" },
+            { n: "คู่มือ", u: "https://script.google.com/macros/s/AKfycbwCVMLiKr2RmWXHMeohO6tdGjuaNeeASn8PGm6zGjlDqgLFwIdbyoae7hfmErAG3MulvQ/exec", img: "pic9.jpg" },
+            { n: "ข่าวสาร", u: "https://script.google.com/macros/s/AKfycbz1rmB_ZaYszuwFHAvpMP6oAS7IVGr93KV2QuFhsKRqR-jrUBcE-slfzM6gXE5Nr9eu/exec", img: "pic10.jpg" },
+            { n: "ห้องสมุด", u: "http://khanchai.vlcloud.net/", img: "pic11.jpg" },
+            { n: "เกรด ม.", u: "http://www.dograde.online/khanchai/", img: "pic12.jpg" },
+            { n: "ภาพกิจกรรม", u: "https://script.google.com/macros/s/AKfycbz_rtqBkrrFVoDmIkGHzAldYU1BpMBjp16gTsGxLcoueiygrEAMK_0qS2eaEELNPOYW/exec", img: "pic13.jpg" },
+            { n: "วารสาร", u: "https://khanchai.ac.th/ebook", img: "pic14.jpg" },
+            { n: "เกรด ปวช.", u: "https://script.google.com/macros/s/AKfycbxfEjNfbTZ86Dw1ekrIkz08KO9cwie1zV2khA5GiyeqgMBqCkJ6JESREzrpaVmDYiDQfA/exec", img: "pic15.jpg" },
+            { n: "FB โรงเรียน", u: "https://www.facebook.com/share/1CsCUxCFTF/", img: "pic16.jpg" },
+            { n: "IDEA BOX", u: "https://topickc.sadaokc.com/submit.php", img: "pic17.jpg" },
+            { n: "FB สภา", u: "https://www.facebook.com/share/1Ha43rKgzp/", img: "pic18.jpg" },
+            { n: "%มาเรียน", u: "https://search.kc-lovecare.com/", img: "pic19.jpg" },
+            { n: "โควตา ม.4", u: "https://quotam4.sadaokc.com/", img: "pic20.jpg" },
+            { n: "ผ้าอนามัย", u: "https://freepads.sadaokc.com/", img: "pic21.jpg" },
+            { n: "แก้ 0/ร/มผ", u: "https://script.google.com/macros/s/AKfycbyH81mDslsgy78twi-OzpJuyBtWZbTYBL2p5p_kEEKBCqgATztIzVHm3SnTyYv2rxl7/exec", img: "pic22.jpg" }
         ];
 
-        const container = document.getElementById('card-container');
+        const grid = document.getElementById('main-grid');
         
-        websites.forEach((site, index) => {
-            const a = document.createElement('a');
-            a.href = site.u;
-            a.className = 'card';
-            a.style.animationDelay = `${index * 0.05}s`; // ดีเลย์การปรากฏทีละปุ่ม
-            a.innerHTML = `<span class="icon">${site.i}</span><span class="title">${site.n}</span>`;
-            container.appendChild(a);
+        apps.forEach((app, index) => {
+            const card = document.createElement('a');
+            card.href = app.u;
+            card.className = 'app-card';
+            // Staggered Delay: โผล่ขึ้นมาทีละตัวแบบต่อเนื่อง
+            card.style.animationDelay = `${index * 0.05}s`;
+            
+            card.innerHTML = `
+                <div class="icon-container">
+                    <img src="${app.img}" alt="${app.n}" loading="lazy">
+                </div>
+                <div class="app-label">${app.n}</div>
+            `;
+            grid.appendChild(card);
         });
+
+        // ล็อก Context Menu และป้องกันการลากวางรูป
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+        document.addEventListener('dragstart', e => e.preventDefault());
     </script>
     </body>
 </html>
