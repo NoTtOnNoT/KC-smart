@@ -187,6 +187,8 @@ header {
     transform: translateY(60px);
     animation: emerge 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     width: 100%;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
 }
 
 @keyframes emerge {

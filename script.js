@@ -49,6 +49,13 @@ function createAppGrid() {
             </div>
             <div class="app-label">${app.n}</div>
         `;
+        card.addEventListener('touchstart', function () {
+            this.classList.add('active'); // บังคับให้เกิดสถานะกด
+        });
+
+        card.addEventListener('touchend', function () {
+            this.classList.remove('active'); // เอานิ้วออกแล้วคืนค่า
+        });
 
         card.addEventListener('click', (e) => {
             if (app.u && app.u !== "#") {
