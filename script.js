@@ -1,3 +1,4 @@
+// [ส่วนที่ 1] ข้อมูลแอปทั้งหมด
 const apps = [
     { n: "ตารางเรียน", u: "https://studentskc.sadaokc.com/", img: "pic1.png" },
     { n: "ตารางสอน", u: "https://teacherkc.sadaokc.com/", img: "pic2.png" },
@@ -10,7 +11,7 @@ const apps = [
     { n: "คู่มือนักเรียน", u: "https://script.google.com/macros/s/AKfycbwCVMLiKr2RmWXHMeohO6tdGjuaNeeASn8PGm6zGjlDqgLFwIdbyoae7hfmErAG3MulvQ/exec", img: "pic9.png" },
     { n: "แจ้งข่าวสาร", u: "https://script.google.com/macros/s/AKfycbz1rmB_ZaYszuwFHAvpMP6oAS7IVGr93KV2QuFhsKRqR-jrUBcE-slfzM6gXE5Nr9eu/exec", img: "pic10.png" },
     { n: "ห้องสมุดออนไลน์", u: "http://khanchai.vlcloud.net/", img: "pic11.png" },
-    { n: "งานทะเบียน", u: "", img: "pic23.png" },
+    { n: "งานทะเบียน", u: "#", img: "pic23.png" },
     { n: "ดูเกรดมัธยม", u: "http://www.dograde.online/khanchai/", img: "pic12.png" },
     { n: "ภาพกิจกรรม", u: "https://script.google.com/macros/s/AKfycbz_rtqBkrrFVoDmIkGHzAldYU1BpMBjp16gTsGxLcoueiygrEAMK_0qS2eaEELNPOYW/exec", img: "pic13.png" },
     { n: "วารสารโรงเรียน", u: "https://khanchai.ac.th/ebook", img: "pic14.png" },
@@ -18,32 +19,76 @@ const apps = [
     { n: "เพจโรงเรียน", u: "https://www.facebook.com/share/1CsCUxCFTF/", img: "pic16.png" },
     { n: "IDEA BOX", u: "https://topickc.sadaokc.com/submit.php", img: "pic17.png" },
     { n: "เพจสภา", u: "https://www.facebook.com/share/1Ha43rKgzp/", img: "pic18.png" },
-    { n: "แนะนำคำค้น", u: "", img: "pic24.png" },
+    { n: "แนะนำคำค้น", u: "https://line.me/R/ti/p/@282vdaue", img: "pic24.png" },
     { n: "% มาเรียน", u: "https://search.kc-lovecare.com/", img: "pic19.png" },
     { n: "โควตา ม.4", u: "https://quotam4.sadaokc.com/", img: "pic20.png" },
     { n: "ผ้าอนามัย", u: "https://freepads.sadaokc.com/", img: "pic21.png" },
     { n: "แก้ 0/ร/มผ", u: "https://script.google.com/macros/s/AKfycbyH81mDslsgy78twi-OzpJuyBtWZbTYBL2p5p_kEEKBCqgATztIzVHm3SnTyYv2rxl7/exec", img: "pic22.png" }
 ];
 
-const grid = document.getElementById('main-grid');
+// [ส่วนที่ 2] แก้ไขฟังก์ชันสร้าง Grid
+function createAppGrid() {
+    const grid = document.getElementById('main-grid');
+    const popup = document.getElementById('loading-popup');
+    const appNameDisplay = document.getElementById('target-app-name');
 
-// สร้าง App Cards
-apps.forEach((app, index) => {
-    const card = document.createElement('a');
-    card.href = app.u;
-    card.className = 'app-card';
-    card.style.animationDelay = `${index * 0.05}s`;
+    if (!grid) return;
 
-    card.innerHTML = `
-        <div class="icon-container">
-            <img src="${app.img}" alt="${app.n}" loading="lazy">
-        </div>
-        <div class="app-label">${app.n}</div>
-    `;
-    grid.appendChild(card);
+    apps.forEach((app, index) => {
+        const card = document.createElement('a');
+        card.href = app.u || "javascript:void(0)";
+        card.className = 'app-card';
+
+        // --- จุดปรับปรุง: เริ่มแสดงไอคอนหลังจาก 0.8 วินาที (หน้าโหลดเริ่มหาย) ---
+        // (index * 0.04) คือการทยอยขึ้น ส่วน + 0.8คือรอให้ Splash หายก่อน
+        card.style.animationDelay = `${(index * 0.04) + 0.8}s`;
+
+        card.innerHTML = `
+            <div class="icon-container">
+                <img src="${app.img}" alt="${app.n}" loading="lazy">
+            </div>
+            <div class="app-label">${app.n}</div>
+        `;
+
+        card.addEventListener('click', (e) => {
+            if (app.u && app.u !== "#") {
+                e.preventDefault();
+                if (navigator.vibrate) navigator.vibrate(50);
+                if (appNameDisplay) appNameDisplay.innerText = `กำลังเปิด ${app.n}...`;
+                if (popup) popup.classList.add('active');
+                setTimeout(() => {
+                    window.location.href = app.u;
+                    setTimeout(() => popup.classList.remove('active'), 2000);
+                }, 800);
+            }
+        });
+        grid.appendChild(card);
+    });
+}
+
+function initApp() {
+    const splashScreen = document.getElementById('splash-screen');
+
+    // 1. หน้าโหลดโชว์แค่ 0.8 วินาที (หรือลดเป็น 0.5 ถ้าอยากให้เร็วกว่านี้)
+    setTimeout(() => {
+        if (splashScreen) {
+            splashScreen.classList.add('fade-out');
+
+            // ลบ Element ทิ้งทันทีที่ซูมจบ (0.6 วินาที)
+            setTimeout(() => {
+                splashScreen.remove();
+            }, 250);
+        }
+    }, 800);
+
+    // ระบบป้องกันอื่นๆ
+    document.oncontextmenu = () => false;
+    document.onselectstart = () => false;
+    document.ondragstart = () => false;
+}
+
+// [ส่วนที่ 4] เริ่มทำงานเมื่อโหลดหน้าเสร็จ
+document.addEventListener('DOMContentLoaded', () => {
+    createAppGrid();
+    initApp();
 });
-
-// ระบบความปลอดภัยและการล็อก Context Menu
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('selectstart', e => e.preventDefault());
-document.addEventListener('dragstart', e => e.preventDefault());

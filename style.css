@@ -1,16 +1,16 @@
+/* --- ปรับปรุงสีตัวแปรให้ตรงกับธีม Splash Screen --- */
 :root {
     --primary-bg: #0a051a;
+    --school-purple: #4a148c;
+    --school-white: #ffffff;
     --accent-gold: #ffd600;
-    --glass-white: rgba(255, 255, 255, 0.1);
+    --gold-glow: rgba(255, 214, 0, 0.4);
+    /* เพิ่มตัวแปรนี้ */
 
-    /* 1. ขนาดไอคอน: เริ่มที่ 64px ในจอเล็ก และขยายได้ถึง 85px ในจอใหญ่ */
-    --icon-size: clamp(64px, 8.5vw, 85px);
-
-    /* 2. ระยะห่าง (Gap): ยืดหยุ่นตามความกว้างและความสูงหน้าจอ */
-    --grid-gap-v: clamp(20px, 4vh, 40px);
-    /* แนวตั้ง */
-    --grid-gap-h: clamp(10px, 2.5vw, 25px);
-    /* แนวนอน */
+    /* Responsive Sizes */
+    --icon-size: clamp(68px, 9vw, 90px);
+    --grid-gap-v: clamp(30px, 6vh, 50px);
+    --grid-gap-h: clamp(15px, 3vw, 30px);
 }
 
 /* --- ป้องกันทุกการกดค้างและเลือกข้อความ --- */
@@ -22,6 +22,14 @@
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+}
+
+html,
+body {
+    /* ป้องกันการเด้งไปมาของหน้าจอ (Overscroll) บน iOS */
+    overscroll-behavior-y: contain;
+    /* ทำให้การเลื่อนลื่นไหลแบบ Native App */
+    -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -112,10 +120,23 @@ header {
 
 .school-name {
     color: var(--accent-gold);
-    font-size: 0.75rem;
-    letter-spacing: 2px;
+    font-size: clamp(10px, 2.5vw, 14px) !important;
+    letter-spacing: 1px;
     opacity: 0.8;
     margin-top: 8px;
+
+    /* เพิ่ม 3 บรรทัดนี้ */
+    white-space: nowrap;
+    /* บังคับไม่ให้ขึ้นบรรทัดใหม่ */
+    overflow: hidden;
+    /* ซ่อนส่วนที่ล้นหน้าจอ */
+    text-overflow: ellipsis;
+    /* ถ้าล้นให้แสดงเป็น ... (หรือลบออกถ้าอยากให้โชว์เต็ม) */
+
+    width: 100%;
+    /* กำหนดความกว้าง */
+    padding: 0 10px;
+    /* เว้นระยะขอบซ้ายขวาเล็กน้อย */
 }
 
 /* --- ระบบ Grid ที่สมดุล (4 ถึง 8 คอลัมน์) --- */
@@ -163,7 +184,7 @@ header {
     align-items: center;
     text-decoration: none;
     opacity: 0;
-    transform: translateY(40px);
+    transform: translateY(60px);
     animation: emerge 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     width: 100%;
 }
@@ -207,6 +228,19 @@ header {
     transition: 0.6s;
 }
 
+.icon-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.05) 100%);
+    z-index: 1;
+}
+
 .app-label {
     margin-top: 10px;
     /* ฟอนต์ขยายเล็กน้อยตามความใหญ่ของไอคอน */
@@ -221,9 +255,24 @@ header {
     text-overflow: ellipsis;
 }
 
+/* ค้นหา .app-card:active ในโค้ดเดิมแล้วแทนที่ด้วยตัวนี้ */
 .app-card:active .icon-container {
-    transform: scale(0.88) translateY(4px);
-    filter: brightness(0.75);
+    transform: scale(0.9) translateY(4px);
+    /* ปุ่มยุบลงและขยับลงตามแรงกด */
+    filter: brightness(0.8);
+    /* สีดูลึกลง */
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.5),
+        inset 0 4px 10px rgba(0, 0, 0, 0.4);
+    /* เงาด้านในเพิ่มมิติ */
+    transition: all 0.1s ease;
+    /* จังหวะกดต้องตอบสนองไว (0.1s) */
+}
+
+/* เพิ่มแอนิเมชันให้ชื่อแอปตอนกด */
+.app-card:active .app-label {
+    transform: scale(0.95);
+    opacity: 0.8;
 }
 
 .dock-container {
@@ -248,4 +297,271 @@ header {
     font-size: 0.65rem;
     opacity: 0.6;
     letter-spacing: 1px;
+}
+
+/* เพิ่มส่วนนี้เข้าไปใหม่ */
+@media (hover: hover) {
+    .app-card:hover .icon-container {
+        transform: translateY(-8px) scale(1.05);
+        /* ลอยขึ้นและขยายใหญ่เล็กน้อย */
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6),
+            0 0 15px var(--accent-gold);
+        /* เพิ่มแสงเรืองสีทอง */
+        border-color: var(--accent-gold);
+    }
+
+    .app-card:hover .icon-container::after {
+        left: 150%;
+        /* ให้แสง Shine วิ่งผ่านเวลาเอาเมาส์ชี้ */
+        transition: 0.6s ease-in-out;
+    }
+
+    .app-card:hover .app-label {
+        color: var(--accent-gold);
+        /* เปลี่ยนชื่อแอปเป็นสีทองตอนชี้ */
+        transform: translateY(-2px);
+    }
+}
+
+/* สร้างแอนิเมชันใหม่ */
+@keyframes goldPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 214, 0, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 15px rgba(255, 214, 0, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 214, 0, 0);
+    }
+}
+
+/* วิธีใช้: เอาคลาส pulse ไปใส่ใน HTML ของไอคอนที่ต้องการให้เรืองแสง */
+.icon-container.pulse {
+    animation: goldPulse 2s infinite;
+    border-color: var(--accent-gold);
+}
+
+/* สร้าง Effect แสงทองเรืองแสงรอบไอคอนเป็นระยะ */
+@keyframes goldShine {
+    0% {
+        filter: drop-shadow(0 0 5px rgba(255, 214, 0, 0.2));
+    }
+
+    50% {
+        filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.5));
+    }
+
+    100% {
+        filter: drop-shadow(0 0 5px rgba(255, 214, 0, 0.2));
+    }
+}
+
+/* --- Splash Screen Styles --- */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #1a0a33 0%, #0d0221 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    /* ให้ Splash Screen อยู่บนสุด */
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+}
+
+.splash-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    /* พื้นหลังหายไปไวๆ พร้อมกัน */
+    transition: opacity 0.6s ease-in-out, visibility 0.6s;
+}
+
+.splash-content {
+    text-align: center;
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+}
+
+/* --- ซูมพุ่งแบบติดเทอร์โบ --- */
+.splash-screen.fade-out .splash-content {
+    transform: scale(15);
+    opacity: 0;
+    /* ลดเวลาเหลือ 0.6 วินาที เพื่อความสะใจ */
+    /* cubic-bezier(0.9, 0, 0.1, 1) ทำให้ช่วงแรกพุ่งเหมือนโดนดีด */
+    transition:
+        transform 0.6s cubic-bezier(0.9, 0, 0.1, 1),
+        opacity 0.4s ease-in;
+}
+
+.splash-logo-title {
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 800;
+    letter-spacing: 6px;
+    background: linear-gradient(135deg, var(--school-white) 30%, var(--accent-gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 25px var(--gold-glow));
+    animation: splashLogoPulse 2s infinite ease-in-out alternate;
+    /* แอนิเมชันเรืองแสง */
+    margin-bottom: 10px;
+}
+
+.splash-school-name {
+    color: var(--school-white);
+    font-size: clamp(10px, 2.5vw, 14px);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 30px;
+}
+
+/* เพิ่มเติมจาก Loading Popup เดิม */
+#target-app-name {
+    animation: fadeInOut 1.5s infinite ease-in-out;
+}
+
+@keyframes fadeInOut {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* ปรับ Spinner ให้ดูพรีเมียมขึ้น */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 214, 0, 0.1);
+    border-top: 3px solid var(--accent-gold);
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes splashLogoPulse {
+    0% {
+        filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.2));
+    }
+
+    100% {
+        filter: drop-shadow(0 0 30px rgba(255, 214, 0, 0.6));
+    }
+}
+
+/* โครงสร้างพื้นหลังของ Popup */
+.loading-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 5, 26, 0.8);
+    /* พื้นหลังดำม่วงโปร่งแสง */
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    /* อยู่หน้าสุดเสมอ */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+/* เมื่อสั่งให้โชว์ */
+.loading-popup.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content {
+    background: linear-gradient(145deg, #1a0a33, #0a051a);
+    padding: 30px 50px;
+    border-radius: 20px;
+    border: 1px solid var(--accent-gold);
+    text-align: center;
+    box-shadow: 0 0 30px rgba(255, 214, 0, 0.2);
+}
+
+.popup-text {
+    color: var(--accent-gold);
+    margin-top: 15px;
+    font-size: 1rem;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+/* คอนเทนเนอร์ล่างสุด */
+.special-footer {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* ตัวปุ่ม LINE */
+.line-button {
+    display: flex;
+    align-items: center;
+    background: #06C755;
+    /* สีเขียว LINE */
+    padding: 12px 25px;
+    border-radius: 50px;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 20px rgba(6, 199, 85, 0.3);
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.line-icon-wrapper {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+}
+
+.line-icon-wrapper img {
+    width: 100%;
+    height: 100%;
+}
+
+/* เอฟเฟกต์ตอนกด */
+.line-button:active {
+    transform: scale(0.95);
+    background: #05a346;
+}
+
+/* กรณีเปิดบนคอมฯ ให้มีการลอยขึ้น */
+@media (hover: hover) {
+    .line-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 25px rgba(6, 199, 85, 0.5);
+    }
 }
