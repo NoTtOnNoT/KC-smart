@@ -19,7 +19,7 @@ const apps = [
     { n: "เพจโรงเรียน", u: "https://www.facebook.com/share/1CsCUxCFTF/", img: "pic16.png" },
     { n: "IDEA BOX", u: "https://topickc.sadaokc.com/submit.php", img: "pic17.png" },
     { n: "เพจสภา", u: "https://www.facebook.com/share/1Ha43rKgzp/", img: "pic18.png" },
-    { n: "แนะนำคำค้น", u: "https://line.me/R/ti/p/@282vdaue", img: "pic24.png" },
+    { n: "KC ScoreHub", u: "https://myscores.sadaokc.com/", img: "pic24.jpg" },
     { n: "% มาเรียน", u: "https://search.kc-lovecare.com/", img: "pic19.png" },
     { n: "โควตา ม.4", u: "https://quotam4.sadaokc.com/", img: "pic20.png" },
     { n: "ผ้าอนามัย", u: "https://freepads.sadaokc.com/", img: "pic21.png" },
