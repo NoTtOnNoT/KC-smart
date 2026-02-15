@@ -1,0 +1,44 @@
+{
+    "name": "KC smart",
+    "short_name": "KC smart",
+    "start_url": "/",
+    "display": "standalone",
+    "description": "แอปพลิเคชันสำหรับ KC smart",
+    "lang": "th-TH",
+    "dir": "ltr",
+    "theme_color": "#000000",
+    "background_color": "#000000",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "KCsmartปก.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "KCsmartปก.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "https://kc-smart.vercel.app/screenshot1.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Home Page"
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false,
+    "shortcuts": [
+        {
+            "name": "เปิดหน้าหลัก",
+            "url": "/",
+            "description": "เปิดหน้าแรกของ KC smart"
+        }
+    ]
+}
