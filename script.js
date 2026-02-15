@@ -26,7 +26,7 @@ const apps = [
     { n: "แก้ 0/ร/มผ", u: "https://script.google.com/macros/s/AKfycbyH81mDslsgy78twi-OzpJuyBtWZbTYBL2p5p_kEEKBCqgATztIzVHm3SnTyYv2rxl7/exec", img: "pic22.png" }
 ];
 
-// [ส่วนที่ 2] แก้ไขฟังก์ชันสร้าง Grid
+// [ส่วนที่ 2] ฟังก์ชันสร้าง Grid
 function createAppGrid() {
     const grid = document.getElementById('main-grid');
     const popup = document.getElementById('loading-popup');
@@ -39,23 +39,19 @@ function createAppGrid() {
         card.href = app.u || "javascript:void(0)";
         card.className = 'app-card';
 
-        // --- จุดปรับปรุง: เริ่มแสดงไอคอนหลังจาก 0.8 วินาที (หน้าโหลดเริ่มหาย) ---
-        // (index * 0.04) คือการทยอยขึ้น ส่วน + 0.8คือรอให้ Splash หายก่อน
-        card.style.animationDelay = `${(index * 0.04) + 0.8}s`;
+        // ปรับ Delay ให้สั้นลงเพื่อให้รู้สึกเร็วขึ้น (0.03s แทน 0.04s)
+        card.style.animationDelay = `${(index * 0.03) + 0.6}s`;
 
         card.innerHTML = `
             <div class="icon-container">
-                <img src="${app.img}" alt="${app.n}" fetchpriority="high">
+                <img src="${app.img}" alt="${app.n}" fetchpriority="high" decoding="async">
             </div>
             <div class="app-label">${app.n}</div>
         `;
-        card.addEventListener('touchstart', function () {
-            this.classList.add('active'); // บังคับให้เกิดสถานะกด
-        });
 
-        card.addEventListener('touchend', function () {
-            this.classList.remove('active'); // เอานิ้วออกแล้วคืนค่า
-        });
+        // Event Listeners สำหรับสัมผัส
+        card.addEventListener('touchstart', () => card.classList.add('active'), { passive: true });
+        card.addEventListener('touchend', () => card.classList.remove('active'), { passive: true });
 
         card.addEventListener('click', (e) => {
             if (app.u && app.u !== "#") {
@@ -63,48 +59,55 @@ function createAppGrid() {
                 if (navigator.vibrate) navigator.vibrate(50);
                 if (appNameDisplay) appNameDisplay.innerText = `กำลังเปิด ${app.n}...`;
                 if (popup) popup.classList.add('active');
+
                 setTimeout(() => {
                     window.location.href = app.u;
+                    // ล้างสถานะเมื่อ User กด Back กลับมา
                     setTimeout(() => popup.classList.remove('active'), 2000);
-                }, 800);
+                }, 400); // ลดเวลาหน่วงก่อนเปลี่ยนหน้าให้กระชับขึ้น
             }
         });
         grid.appendChild(card);
     });
 }
 
-function initApp() {
+// [ส่วนที่ 3] ฟังก์ชันเริ่มระบบและจัดการ Splash Screen
+async function initApp() {
     const splashScreen = document.getElementById('splash-screen');
-    
-    // สร้าง Promise เพื่อรอโหลดรูปภาพ 6 รูปแรก (ที่เป็นเมนูหลัก)
-    const criticalImages = apps.slice(0, 6).map(app => {
+
+    // 1. เริ่ม Preload รูปภาพทั้งหมดทันทีเบื้องหลัง
+    const preloadAllImages = apps.map(app => {
         return new Promise((resolve) => {
             const img = new Image();
             img.src = app.img;
             img.onload = resolve;
-            img.onerror = resolve; // ต่อให้โหลดพลาดก็ให้ผ่านไปได้
+            img.onerror = resolve; // ข้ามรูปที่เสีย
         });
     });
 
-    // รอให้ทั้ง 0.8 วินาทีผ่านไป และรูปสำคัญโหลดเสร็จ
-    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 800));
+    // 2. กำหนดเวลาขั้นต่ำที่ต้องโชว์ Splash (เพื่อให้ไม่กระพริบเร็วเกินไป)
+    const minimumDisplayTime = new Promise(resolve => setTimeout(resolve, 800));
 
-    Promise.all([...criticalImages, timeoutPromise]).then(() => {
-        if (splashScreen) {
-            splashScreen.classList.add('fade-out');
-            setTimeout(() => {
-                splashScreen.remove();
-            }, 250);
-        }
-    });
+    // 3. รอจนกว่า: (รูปภาพ 8 รูปแรกโหลดเสร็จ) AND (เวลาขั้นต่ำผ่านไป)
+    // การรอแค่ 8 รูปแรกช่วยให้แอปเปิดเร็วขึ้นในขณะที่รูปที่เหลือจะทยอยตามมาเอง
+    const criticalImages = preloadAllImages.slice(0, 8);
 
-    // ระบบป้องกันอื่นๆ
+    await Promise.all([...criticalImages, minimumDisplayTime]);
+
+    if (splashScreen) {
+        splashScreen.classList.add('fade-out');
+        setTimeout(() => {
+            splashScreen.remove();
+        }, 300);
+    }
+
+    // ระบบความปลอดภัย
     document.oncontextmenu = () => false;
     document.onselectstart = () => false;
     document.ondragstart = () => false;
 }
 
-// [ส่วนที่ 4] เริ่มทำงานเมื่อโหลดหน้าเสร็จ
+// [ส่วนที่ 4] รันระบบ
 document.addEventListener('DOMContentLoaded', () => {
     createAppGrid();
     initApp();
