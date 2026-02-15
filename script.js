@@ -45,7 +45,7 @@ function createAppGrid() {
 
         card.innerHTML = `
             <div class="icon-container">
-                <img src="${app.img}" alt="${app.n}" loading="lazy">
+                <img src="${app.img}" alt="${app.n}" fetchpriority="high">
             </div>
             <div class="app-label">${app.n}</div>
         `;
@@ -75,18 +75,28 @@ function createAppGrid() {
 
 function initApp() {
     const splashScreen = document.getElementById('splash-screen');
+    
+    // สร้าง Promise เพื่อรอโหลดรูปภาพ 6 รูปแรก (ที่เป็นเมนูหลัก)
+    const criticalImages = apps.slice(0, 6).map(app => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = app.img;
+            img.onload = resolve;
+            img.onerror = resolve; // ต่อให้โหลดพลาดก็ให้ผ่านไปได้
+        });
+    });
 
-    // 1. หน้าโหลดโชว์แค่ 0.8 วินาที (หรือลดเป็น 0.5 ถ้าอยากให้เร็วกว่านี้)
-    setTimeout(() => {
+    // รอให้ทั้ง 0.8 วินาทีผ่านไป และรูปสำคัญโหลดเสร็จ
+    const timeoutPromise = new Promise(resolve => setTimeout(resolve, 800));
+
+    Promise.all([...criticalImages, timeoutPromise]).then(() => {
         if (splashScreen) {
             splashScreen.classList.add('fade-out');
-
-            // ลบ Element ทิ้งทันทีที่ซูมจบ (0.6 วินาที)
             setTimeout(() => {
                 splashScreen.remove();
             }, 250);
         }
-    }, 800);
+    });
 
     // ระบบป้องกันอื่นๆ
     document.oncontextmenu = () => false;
