@@ -24,7 +24,8 @@
     user-select: none;
 }
 
-html, body {
+html,
+body {
     /* เปลี่ยนจาก height: 100vh เป็น min-height */
     min-height: 100%;
     /* ปล่อยให้ height เป็น auto เพื่อให้เนื้อหาดันตัวได้อิสระ */
@@ -32,7 +33,7 @@ html, body {
     /* บังคับให้การเลื่อนนิ้วลื่นเหมือนแอป Native */
     -webkit-overflow-scrolling: touch;
     /* ลดการขัดขวางการเลื่อน */
-    overscroll-behavior-y: auto; 
+    overscroll-behavior-y: auto;
 }
 
 body {
@@ -884,4 +885,104 @@ header {
         bottom: 10px !important;
         /* บังคับให้อยู่ใกล้ขอบล่างเสมอ */
     }
+}
+
+/* จัดกลุ่มเนื้อหาใน Header ให้เรียงเป็นแถวหน้ากระดาน */
+.header-content {
+    display: flex;
+    align-items: center;
+    /* จัดให้อยู่กลางแนวตั้งพร้อมกัน */
+    justify-content: center;
+    /* จัดให้อยู่กลางแนวนอน */
+    gap: 0;
+    /* ระยะห่างระหว่างรูปกับข้อความ */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ปรับขนาดรูปข้างข้อความ */
+.header-side-img {
+    width: clamp(50px, 8vw, 80px);
+    /* ขนาดรูปปรับตามหน้าจอ */
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255, 214, 0, 0.3));
+    /* เพิ่มแสงเรืองรองให้เข้ากับธีม */
+}
+
+/* ปรับส่วนข้อความไม่ให้ขยับไปไหน */
+.title-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* ปรับแต่งพิเศษสำหรับมือถือ (ถ้าจอมันแคบเกินไป) */
+@media (max-width: 480px) {
+    .header-content {
+        gap: 10px;
+        /* ลดระยะห่างบนมือถือ */
+    }
+
+    .header-side-img {
+        width: 40px;
+        /* ลดขนาดรูปบนมือถือ */
+    }
+}
+
+.logo-title {
+    display: inline-flex;
+    /* ทำให้รูปกับข้อความรวมร่างกัน */
+    align-items: center;
+    /* จัดกลางแนวตั้งให้เท่ากัน */
+    justify-content: center;
+    gap: 10px;
+    /* ระยะห่างระหว่างรูปกับตัวอักษร */
+
+    /* โค้ด Gradient เดิมของคุณ */
+    font-size: clamp(2.5rem, 8vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: 4px;
+    background: linear-gradient(to bottom, #fff 40%, var(--accent-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.4));
+}
+
+.inner-logo {
+    /* ปรับความสูงให้สัมพันธ์กับขนาดตัวอักษร */
+    height: 0.9em;
+    /* ให้รูปสูงเกือบเท่าตัวอักษรพอดี */
+    width: auto;
+    object-fit: contain;
+
+    /* ป้องกันการโดนครอบงำจาก Gradient ของตัวหนังสือ */
+    -webkit-text-fill-color: initial;
+}
+
+/* ปรับระยะห่างระหว่างกลุ่มโลโก้กับชื่อโรงเรียน */
+.school-name {
+    margin-top: 5px;
+    position: relative;
+    z-index: 1;
+}
+
+.inner-logo:first-of-type {
+    height: 1.1em;
+    /* ปรับให้ใหญ่กว่าตัวหนังสือ (เดิม 0.9em) */
+    margin-right: 0;
+    /* เพิ่มระยะห่างทางขวานิดหน่อย */
+    transform: translateY(2px);
+
+    /* หากต้องการให้รูปแรกดูลอยเด่นกว่า ให้เพิ่มเงาเฉพาะตัวได้ */
+    filter: drop-shadow(0 0 7px rgba(255, 214, 0, 0.6));
+}
+
+.inner-logo:last-of-type {
+    height: 0.9em;
+    /* ขนาดปกติเท่าเดิม */
+    filter: drop-shadow(0 0 7px rgba(255, 214, 0, 0.6));
+
 }
