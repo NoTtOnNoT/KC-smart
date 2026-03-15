@@ -118,6 +118,25 @@ const searchBox = document.getElementById('searchBox');
 const searchToggle = document.getElementById('searchToggle');
 const searchInput = document.getElementById('appSearch');
 
+searchToggle.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // สลับคลาส expanded
+    mainFooter.classList.toggle('expanded');
+    
+    // ถ้ากางออก ให้โฟกัสที่ช่องพิมพ์ทันที
+    if (mainFooter.classList.contains('expanded')) {
+        appSearch.focus();
+    }
+});
+
+// (ตัวเลือก) ปิดหน้าจอค้นหาเมื่อกดปุ่ม ESC
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mainFooter.classList.contains('expanded')) {
+        mainFooter.classList.remove('expanded');
+    }
+});
+
 // คลิกเปิด-ปิด
 searchToggle.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -166,28 +185,24 @@ function filterApps(query) {
     });
 }
 
-searchInput.addEventListener('focus', () => {
-    // เลื่อนหน้าจอไปที่ด้านบนสุด (0,0)
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth' // เลื่อนแบบนุ่มนวล
-    });
-});
-
 const footer = document.querySelector('.special-footer');
 
 if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', () => {
-        // คำนวณความสูงของแป้นพิมพ์ที่ดันขึ้นมา
         const offset = window.innerHeight - window.visualViewport.height;
         
-        if (offset > 0) {
-            // ถ้าแป้นพิมพ์เด้งขึ้นมา ให้ปุ่มอยู่ชิดขอบแป้นพิมพ์พอดี
-            footer.style.bottom = `${offset + 10}px`; 
-            footer.style.position = 'fixed';
-        } else {
-            // ถ้าแป้นพิมพ์ปิด ให้กลับไปอยู่ที่เดิม
-            footer.style.bottom = '20px';
+        if (mainFooter.classList.contains('expanded')) {
+            if (offset > 0) {
+                // แป้นพิมพ์เปิด: บังคับให้ช่องพิมพ์อยู่บนสุดเสมอ
+                mainFooter.style.top = '0';
+                mainFooter.style.bottom = 'auto';
+            } else {
+                // แป้นพิมพ์ปิด: ให้แสดงเต็มจอปกติ (หรือกลับไปตำแหน่งเดิม)
+                mainFooter.style.top = '0';
+                mainFooter.style.bottom = '0';
+            }
         }
+        // บังคับไม่ให้หน้าจอหลักเลื่อนหนี
+        window.scrollTo(0, 0);
     });
 }

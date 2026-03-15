@@ -59,6 +59,7 @@ body {
 
 html {
     background-color: #0a051a;
+    
     /* สีเดียวกับพื้นหลังหลักของคุณ */
     height: 100%;
     scroll-behavior: smooth;
@@ -168,7 +169,7 @@ header {
     gap: 25px 8px;
 
     /* Padding: เผื่อด้านล่าง 120px กันปุ่ม Footer ทับไอคอน */
-    padding: 20px 15px 30px 15px;
+    padding: 20px 15px 100px 15px;
     width: 100%;
     max-width: 1000px;
     margin: 0 auto;
@@ -237,7 +238,7 @@ header {
 @media (min-width: 760px) {
     .app-grid {
         grid-template-columns: repeat(7, 1fr);
-        padding: 30px 20px 30px 20px;
+        padding: 30px 30px 30px 20px;
     }
 }
 
