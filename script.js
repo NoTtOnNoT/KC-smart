@@ -112,3 +112,82 @@ document.addEventListener('DOMContentLoaded', () => {
     createAppGrid();
     initApp();
 });
+
+// ควบคุมปุ่มค้นหา
+const searchBox = document.getElementById('searchBox');
+const searchToggle = document.getElementById('searchToggle');
+const searchInput = document.getElementById('appSearch');
+
+// คลิกเปิด-ปิด
+searchToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    searchBox.classList.toggle('active');
+    if (searchBox.classList.contains('active')) {
+        setTimeout(() => searchInput.focus(), 300);
+    } else {
+        // เมื่อปิด ให้เคลียร์ช่องค้นหาและรีเซ็ตการกรอง
+        searchInput.value = '';
+        filterApps(''); 
+    }
+});
+
+// คลิกข้างนอกให้หดกลับ
+document.addEventListener('click', (e) => {
+    if (!searchBox.contains(e.target)) {
+        searchBox.classList.remove('active');
+        searchInput.value = ''; // เคลียร์ช่องค้นหาเมื่อปิด
+        filterApps(''); // รีเซ็ตการกรอง
+    }
+});
+
+// ระบบค้นหา (กรองข้อมูล)
+searchInput.addEventListener('input', function() {
+    filterApps(this.value);
+});
+
+// ฟังก์ชันสำหรับกรองข้อมูลแอป (คุณต้องแก้ไข Class ให้ตรงกับของเดิม)
+function filterApps(query) {
+    const searchTerm = query.toLowerCase();
+    
+    // สำคัญ: เปลี่ยน '.app-item, .app-card' เป็น class ที่คุณใช้เรียกแต่ละปุ่มเว็บใน Grid
+    const cards = document.querySelectorAll('.app-item, .app-card'); 
+
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+            card.style.display = ""; // แสดงปกติ
+            card.style.opacity = "1";
+            card.style.transform = "scale(1)";
+        } else {
+            card.style.display = "none"; // ซ่อน
+            card.style.opacity = "0";
+            card.style.transform = "scale(0.8)";
+        }
+    });
+}
+
+searchInput.addEventListener('focus', () => {
+    // เลื่อนหน้าจอไปที่ด้านบนสุด (0,0)
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth' // เลื่อนแบบนุ่มนวล
+    });
+});
+
+const footer = document.querySelector('.special-footer');
+
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+        // คำนวณความสูงของแป้นพิมพ์ที่ดันขึ้นมา
+        const offset = window.innerHeight - window.visualViewport.height;
+        
+        if (offset > 0) {
+            // ถ้าแป้นพิมพ์เด้งขึ้นมา ให้ปุ่มอยู่ชิดขอบแป้นพิมพ์พอดี
+            footer.style.bottom = `${offset + 10}px`; 
+            footer.style.position = 'fixed';
+        } else {
+            // ถ้าแป้นพิมพ์ปิด ให้กลับไปอยู่ที่เดิม
+            footer.style.bottom = '20px';
+        }
+    });
+}

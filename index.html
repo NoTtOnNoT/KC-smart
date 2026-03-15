@@ -15,11 +15,13 @@
         <meta name="mobile-web-app-capable" content="yes">
 
         <meta name="theme-color" content="#0a051a">
-    <script>navigator.serviceWorker.register("service-worker.js")</script> 
-    <link rel="manifest" href="manifest.json" />    <link rel="stylesheet" href="style.css">
+        <script>navigator.serviceWorker.register("service-worker.js")</script>
+        <link rel="manifest" href="manifest.json" /> <link rel="stylesheet"
+            href="style.css">
     </head>
     <body>
-        <body ontouchstart=""></body>
+        <div class="energy-scan"></div>
+        <body ontouchstart></body>
         <div id="splash-screen" class="splash-screen">
             <div class="splash-content">
                 <h1 class="splash-logo-title">KC SMART</h1>
@@ -53,6 +55,22 @@
                 </div>
                 <span>LINE | KC Smart</span>
             </a>
+
+            <div class="search-container">
+                <div class="search-box" id="searchBox">
+                    <input type="text" class="search-input"
+                        placeholder="ค้นหา KC Smart ..." id="appSearch">
+                    <button class="search-btn" id="searchToggle"
+                        aria-label="Search">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="dock-container">
             <div class="dock">
