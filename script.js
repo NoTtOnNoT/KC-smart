@@ -289,8 +289,8 @@ buttons.forEach(btn => {
         btnInstall.addEventListener('click', () => {
             if (isIOS) {
                 // เนื้อหาพิเศษสำหรับ iOS/iPadOS
-                if (modalTitle) modalTitle.innerText = "ติดตั้งบน iPhone / iPad";
-                if (modalBody) modalBody.innerHTML = "แอปนี้ยังไม่ได้ติดตั้งในเครื่องของคุณ<br><br>1. กดปุ่ม <b>'แชร์' (Share)</b> <img src='https://img.icons8.com/ios/20/ffffff/share-rounded.png' style='vertical-align:middle'> ด้านล่างหรือด้านบนของเบราว์เซอร์<br>2. เลือกเมนู <b>'เพิ่มลงในหน้าจอโฮม'</b><br>(Add to Home Screen)";
+                if (modalTitle) modalTitle.innerText = "ติดตั้ง KC Smart บน ios";
+                if (modalBody) modalBody.innerHTML = "แอปนี้ยังไม่ได้ติดตั้งในเครื่องของคุณ<br><br>1. กดปุ่ม <b>'แชร์' (Share)</b> ด้านบนขวาของเบราว์เซอร์<br>2. เลือกเมนู <b>'เพิ่มลงในหน้าจอโฮม'</b><br>(Add to Home Screen)";
                 
                 // ซ่อนปุ่ม "ติดตั้งเลย" เพราะ iOS บังคับให้กดผ่านเมนู Safari เท่านั้น
                 if (modalConfirm) modalConfirm.style.display = 'none'; 
@@ -300,8 +300,8 @@ buttons.forEach(btn => {
             } 
             else if (deferredPrompt) {
                 // เนื้อหาปกติสำหรับ Android
-                if (modalTitle) modalTitle.innerText = "ติดตั้ง KC SMART";
-                if (modalBody) modalBody.innerText = "เพิ่มแอปไว้บนหน้าจอหลักเพื่อการใช้งานที่รวดเร็ว และดูสวยงามเหมือนแอปจริงในเครื่องคุณ";
+                if (modalTitle) modalTitle.innerText = "ติดตั้ง KC Smart";
+                if (modalBody) modalBody.innerText = "เพิ่ม KC Smart ไว้บนหน้าจอหลัก เพื่อสามารถเข้าใช้งานได้อย่างรวดเร็วจ้าาา!";
                 if (modalConfirm) {
                     modalConfirm.style.display = 'block';
                     modalConfirm.innerText = "ติดตั้งเลย";
