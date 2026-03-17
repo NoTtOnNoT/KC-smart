@@ -1016,9 +1016,11 @@ header {
 
 /* Container ปรับให้เข้าคู่กับ Search */
 .install-fab-container {
-    display: none;
-    /* เปิดด้วย JS เมื่อเงื่อนไข PWA ครบ */
-    margin: 0;
+    display: none; /* เริ่มต้นซ่อนไว้ */
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    z-index: 9999 !important; /* ให้ลอยอยู่เหนือทุกอย่าง */
 }
 
 /* ตัวปุ่มวงกลม - ใช้ดีไซน์เดียวกับ search-btn */

@@ -218,7 +218,7 @@ buttons.forEach(btn => {
 });
 
 // ==========================================
-// ระบบติดตั้งแอป KC SMART (Ultimate Hybrid Version)
+// ระบบติดตั้งแอป KC SMART (Ultimate Hybrid Version - Fixed iPadOS)
 // ==========================================
 
 (function () {
@@ -234,8 +234,9 @@ buttons.forEach(btn => {
     const modalTitle = customModal?.querySelector('.modal-body h3');
     const modalBody = customModal?.querySelector('.modal-body p');
 
-    // 2. ฟังก์ชันตรวจสอบสถานะและอุปกรณ์
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    // 2. ฟังก์ชันตรวจสอบอุปกรณ์ (รองรับ iPhone และ iPadOS รุ่นใหม่)
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     
     const isStandalone = () => {
         return window.matchMedia('(display-mode: standalone)').matches ||
@@ -258,24 +259,27 @@ buttons.forEach(btn => {
             return;
         }
 
-        // กรณี iOS: บังคับโชว์ปุ่มทันที เพราะ iOS ไม่มี Event อัตโนมัติ
+        // กรณี iOS/iPadOS: บังคับโชว์ปุ่มทันที เพราะระบบไม่มี Event อัตโนมัติ
         if (isIOS) {
-            if (installContainer) installContainer.style.display = 'flex';
-            console.log('🍎 iOS Mode: Show button immediately');
+            if (installContainer) {
+                // ใช้ setProperty เพื่อให้มั่นใจว่า CSS display จะถูกทับแน่นอน
+                installContainer.style.setProperty('display', 'flex', 'important');
+            }
+            console.log('🍎 iOS/iPadOS Mode: Show button immediately');
         }
     };
 
     // รันเช็คเบื้องต้นทันที
     initInstallUI();
 
-    // 3. สำหรับ Android/Chrome: ดักจับ Event (มักจะมาช้า 5-15 วิ)
+    // 3. สำหรับ Android/Chrome: ดักจับ Event (มักจะมาช้าตามรอบเบราว์เซอร์)
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         
         // ถ้าไม่ใช่ iOS และยังไม่ได้ติดตั้ง ให้แสดงปุ่มเมื่อ Event มาถึง
         if (!isIOS && installContainer && !isStandalone()) {
-            installContainer.style.display = 'flex';
+            installContainer.style.setProperty('display', 'flex', 'important');
             console.log('🤖 Android Mode: Prompt Ready');
         }
     });
@@ -284,11 +288,11 @@ buttons.forEach(btn => {
     if (btnInstall) {
         btnInstall.addEventListener('click', () => {
             if (isIOS) {
-                // เนื้อหาพิเศษสำหรับ iOS
+                // เนื้อหาพิเศษสำหรับ iOS/iPadOS
                 if (modalTitle) modalTitle.innerText = "ติดตั้งบน iPhone / iPad";
-                if (modalBody) modalBody.innerHTML = "แอปนี้ยังไม่ได้ติดตั้งในเครื่องของคุณ<br><br>1. กดปุ่ม <b>'แชร์' (Share)</b> <img src='https://img.icons8.com/ios/20/ffffff/share-rounded.png' style='vertical-align:middle'> ด้านล่าง<br>2. เลือกเมนู <b>'เพิ่มลงในหน้าจอโฮม'</b><br>(Add to Home Screen)";
+                if (modalBody) modalBody.innerHTML = "แอปนี้ยังไม่ได้ติดตั้งในเครื่องของคุณ<br><br>1. กดปุ่ม <b>'แชร์' (Share)</b> <img src='https://img.icons8.com/ios/20/ffffff/share-rounded.png' style='vertical-align:middle'> ด้านล่างหรือด้านบนของเบราว์เซอร์<br>2. เลือกเมนู <b>'เพิ่มลงในหน้าจอโฮม'</b><br>(Add to Home Screen)";
                 
-                // ซ่อนปุ่ม "ติดตั้งเลย" เพราะ iOS บังคับให้กดผ่านเมนูเบราว์เซอร์เท่านั้น
+                // ซ่อนปุ่ม "ติดตั้งเลย" เพราะ iOS บังคับให้กดผ่านเมนู Safari เท่านั้น
                 if (modalConfirm) modalConfirm.style.display = 'none'; 
                 
                 customModal.style.display = 'flex';
@@ -298,13 +302,15 @@ buttons.forEach(btn => {
                 // เนื้อหาปกติสำหรับ Android
                 if (modalTitle) modalTitle.innerText = "ติดตั้ง KC SMART";
                 if (modalBody) modalBody.innerText = "เพิ่มแอปไว้บนหน้าจอหลักเพื่อการใช้งานที่รวดเร็ว และดูสวยงามเหมือนแอปจริงในเครื่องคุณ";
-                if (modalConfirm) modalConfirm.style.display = 'block';
+                if (modalConfirm) {
+                    modalConfirm.style.display = 'block';
+                    modalConfirm.innerText = "ติดตั้งเลย";
+                }
                 
                 customModal.style.display = 'flex';
                 requestAnimationFrame(() => customModal.classList.add('active'));
             } else {
-                // กรณีฉุกเฉิน: ถ้าไม่มี prompt และไม่ใช่ iOS
-                alert('เบราว์เซอร์ของคุณยังไม่พร้อมติดตั้ง หรือคุณได้ติดตั้งแอปไปแล้วครับ');
+                alert('ขออภัย! ระบบยังไม่พร้อมติดตั้งในขณะนี้ หรือคุณได้ติดตั้งแอปไปแล้วครับ');
             }
         });
     }
@@ -338,23 +344,4 @@ buttons.forEach(btn => {
         console.log('🚀 Installed successfully');
     });
 
-})();
-
-// โค้ดสำหรับเช็คปัญหาบน iOS โดยเฉพาะ
-(function() {
-    const container = document.querySelector('.install-fab-container');
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-
-    if (!container) {
-        alert("❌ ไม่พบ Class .install-fab-container ในหน้า HTML");
-    } else if (isStandalone) {
-        alert("✅ ตอนนี้คุณรันอยู่ในโหมดแอป (Standalone) แล้ว ปุ่มจึงไม่โชว์");
-    } else if (isIOS) {
-        container.style.display = 'flex';
-        container.style.backgroundColor = 'red'; // ลองเปลี่ยนเป็นสีแดงดูว่าเห็นไหม
-        alert("🍎 นี่คือ iOS และเครื่องควรจะโชว์ปุ่มสีแดงแล้ว ถ้ายังไม่เห็นแสดงว่า CSS ตัวอื่นบังอยู่");
-    } else {
-        alert("🤖 นี่ไม่ใช่ iOS (อาจเป็น Android หรือ PC)");
-    }
 })();
