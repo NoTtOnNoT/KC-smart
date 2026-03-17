@@ -3,11 +3,11 @@
     "short_name": "KC Smart",
     "start_url": "./index.html",
     "display": "standalone",
-    "description": "KC Smart | Sadao Khanchai Kamphalanon Anusorn School",
+    "description": "KC Smart | Sadao Khanchai",
     "lang": "th-TH",
     "dir": "ltr",
-    "theme_color": "#7300ff",
-    "background_color": "#1a0b2e",
+    "theme_color": "#000000",
+    "background_color": "#000000",
     "orientation": "portrait",
     "icons": [
         {
