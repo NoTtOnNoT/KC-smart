@@ -200,19 +200,6 @@ function filterApps(query) {
     });
 }
 
-// ใส่ในไฟล์ script.js หรือล่างสุดของ HTML
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-            .then(registration => {
-                console.log('SW registered with scope:', registration.scope);
-            })
-            .catch(err => {
-                console.error('SW registration failed:', err);
-            });
-    });
-}
-
 const header = document.querySelector('header');
 header.addEventListener('click', () => {
     window.scrollTo({
