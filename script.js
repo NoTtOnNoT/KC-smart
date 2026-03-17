@@ -218,100 +218,132 @@ buttons.forEach(btn => {
 });
 
 // ==========================================
-// ระบบติดตั้งแอป KC SMART (Full Custom Modal Version)
+// ระบบติดตั้งแอป KC SMART (Premium Version)
 // ==========================================
 
-// 1. ประกาศตัวแปรหลัก
-let deferredPrompt;
-const installContainer = document.querySelector('.install-fab-container'); // หรือ .install-banner ตาม class ของคุณ
-const btnInstall = document.getElementById('btnInstall');
+(function () {
+    // 1. ประกาศตัวแปรหลัก
+    let deferredPrompt = null;
+    const installContainer = document.querySelector('.install-fab-container');
+    const btnInstall = document.getElementById('btnInstall');
 
-// ตัวแปรสำหรับ Custom Modal
-const customModal = document.getElementById('custom-install-modal');
-const modalConfirm = document.getElementById('modal-confirm');
-const modalCancel = document.getElementById('modal-cancel');
+    // ตัวแปรสำหรับ Custom Modal
+    const customModal = document.getElementById('custom-install-modal');
+    const modalConfirm = document.getElementById('modal-confirm');
+    const modalCancel = document.getElementById('modal-cancel');
 
-// 2. ดักจับเหตุการณ์เตรียมติดตั้ง (ก่อนหน้าต่างระบบจะขึ้น)
-window.addEventListener('beforeinstallprompt', (e) => {
-    // ป้องกันหน้าต่างระบบเด้งขึ้นมาเอง
-    e.preventDefault();
-    
-    // เก็บเหตุการณ์ไว้เรียกใช้ภายหลัง
-    deferredPrompt = e;
-    
-    // แสดงปุ่มติดตั้งบนหน้าเว็บ
-    if (installContainer) {
-        installContainer.style.display = 'flex'; 
+    /**
+     * ฟังก์ชันตรวจสอบว่ารันอยู่ในโหมด App หรือไม่
+     */
+    const isStandalone = () => {
+        return window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true ||
+            document.referrer.includes('android-app://');
+    };
+
+    /**
+     * ฟังก์ชันสำหรับปิด Modal อย่างนุ่มนวล
+     */
+    const closeModal = () => {
+        if (customModal) {
+            customModal.classList.remove('active');
+            setTimeout(() => {
+                customModal.style.display = 'none';
+            }, 300);
+        }
+    };
+
+    // --- เริ่มต้นการทำงาน ---
+
+    // A. เช็คโหมด Standalone ทันทีที่โหลด
+    if (isStandalone()) {
+        console.log('📱 App Mode: เข้าใช้งานผ่านแอปที่ติดตั้งแล้ว');
+        if (installContainer) installContainer.style.display = 'none';
     }
-    
-    console.log('✅ PWA: ระบบพร้อมสำหรับการติดตั้ง');
-});
 
-// 3. เมื่อคลิกปุ่มติดตั้งหลักบนหน้าเว็บ
-if (btnInstall) {
-    btnInstall.addEventListener('click', () => {
-        console.log('🔘 คลิกปุ่มติดตั้งหลักบนหน้าเว็บ');
+    // B. ดักจับเหตุการณ์ก่อนติดตั้ง (PWA Trigger)
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // ป้องกัน Browser แสดง Prompt เอง
+        e.preventDefault();
 
-        // ตรวจสอบว่ามีสิทธิ์ติดตั้งไหม
-        if (deferredPrompt) {
-            // โชว์หน้าต่างม่วง-ทองของเราก่อน (ห้ามใช้ prompt() ตรงนี้)
-            if (customModal) {
-                customModal.style.display = 'flex';
-                // ให้เวลาเบราว์เซอร์ Render นิดนึงก่อนใส่ class active เพื่อทำอนิเมชั่น
-                setTimeout(() => customModal.classList.add('active'), 10);
-            }
-        } else {
-            // กรณีไม่มี deferredPrompt (เช่น ติดตั้งไปแล้ว หรือ iOS)
-            alert('ขออภัย! ขณะนี้กำลังทำการพัฒนาระบบ สามารถติดตั้งไปยังหน้าจอหลักได้ด้วยตนเองผ่านเมนูแชร์ของเบราว์เซอร์จ้าาา');
+        // เก็บสิทธิ์ไว้ใช้งาน
+        deferredPrompt = e;
+
+        // แสดงปุ่มติดตั้งเฉพาะเมื่อไม่ได้อยู่ในโหมด Standalone
+        if (installContainer && !isStandalone()) {
+            installContainer.style.display = 'flex';
+            console.log('✅ PWA: ระบบพร้อมสำหรับการติดตั้ง');
         }
     });
-}
 
-// 4. เมื่อกดยืนยัน "ติดตั้งเลย" ใน Custom Modal ของเรา
-if (modalConfirm) {
-    modalConfirm.addEventListener('click', async () => {
-        console.log('🔘 กดยืนยันใน Custom Modal');
+    // C. การจัดการปุ่มติดตั้งหลักบนหน้าเว็บ
+    if (btnInstall) {
+        btnInstall.addEventListener('click', () => {
+            console.log('🔘 คลิกปุ่มติดตั้งหลัก');
 
-        // ปิดหน้าต่างของเราก่อน
-        customModal.classList.remove('active');
-        setTimeout(() => customModal.style.display = 'none', 300);
-        
-        // เมื่อหน้าต่างเราปิดลง ค่อยเรียกหน้าต่าง "จริง" ของระบบขึ้นมา
-        if (deferredPrompt) {
-            // เรียกหน้าต่างระบบ (หน้าต่างขาวๆ ของ Chrome/Android)
-            deferredPrompt.prompt(); 
-            
-            // รอรับผล
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`👤 ผู้ใช้ตัดสินใจ: ${outcome}`);
-            
-            // ล้างค่าทิ้ง (Prompt ใช้ได้ครั้งเดียวต่อการโหลดหน้า)
-            deferredPrompt = null; 
-            
-            // ซ่อนปุ่มบนหน้าเว็บถ้าติดตั้งสำเร็จ
-            if (outcome === 'accepted' && installContainer) {
-                installContainer.style.display = 'none';
+            if (deferredPrompt) {
+                // แสดง Custom Modal ของเรา
+                if (customModal) {
+                    customModal.style.display = 'flex';
+                    // ให้ Browser render display:flex ก่อนจึงใส่ class active
+                    requestAnimationFrame(() => {
+                        customModal.classList.add('active');
+                    });
+                }
+            } else {
+                // กรณีไม่มีสิทธิ์ (ติดตั้งแล้ว/iOS/Browser ไม่รองรับ)
+                const msg = isStandalone()
+                    ? 'แอปนี้ถูกติดตั้งและใช้งานอยู่แล้วจ้าาา'
+                    : 'ขออภัย! ขณะนี้ระบบติดตั้งอัตโนมัติไม่พร้อมใช้งาน คุณสามารถติดตั้งได้ด้วยตนเองผ่านเมนู "เพิ่มลงในหน้าจอหลัก" ของเบราว์เซอร์ได้เลยครับ';
+                alert(msg);
             }
-        }
-    });
-}
-
-// 5. เมื่อกดยกเลิกใน Custom Modal ของเรา
-if (modalCancel) {
-    modalCancel.addEventListener('click', () => {
-        customModal.classList.remove('active');
-        setTimeout(() => customModal.style.display = 'none', 300);
-    });
-}
-
-// 6. ดักจับเมื่อการติดตั้งเสร็จสิ้นสมบูรณ์
-window.addEventListener('appinstalled', (evt) => {
-    console.log('🚀 ติดตั้ง KC SMART ลงเครื่องสำเร็จ!');
-    if (installContainer) {
-        installContainer.style.display = 'none';
+        });
     }
+
+    // D. กดยืนยันใน Custom Modal
+    if (modalConfirm) {
+        modalConfirm.addEventListener('click', async () => {
+            console.log('🔘 กดยืนยันการติดตั้ง');
+            closeModal();
+
+            if (deferredPrompt) {
+                // เรียก Prompt ของระบบ (Native)
+                deferredPrompt.prompt();
+
+                try {
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`👤 ผู้ใช้ตัดสินใจ: ${outcome}`);
+
+                    if (outcome === 'accepted') {
+                        if (installContainer) installContainer.style.display = 'none';
+                    }
+                } catch (err) {
+                    console.error('Error during installation:', err);
+                } finally {
+                    deferredPrompt = null;
+                }
+            }
+        });
+    }
+
+    // E. กดยกเลิกใน Custom Modal
+    if (modalCancel) {
+        modalCancel.addEventListener('click', closeModal);
+    }
+
+    // F. คลิกพื้นที่ว่างนอก Modal เพื่อปิด
     if (customModal) {
-        customModal.classList.remove('active');
-        customModal.style.display = 'none';
+        customModal.addEventListener('click', (e) => {
+            if (e.target === customModal) closeModal();
+        });
     }
-});
+
+    // G. เมื่อติดตั้งสำเร็จสมบูรณ์
+    window.addEventListener('appinstalled', (evt) => {
+        console.log('🚀 ยินดีด้วย! KC SMART ติดตั้งลงเครื่องสำเร็จ');
+        deferredPrompt = null;
+        if (installContainer) installContainer.style.display = 'none';
+        closeModal();
+    });
+
+})();
