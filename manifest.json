@@ -6,8 +6,8 @@
     "description": "KC Smart | Sadao Khanchai",
     "lang": "th-TH",
     "dir": "ltr",
-    "theme_color": "#000000",
-    "background_color": "#000000",
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff",
     "orientation": "portrait",
     "icons": [
         {
