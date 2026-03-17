@@ -1,44 +1,42 @@
 {
-    "name": "KC smart",
-    "short_name": "KC smart",
-    "start_url": "/",
+    "name": "KC Smart",
+    "short_name": "KC Smart",
+    "start_url": "./index.html",
     "display": "standalone",
-    "description": "KC smart | Sadao Khanchai",
+    "description": "KC Smart | Sadao Khanchai Kamphalanon Anusorn School",
     "lang": "th-TH",
     "dir": "ltr",
-    "theme_color": "#000000",
-    "background_color": "#000000",
+    "theme_color": "#7300ff",
+    "background_color": "#1a0b2e",
     "orientation": "portrait",
     "icons": [
         {
-            "src": "KCsmartปก.png",
+            "src": "icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "maskable"
+            "purpose": "any maskable"
         },
         {
-            "src": "KCsmartปก.png",
+            "src": "icon-192.png",
             "sizes": "192x192",
             "type": "image/png",
-            "purpose": "any"
+            "purpose": "any maskable"
         }
     ],
     "screenshots": [
         {
-            "src": "https://kc-smart.vercel.app/screenshot1.png",
+            "src": "screenshot1.png",
             "sizes": "1280x720",
             "type": "image/png",
             "form_factor": "wide",
             "label": "Home Page"
         }
     ],
-    "related_applications": [],
-    "prefer_related_applications": false,
     "shortcuts": [
         {
             "name": "เปิดหน้าหลัก",
-            "url": "/",
-            "description": "เปิดหน้าแรกของ KC smart"
+            "url": "./index.html",
+            "description": "เปิดหน้าแรกของ KC Smart"
         }
     ]
 }
