@@ -1016,7 +1016,7 @@ header {
 
 /* Container ปรับให้เข้าคู่กับ Search */
 .install-fab-container {
-    display: block;
+    display: none;
     /* เปิดด้วย JS เมื่อเงื่อนไข PWA ครบ */
     margin: 0;
 }
