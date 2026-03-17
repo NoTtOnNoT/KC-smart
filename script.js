@@ -222,16 +222,22 @@ buttons.forEach(btn => {
 // ==========================================
 
 (function () {
+    // 1. ประกาศตัวแปรหลัก
     let deferredPrompt = null;
     const installContainer = document.querySelector('.install-fab-container');
     const btnInstall = document.getElementById('btnInstall');
+
+    // Elements ของ Custom Modal
     const customModal = document.getElementById('custom-install-modal');
     const modalConfirm = document.getElementById('modal-confirm');
     const modalCancel = document.getElementById('modal-cancel');
+    const modalTitle = customModal?.querySelector('.modal-body h3');
+    const modalBody = customModal?.querySelector('.modal-body p');
 
     // เช็คว่าเป็น iOS หรือไม่
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
+    // เช็คว่าติดตั้งแอปไปแล้วหรือยัง
     const isStandalone = () => {
         return window.matchMedia('(display-mode: standalone)').matches ||
                window.navigator.standalone === true;
@@ -244,53 +250,53 @@ buttons.forEach(btn => {
         }
     };
 
-    // --- เริ่มต้นการทำงาน ---
+    // --- เริ่มต้น Logic ---
 
-    // 1. ถ้าติดตั้งแล้ว ซ่อนปุ่มทันที
+    // A. ถ้าติดตั้งแล้ว ซ่อนปุ่มทันทีเพื่อความคลีน
     if (isStandalone()) {
         if (installContainer) installContainer.style.display = 'none';
     } else {
-        // 2. ถ้ายังไม่ติดตั้ง และเป็น iOS ให้โชว์ปุ่มรอไว้เลย (เพราะ iOS ไม่มี event trigger)
+        // B. ถ้าเป็น iOS ให้โชว์ปุ่มทันที (ไม่ต้องรอ Event เพราะ iOS ไม่มี Event นี้)
         if (isIOS && installContainer) {
             installContainer.style.display = 'flex';
         }
     }
 
-    // 3. สำหรับ Android/PC (ดักจับ Event)
+    // C. สำหรับ Android/PC: ดักจับ Event (ถ้ามาถึงปุ่มจะโชว์ทันที)
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        // โชว์ปุ่มทันทีที่ Event มา (ปกติจะเร็วขึ้นถ้าเราไม่ไปกวนมัน)
         if (installContainer && !isStandalone()) {
-            installContainer.style.display = 'flex';
+            installContainer.style.display = 'flex'; // แสดงปุ่มเมื่อระบบพร้อม
         }
     });
 
+    // D. เมื่อคลิกปุ่มติดตั้งหลัก
     if (btnInstall) {
         btnInstall.addEventListener('click', () => {
             if (isIOS) {
-                // ถ้าเป็น iOS ให้เปลี่ยนข้อความใน Modal เป็นสอนวิธีติดตั้ง
-                const modalBody = customModal.querySelector('.modal-body p');
-                const modalTitle = customModal.querySelector('.modal-body h3');
-                if (modalTitle) modalTitle.innerText = "ติดตั้งบน iOS";
-                if (modalBody) modalBody.innerHTML = "1. กดปุ่ม <b>แชร์ (Share)</b> ที่แถบด้านล่าง <br> 2. เลือก <b>'เพิ่มลงในหน้าจอโฮม' (Add to Home Screen)</b>";
+                // กรณี iOS: เปลี่ยนเนื้อหาใน Modal เป็นวิธีติดตั้ง Manual
+                if (modalTitle) modalTitle.innerText = "ติดตั้งบน iPhone / iPad";
+                if (modalBody) modalBody.innerHTML = "1. กดปุ่ม <b>'แชร์' (Share)</b> <img src='https://img.icons8.com/ios/20/ffffff/share-rounded.png' style='vertical-align:middle'> ที่แถบเมนู<br>2. เลือก <b>'เพิ่มลงในหน้าจอโฮม'</b><br>(Add to Home Screen)";
                 
-                // ซ่อนปุ่มยืนยัน เพราะ iOS ต้องกดเองที่เมนูระบบ
+                // ซ่อนปุ่ม "ติดตั้งเลย" เพราะต้องกดเองที่เมนู iOS
                 if (modalConfirm) modalConfirm.style.display = 'none'; 
                 
                 customModal.style.display = 'flex';
                 requestAnimationFrame(() => customModal.classList.add('active'));
             } 
             else if (deferredPrompt) {
-                // สำหรับ Android/PC
+                // กรณี Android/PC: ใช้ Modal ม่วง-ทอง ปกติ
+                if (modalConfirm) modalConfirm.style.display = 'block';
                 customModal.style.display = 'flex';
                 requestAnimationFrame(() => customModal.classList.add('active'));
             } else {
-                alert('ระบบยังไม่พร้อมติดตั้ง หรือคุณติดตั้งไปแล้วครับ');
+                alert('ระบบยังไม่พร้อมติดตั้ง หรือคุณติดตั้งแอปนี้ไปแล้วครับ');
             }
         });
     }
 
+    // E. กดยืนยันติดตั้ง (เฉพาะ Android/PC)
     if (modalConfirm) {
         modalConfirm.addEventListener('click', async () => {
             closeModal();
@@ -307,6 +313,12 @@ buttons.forEach(btn => {
 
     if (modalCancel) modalCancel.addEventListener('click', closeModal);
 
+    // ปิดเมื่อคลิกนอก Modal
+    customModal?.addEventListener('click', (e) => {
+        if (e.target === customModal) closeModal();
+    });
+
+    // F. ซ่อนปุ่มเมื่อติดตั้งสำเร็จ
     window.addEventListener('appinstalled', () => {
         if (installContainer) installContainer.style.display = 'none';
         closeModal();
