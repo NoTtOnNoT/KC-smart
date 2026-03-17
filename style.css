@@ -55,14 +55,24 @@ body {
 
     animation: gradientBG 15s ease infinite;
     scrollbar-width: none;
+
+    /* เปิดโหมดเลื่อนแบบไหลลื่นสำหรับ iOS (Rubber banding effect) */
+    -webkit-overflow-scrolling: touch;
+
+    /* ปรับแต่งความลื่นไหลของการเรนเดอร์ */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
 }
 
 html {
     background-color: #0a051a;
-    
+
     /* สีเดียวกับพื้นหลังหลักของคุณ */
     height: 100%;
     scroll-behavior: smooth;
+    /* ทำให้การกระโดดไปตาม anchor link นุ่มนวลขึ้น */
+    -webkit-text-size-adjust: 100%;
+    /* ป้องกันฟอนต์กระตุกเวลาเปลี่ยนแนวตั้งแนวนอน */
 }
 
 @keyframes gradientBG {
@@ -77,6 +87,17 @@ html {
     100% {
         background-position: 0% 50%;
     }
+}
+
+.bg-blobs,
+.blob,
+.inner-logo {
+    /* บังคับให้ใช้ GPU ในการประมวลผล (Layer Promotion) */
+    transform: translateZ(0);
+    will-change: transform;
+
+    /* ปิดการดักจับ Event ของเมาส์/นิ้ว ถ้าเป็นแค่ของตกแต่ง เพื่อลดภาระการคำนวณ */
+    pointer-events: none;
 }
 
 /* --- พื้นหลัง Blobs --- */
@@ -617,7 +638,7 @@ header {
 
 .special-footer {
     position: fixed;
-    bottom: 20px;
+    bottom: 22px;
     left: 50%;
     transform: translateX(-50%);
 
@@ -636,8 +657,8 @@ header {
     /* การจัดเรียง */
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
+    gap: 7px;
+    padding: 8px 9px;
     /* ปรับ padding ให้กระชับ */
     box-sizing: border-box;
     z-index: 1000;
@@ -650,7 +671,7 @@ header {
     align-items: center;
     background: #06C755;
     /* สีเขียว LINE */
-    padding: 8px 15px;
+    padding: 8px 10px;
     /* ลด padding เพื่อให้เล็กลง */
     border-radius: 50px;
     text-decoration: none;
@@ -662,19 +683,19 @@ header {
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 25px;
     /* ทรงมนเหมือนกล่องค้นหา */
-    height: 45px;
+    height: 44px;
     /* กำหนดความสูงให้ตายตัว */
     box-sizing: border-box;
-    font-size: 14px;
+    font-size: 11px;
     /* ปรับขนาดฟอนต์ให้พอดี */
     white-space: nowrap;
     /* กันข้อความตัดบรรทัด */
 }
 
 .line-icon-wrapper {
-    width: 20px;
-    height: 20px;
-    margin-right: 12px;
+    width: 15px;
+    height: 15px;
+    margin-right: 10px;
 }
 
 .line-icon-wrapper img {
@@ -846,7 +867,7 @@ header {
 .search-box.active .search-btn {
     transform: rotate(90deg) scale(0.95);
     /* หมุนและยุบตัวเล็กน้อย */
-    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    background: linear-gradient(135deg, #7300ff, #b181ff, #dcc7ff);
     box-shadow: 0 6px 15px rgba(167, 119, 227, 0.4);
     /* เงาใหม่ */
     animation: none;
@@ -986,4 +1007,256 @@ header {
     /* ขนาดปกติเท่าเดิม */
     filter: drop-shadow(0 0 7px rgba(255, 214, 0, 0.6));
 
+}
+
+.app-item,
+.app-card {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Container ปรับให้เข้าคู่กับ Search */
+.install-fab-container {
+    display: block;
+    /* เปิดด้วย JS เมื่อเงื่อนไข PWA ครบ */
+    margin: 0;
+}
+
+/* ตัวปุ่มวงกลม - ใช้ดีไซน์เดียวกับ search-btn */
+.install-fab {
+    width: 44px;
+    height: 44px;
+    /* ไล่เฉดสีม่วงเข้มไปม่วงสว่าง */
+    background: linear-gradient(-45deg, 
+        #2a0052, /* ม่วงมืดสุด */
+        #4d0099, /* ม่วงเข้ม */
+        #7b2ff7, /* ม่วงสว่าง */
+        #4d0099  /* วนกลับมาม่วงเข้มเพื่อให้รอยต่อบรรจบกัน */
+    );
+    
+    background-size: 400% 400%;
+    animation: gradient-flow 8s ease-in-out infinite; /* ปรับเวลาให้ช้าลงเพื่อความนวล */
+    
+    border: 2px solid #ffd700; /* เส้นขอบสีทอง (Gold) */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff; /* ไอคอนสีขาว */
+    cursor: pointer;
+    
+    /* เงาสีทองจางๆ */
+    box-shadow: 0 4px 15px rgba(255, 222, 32, 0.3); 
+    
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.install-fab::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.install-fab:hover {
+    background: linear-gradient(-45deg, #4d0099, #8d56e7, #e2d1ff, #8d56e7, #ffe066); /* สีเข้มขึ้นตอน Hover */
+    background-size: 400% 400%;
+    animation: gradient-flow 10s ease infinite; /* เร็วขึ้นเล็กน้อยตอน Hover */
+    border-color: #ffd700;
+}
+
+.install-fab:active {
+    transform: scale(0.98);
+}
+
+@keyframes gradient-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.install-fab::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #ffd700;
+    border-radius: 50%;
+    z-index: -1;
+    opacity: 0;
+    animation: gold-pulse 2s infinite;
+}
+
+@keyframes gold-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+/* ไอคอน 📥 */
+.fab-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+/* Label เล็กๆ ด้านข้าง (ดีไซน์แบบ Minimal) */
+.fab-label {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.install-fab-container:hover .fab-label {
+    opacity: 1;
+}
+
+.fab-icon-circle {
+    width: 32px;
+    height: 32px;
+    background: #00b900;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 185, 0, 0.3);
+}
+
+/* ข้อความข้างปุ่ม */
+.fab-text {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+}
+
+.fab-icon-circle {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.1); /* วงกลมไอคอนโปร่งแสง */
+    border: 1px solid rgba(255, 215, 0, 0.5); /* ขอบทองบางๆ */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fab-text {
+    color: #f0f0f0; /* ขาวนวลๆ ไม่สว่างจ้าจนปวดตา */
+    font-weight: 300;
+}
+
+/* Modal System */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-card {
+    background: linear-gradient(145deg, #1a0b2e, #0f051a);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 28px;
+    width: 100%;
+    max-width: 350px;
+    padding: 35px 25px;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 15px rgba(115, 0, 255, 0.2);
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-overlay.active .modal-card {
+    transform: translateY(0);
+}
+
+.modal-icon-gold {
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.3));
+}
+
+.modal-body h3 {
+    color: #ffffff;
+    font-family: 'Kanit', sans-serif;
+    font-size: 22px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.modal-body p {
+    color: #b181ff;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-modal-secondary {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    padding: 14px;
+    border-radius: 16px;
+    font-family: 'Kanit', sans-serif;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-modal-primary {
+    flex: 2;
+    background: linear-gradient(45deg, #ffd700, #daa520);
+    border: none;
+    color: #1a0b2e;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: 16px;
+    font-family: 'Kanit', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    transition: 0.3s;
+}
+
+.btn-modal-primary:active {
+    transform: scale(0.96);
 }

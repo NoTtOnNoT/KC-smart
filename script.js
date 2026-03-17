@@ -117,16 +117,27 @@ document.addEventListener('DOMContentLoaded', () => {
 const searchBox = document.getElementById('searchBox');
 const searchToggle = document.getElementById('searchToggle');
 const searchInput = document.getElementById('appSearch');
+const mainFooter = document.querySelector('.special-footer');
 
-searchToggle.addEventListener('click', function(e) {
+searchToggle.addEventListener('click', function (e) {
     e.preventDefault();
-    
-    // สลับคลาส expanded
+
+    // เช็คว่ามี mainFooter ไหมก่อนรัน
+    if (!mainFooter) return;
+
+    const isExpanding = !mainFooter.classList.contains('expanded');
     mainFooter.classList.toggle('expanded');
-    
-    // ถ้ากางออก ให้โฟกัสที่ช่องพิมพ์ทันที
-    if (mainFooter.classList.contains('expanded')) {
-        appSearch.focus();
+
+    if (isExpanding) {
+        // ใช้ชื่อ searchInput ให้ตรงกับที่ประกาศไว้ข้างบน
+        setTimeout(() => {
+            if (searchInput) searchInput.focus();
+        }, 300);
+    } else {
+        if (searchInput) {
+            searchInput.blur();
+            searchInput.value = '';
+        }
     }
 });
 
@@ -146,7 +157,7 @@ searchToggle.addEventListener('click', (e) => {
     } else {
         // เมื่อปิด ให้เคลียร์ช่องค้นหาและรีเซ็ตการกรอง
         searchInput.value = '';
-        filterApps(''); 
+        filterApps('');
     }
 });
 
@@ -160,49 +171,160 @@ document.addEventListener('click', (e) => {
 });
 
 // ระบบค้นหา (กรองข้อมูล)
-searchInput.addEventListener('input', function() {
+searchInput.addEventListener('input', function () {
     filterApps(this.value);
 });
 
 // ฟังก์ชันสำหรับกรองข้อมูลแอป (คุณต้องแก้ไข Class ให้ตรงกับของเดิม)
 function filterApps(query) {
     const searchTerm = query.toLowerCase();
-    
-    // สำคัญ: เปลี่ยน '.app-item, .app-card' เป็น class ที่คุณใช้เรียกแต่ละปุ่มเว็บใน Grid
-    const cards = document.querySelectorAll('.app-item, .app-card'); 
+    const cards = document.querySelectorAll('.app-item, .app-card');
 
     cards.forEach(card => {
         const text = card.textContent.toLowerCase();
         if (text.includes(searchTerm)) {
-            card.style.display = ""; // แสดงปกติ
-            card.style.opacity = "1";
-            card.style.transform = "scale(1)";
+            card.style.display = ""; // ใช้ display เพื่อประหยัดพื้นที่
+            // ใช้ requestAnimationFrame เพื่อให้ Browser รอจังหวะเรนเดอร์ opacity
+            requestAnimationFrame(() => {
+                card.style.opacity = "1";
+                card.style.transform = "scale(1)";
+            });
         } else {
-            card.style.display = "none"; // ซ่อน
             card.style.opacity = "0";
             card.style.transform = "scale(0.8)";
+            // รอให้ Animation จบก่อนค่อยสั่ง display: none
+            setTimeout(() => {
+                if (card.style.opacity === "0") card.style.display = "none";
+            }, 300);
         }
     });
 }
 
-const footer = document.querySelector('.special-footer');
+// ใส่ในไฟล์ script.js หรือล่างสุดของ HTML
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+            .then(registration => {
+                console.log('SW registered with scope:', registration.scope);
+            })
+            .catch(err => {
+                console.error('SW registration failed:', err);
+            });
+    });
+}
 
-if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => {
-        const offset = window.innerHeight - window.visualViewport.height;
+const header = document.querySelector('header');
+header.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+});
+
+const buttons = document.querySelectorAll('button, .line-button');
+buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (navigator.vibrate) {
+            navigator.vibrate(10); // สั่นเบามาก 10 มิลลิวินาที
+        }
+    });
+});
+
+// ==========================================
+// ระบบติดตั้งแอป KC SMART (Full Custom Modal Version)
+// ==========================================
+
+// 1. ประกาศตัวแปรหลัก
+let deferredPrompt;
+const installContainer = document.querySelector('.install-fab-container'); // หรือ .install-banner ตาม class ของคุณ
+const btnInstall = document.getElementById('btnInstall');
+
+// ตัวแปรสำหรับ Custom Modal
+const customModal = document.getElementById('custom-install-modal');
+const modalConfirm = document.getElementById('modal-confirm');
+const modalCancel = document.getElementById('modal-cancel');
+
+// 2. ดักจับเหตุการณ์เตรียมติดตั้ง (ก่อนหน้าต่างระบบจะขึ้น)
+window.addEventListener('beforeinstallprompt', (e) => {
+    // ป้องกันหน้าต่างระบบเด้งขึ้นมาเอง
+    e.preventDefault();
+    
+    // เก็บเหตุการณ์ไว้เรียกใช้ภายหลัง
+    deferredPrompt = e;
+    
+    // แสดงปุ่มติดตั้งบนหน้าเว็บ
+    if (installContainer) {
+        installContainer.style.display = 'flex'; 
+    }
+    
+    console.log('✅ PWA: ระบบพร้อมสำหรับการติดตั้ง (ม่วง-ทอง)');
+});
+
+// 3. เมื่อคลิกปุ่มติดตั้งหลักบนหน้าเว็บ
+if (btnInstall) {
+    btnInstall.addEventListener('click', () => {
+        console.log('🔘 คลิกปุ่มติดตั้งหลักบนหน้าเว็บ');
+
+        // ตรวจสอบว่ามีสิทธิ์ติดตั้งไหม
+        if (deferredPrompt) {
+            // โชว์หน้าต่างม่วง-ทองของเราก่อน (ห้ามใช้ prompt() ตรงนี้)
+            if (customModal) {
+                customModal.style.display = 'flex';
+                // ให้เวลาเบราว์เซอร์ Render นิดนึงก่อนใส่ class active เพื่อทำอนิเมชั่น
+                setTimeout(() => customModal.classList.add('active'), 10);
+            }
+        } else {
+            // กรณีไม่มี deferredPrompt (เช่น ติดตั้งไปแล้ว หรือ iOS)
+            alert('แอปนี้ถูกติดตั้งไว้แล้ว หรือเครื่องของคุณยังไม่รองรับการติดตั้งอัตโนมัติในขณะนี้');
+        }
+    });
+}
+
+// 4. เมื่อกดยืนยัน "ติดตั้งเลย" ใน Custom Modal ของเรา
+if (modalConfirm) {
+    modalConfirm.addEventListener('click', async () => {
+        console.log('🔘 กดยืนยันใน Custom Modal');
+
+        // ปิดหน้าต่างของเราก่อน
+        customModal.classList.remove('active');
+        setTimeout(() => customModal.style.display = 'none', 300);
         
-        if (mainFooter.classList.contains('expanded')) {
-            if (offset > 0) {
-                // แป้นพิมพ์เปิด: บังคับให้ช่องพิมพ์อยู่บนสุดเสมอ
-                mainFooter.style.top = '0';
-                mainFooter.style.bottom = 'auto';
-            } else {
-                // แป้นพิมพ์ปิด: ให้แสดงเต็มจอปกติ (หรือกลับไปตำแหน่งเดิม)
-                mainFooter.style.top = '0';
-                mainFooter.style.bottom = '0';
+        // เมื่อหน้าต่างเราปิดลง ค่อยเรียกหน้าต่าง "จริง" ของระบบขึ้นมา
+        if (deferredPrompt) {
+            // เรียกหน้าต่างระบบ (หน้าต่างขาวๆ ของ Chrome/Android)
+            deferredPrompt.prompt(); 
+            
+            // รอรับผล
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`👤 ผู้ใช้ตัดสินใจ: ${outcome}`);
+            
+            // ล้างค่าทิ้ง (Prompt ใช้ได้ครั้งเดียวต่อการโหลดหน้า)
+            deferredPrompt = null; 
+            
+            // ซ่อนปุ่มบนหน้าเว็บถ้าติดตั้งสำเร็จ
+            if (outcome === 'accepted' && installContainer) {
+                installContainer.style.display = 'none';
             }
         }
-        // บังคับไม่ให้หน้าจอหลักเลื่อนหนี
-        window.scrollTo(0, 0);
     });
 }
+
+// 5. เมื่อกดยกเลิกใน Custom Modal ของเรา
+if (modalCancel) {
+    modalCancel.addEventListener('click', () => {
+        customModal.classList.remove('active');
+        setTimeout(() => customModal.style.display = 'none', 300);
+    });
+}
+
+// 6. ดักจับเมื่อการติดตั้งเสร็จสิ้นสมบูรณ์
+window.addEventListener('appinstalled', (evt) => {
+    console.log('🚀 ติดตั้ง KC SMART ลงเครื่องสำเร็จ!');
+    if (installContainer) {
+        installContainer.style.display = 'none';
+    }
+    if (customModal) {
+        customModal.classList.remove('active');
+        customModal.style.display = 'none';
+    }
+});
