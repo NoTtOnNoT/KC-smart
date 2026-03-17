@@ -339,3 +339,22 @@ buttons.forEach(btn => {
     });
 
 })();
+
+// โค้ดสำหรับเช็คปัญหาบน iOS โดยเฉพาะ
+(function() {
+    const container = document.querySelector('.install-fab-container');
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+
+    if (!container) {
+        alert("❌ ไม่พบ Class .install-fab-container ในหน้า HTML");
+    } else if (isStandalone) {
+        alert("✅ ตอนนี้คุณรันอยู่ในโหมดแอป (Standalone) แล้ว ปุ่มจึงไม่โชว์");
+    } else if (isIOS) {
+        container.style.display = 'flex';
+        container.style.backgroundColor = 'red'; // ลองเปลี่ยนเป็นสีแดงดูว่าเห็นไหม
+        alert("🍎 นี่คือ iOS และเครื่องควรจะโชว์ปุ่มสีแดงแล้ว ถ้ายังไม่เห็นแสดงว่า CSS ตัวอื่นบังอยู่");
+    } else {
+        alert("🤖 นี่ไม่ใช่ iOS (อาจเป็น Android หรือ PC)");
+    }
+})();
