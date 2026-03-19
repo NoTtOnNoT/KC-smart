@@ -27,6 +27,7 @@ const apps = [
 ];
 
 // [ส่วนที่ 2] ฟังก์ชันสร้าง Grid
+// [ส่วนที่ 2] ฟังก์ชันสร้าง Grid (ปรับให้สร้างแต่ยังไม่โชว์ทันที)
 function createAppGrid() {
     const grid = document.getElementById('main-grid');
     const popup = document.getElementById('loading-popup');
@@ -34,13 +35,16 @@ function createAppGrid() {
 
     if (!grid) return;
 
+    // เคลียร์ Grid ก่อนเผื่อรันซ้ำ
+    grid.innerHTML = '';
+
     apps.forEach((app, index) => {
         const card = document.createElement('a');
         card.href = app.u || "javascript:void(0)";
         card.className = 'app-card';
 
-        // ปรับ Delay ให้สั้นลงเพื่อให้รู้สึกเร็วขึ้น (0.03s แทน 0.04s)
-        card.style.animationDelay = `${(index * 0.03) + 0.6}s`;
+        // ปรับ Delay เริ่มต้นที่ 0.1s หลังจากหน้าโหลดจางหายไป
+        card.style.animationDelay = `${(index * 0.03) + 0.1}s`;
 
         card.innerHTML = `
             <div class="icon-container">
@@ -49,7 +53,7 @@ function createAppGrid() {
             <div class="app-label">${app.n}</div>
         `;
 
-        // Event Listeners สำหรับสัมผัส
+        // Event Listeners สำหรับ Mobile
         card.addEventListener('touchstart', () => card.classList.add('active'), { passive: true });
         card.addEventListener('touchend', () => card.classList.remove('active'), { passive: true });
 
@@ -62,44 +66,104 @@ function createAppGrid() {
 
                 setTimeout(() => {
                     window.location.href = app.u;
-                    // ล้างสถานะเมื่อ User กด Back กลับมา
+                    // Reset สถานะเผื่อผู้ใช้กดย้อนกลับ
                     setTimeout(() => popup.classList.remove('active'), 2000);
-                }, 400); // ลดเวลาหน่วงก่อนเปลี่ยนหน้าให้กระชับขึ้น
+                }, 400);
             }
         });
         grid.appendChild(card);
     });
 }
 
-// [ส่วนที่ 3] ฟังก์ชันเริ่มระบบและจัดการ Splash Screen
+// [ส่วนที่ 3] ฟังก์ชันจัดการ Splash Screen และลำดับการรัน
 async function initApp() {
-    const splashScreen = document.getElementById('splash-screen');
+    const splash = document.getElementById('splash-screen');
+    const typingElement = document.getElementById('typing-text');
+    const fullText = "Sadao Khanchai Kamphalanon Anusorn School";
 
-    // 1. เริ่ม Preload รูปภาพทั้งหมดทันทีเบื้องหลัง
-    const preloadAllImages = apps.map(app => {
+    // --- 1. ฟังก์ชันพิมพ์ข้อความ (Typing Effect) ---
+    const typeWriter = (text) => {
+        return new Promise((resolve) => {
+            let i = 0;
+            typingElement.innerHTML = '';
+
+            // --- เพิ่มบรรทัดนี้: เปิดขีดพิมพ์เมื่อเริ่มฟังก์ชัน ---
+            typingElement.classList.add('is-typing');
+
+            function type() {
+                if (i < text.length) {
+                    typingElement.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, 35);
+                } else {
+                    // พิมพ์จบแล้ว รอแป๊บนึงค่อยเอาขีดออก
+                    setTimeout(() => {
+                        // --- แก้ไขตรงนี้: ลบ Class ออกเพื่อให้ขีดหายไป ---
+                        typingElement.classList.remove('is-typing');
+                        resolve();
+                    }, 500);
+                }
+            }
+            type();
+        });
+    };
+
+    // --- 2. ฟังก์ชันโหลดรูป (Background Decoding) ---
+    const loadImage = (url) => {
         return new Promise((resolve) => {
             const img = new Image();
-            img.src = app.img;
-            img.onload = resolve;
-            img.onerror = resolve; // ข้ามรูปที่เสีย
+            img.src = url;
+            img.decode()
+                .then(() => resolve(img))
+                .catch(() => resolve());
         });
-    });
+    };
 
-    // 2. กำหนดเวลาขั้นต่ำที่ต้องโชว์ Splash (เพื่อให้ไม่กระพริบเร็วเกินไป)
-    const minimumDisplayTime = new Promise(resolve => setTimeout(resolve, 800));
+    // --- 3. เริ่มกระบวนการแอนิเมชันและโหลดข้อมูล ---
 
-    // 3. รอจนกว่า: (รูปภาพ 8 รูปแรกโหลดเสร็จ) AND (เวลาขั้นต่ำผ่านไป)
-    // การรอแค่ 8 รูปแรกช่วยให้แอปเปิดเร็วขึ้นในขณะที่รูปที่เหลือจะทยอยตามมาเอง
-    const criticalImages = preloadAllImages.slice(0, 8);
+    // โหลดรูปสำคัญรอไว้เบื้องหลัง (ไม่ขัดจังหวะแอนิเมชัน)
+    const criticalImages = [
+        'KClogo.png',
+        'KCsmart.png',
+        ...apps.slice(0, 8).map(app => app.img)
+    ];
+    const loadAssetsTask = Promise.all(criticalImages.map(url => loadImage(url)));
 
-    await Promise.all([...criticalImages, minimumDisplayTime]);
+    if (splash) {
+        // [จังหวะที่ 1] แสดงโลโก้ 2 อันเด้งออกมา (ชิดกัน)
+        // ใช้ requestAnimationFrame เพื่อให้ Browser เตรียมตัวทัน
+        requestAnimationFrame(() => {
+            splash.classList.add('start-anim');
+        });
 
-    if (splashScreen) {
-        splashScreen.classList.add('fade-out');
-        setTimeout(() => {
-            splashScreen.remove();
-        }, 300);
+        // [จังหวะที่ 2] รอให้โลโก้เด้งเสร็จ (800ms) แล้วกางข้อความ KC SMART แทรกตรงกลาง
+        await new Promise(res => setTimeout(res, 800));
+        splash.classList.add('show-text');
+
+        // [จังหวะที่ 3] รอให้ข้อความกางเสร็จ (อีก 800ms) แล้วเริ่มพิมพ์ชื่อโรงเรียน
+        await new Promise(res => setTimeout(res, 800));
+        await typeWriter(fullText);
     }
+
+    // [จังหวะที่ 4] รอให้รูปภาพโหลดเสร็จ (ถ้าแอนิเมชันจบก่อน) และเผื่อเวลาดูผลงาน
+    await loadAssetsTask;
+    await new Promise(res => setTimeout(res, 600));
+
+    // --- 4. ปิด Splash Screen และเริ่มแสดงหน้าแอป ---
+    createAppGrid();
+
+    if (splash) {
+        splash.classList.add('fade-out');
+        document.body.classList.add('app-loaded');
+
+        // ลบ Element ออกจากหน้าจอเพื่อความลื่นไหลของเครื่องผู้ใช้
+        setTimeout(() => {
+            splash.remove();
+        }, 1000);
+    }
+
+    // โหลดรูปที่เหลือแบบ Background
+    apps.slice(8).forEach(app => loadImage(app.img));
 
     // ระบบความปลอดภัย
     document.oncontextmenu = () => false;
@@ -109,7 +173,7 @@ async function initApp() {
 
 // [ส่วนที่ 4] รันระบบ
 document.addEventListener('DOMContentLoaded', () => {
-    createAppGrid();
+    // รันเฉพาะ Splash/Init ก่อน เพื่อความเร็วในการตอบสนองแรก
     initApp();
 });
 
@@ -235,12 +299,12 @@ buttons.forEach(btn => {
     const modalBody = customModal?.querySelector('.modal-body p');
 
     // 2. ฟังก์ชันตรวจสอบอุปกรณ์ (รองรับ iPhone และ iPadOS รุ่นใหม่)
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
     const isStandalone = () => {
         return window.matchMedia('(display-mode: standalone)').matches ||
-               window.navigator.standalone === true;
+            window.navigator.standalone === true;
     };
 
     const closeModal = () => {
@@ -276,7 +340,7 @@ buttons.forEach(btn => {
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        
+
         // ถ้าไม่ใช่ iOS และยังไม่ได้ติดตั้ง ให้แสดงปุ่มเมื่อ Event มาถึง
         if (!isIOS && installContainer && !isStandalone()) {
             installContainer.style.setProperty('display', 'flex', 'important');
@@ -291,13 +355,13 @@ buttons.forEach(btn => {
                 // เนื้อหาพิเศษสำหรับ iOS/iPadOS
                 if (modalTitle) modalTitle.innerText = "ติดตั้ง KC Smart บน ios";
                 if (modalBody) modalBody.innerHTML = "1. กดปุ่ม <b>'แชร์' (Share)</b> ด้านบนขวาของเบราว์เซอร์<br>2. เลือกเมนู <b>'เพิ่มลงในหน้าจอโฮม'</b><br>(Add to Home Screen)";
-                
+
                 // ซ่อนปุ่ม "ติดตั้งเลย" เพราะ iOS บังคับให้กดผ่านเมนู Safari เท่านั้น
-                if (modalConfirm) modalConfirm.style.display = 'none'; 
-                
+                if (modalConfirm) modalConfirm.style.display = 'none';
+
                 customModal.style.display = 'flex';
                 requestAnimationFrame(() => customModal.classList.add('active'));
-            } 
+            }
             else if (deferredPrompt) {
                 // เนื้อหาปกติสำหรับ Android
                 if (modalTitle) modalTitle.innerText = "ติดตั้ง KC Smart";
@@ -306,7 +370,7 @@ buttons.forEach(btn => {
                     modalConfirm.style.display = 'block';
                     modalConfirm.innerText = "ติดตั้งเลย";
                 }
-                
+
                 customModal.style.display = 'flex';
                 requestAnimationFrame(() => customModal.classList.add('active'));
             } else {
@@ -347,9 +411,9 @@ buttons.forEach(btn => {
 })();
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => console.log('Service Worker Registered!', reg))
-      .catch(err => console.log('Service Worker Registration Failed:', err));
-  });
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('Service Worker Registered!', reg))
+            .catch(err => console.log('Service Worker Registration Failed:', err));
+    });
 }

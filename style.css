@@ -286,25 +286,44 @@ header {
     /* เอฟเฟกต์ตอนจิ้มจะยุบตัวลง */
 }
 
+body:not(.app-loaded) {
+    overflow: hidden;
+}
+
 .app-card {
+    /* 1. เตรียมสถานะเริ่มต้น (ซ่อนไว้และดันลงข้างล่าง) */
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+
+    /* 2. ใช้ GPU ช่วยประมวลผล */
     will-change: transform, opacity;
-    transform: translate3d(0, 60px, 0);
+    backface-visibility: hidden;
+
+    /* 3. Layout ปกติของคุณ */
     display: flex;
     flex-direction: column;
     align-items: center;
     text-decoration: none;
-    opacity: 0;
-    transform: translateY(60px);
-    animation: emerge 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     width: 100%;
     -webkit-tap-highlight-color: transparent;
     outline: none;
 }
 
-@keyframes emerge {
+/* 4. สั่งให้รัน Animation เฉพาะตอนที่หน้าโหลดจางไปแล้วเท่านั้น */
+.app-loaded .app-card {
+    /* ใช้ cubic-bezier เพื่อความนุ่มนวลแบบแอป iPhone */
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 20px, 0);
+    }
+
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translate3d(0, 0, 0);
     }
 }
 
@@ -480,86 +499,147 @@ header {
     }
 }
 
-/* --- Splash Screen Styles --- */
+/* หน้าจอโหลด */
 .splash-screen {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at center, #1a0a33 0%, #0d0221 100%);
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: #0a051a !important; /* บังคับพื้นหลังเข้ม */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999;
-    /* ให้ Splash Screen อยู่บนสุด */
+    z-index: 1000000;
+    transition: opacity 0.8s ease-in-out;
+}
+
+.splash-anim-wrapper .logo-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0; /* เริ่มต้นชิดกัน */
+    transition: gap 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.splash-text-slide {
+    display: inline-block;
+    width: 0; /* เริ่มต้นปิดไว้ */
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-size: 2.2rem;
+    color: #fff;
+    /* ใช้ Class text-glow เดิมของคุณได้เลย */
+}
+
+.splash-logo {
+    /* 1. ขยายขนาดรูป (แนะนำ 100px - 150px สำหรับมือถือ) */
+    width: 120px; 
+    height: auto;
+    object-fit: contain; /* ป้องกันรูปบิดเบี้ยว */
+    
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.splash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%; /* ให้มีพื้นที่ขอบจอซ้ายขวา 5% */
+    max-width: 600px; /* กันไม่ให้ใหญ่เกินไปในคอม */
+    margin: 0 auto;
+}
+
+/* 2. จัดวางโลโก้และข้อความ */
+.splash-logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0; 
+    transition: gap 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 3. ตั้งค่ารูปโลโก้ (บังคับให้เห็น) */
+.splash-inner-logo {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    opacity: 0; /* เริ่มต้นซ่อน */
+    transform: scale(0.5);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 4. ส่วนของข้อความ KC SMART */
+.splash-text-container {
+    width: 0; /* เริ่มต้นปิดไว้ */
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.splash-text-container .text-glow {
+    font-size: 5rem;
+    color: #ffffff;
+    padding: 0 5px;
+}
+
+.splash-main-text {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 2px;
+    /* มั่นใจว่าตัวอักษรไม่โปร่งใส */
+    opacity: 1 !important; 
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+/* --- สถานะสั่งงานจาก JS --- */
+
+/* จังหวะ 1: โลโก้เด้งขึ้นมาชิดกัน */
+.start-anim .splash-logo {
     opacity: 1;
-    visibility: visible;
-    transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+    transform: scale(1);
+}
+
+/* จังหวะ 2: กางข้อความออกและถ่างโลโก้ */
+.show-text .splash-anim-wrapper .logo-title {
+    gap: 15px; 
+}
+.show-text .splash-text-container {
+    width: 400px; /* ปรับให้พอดีความกว้างตัวหนังสือ */
+}
+
+/* ชื่อโรงเรียน */
+.splash-school-name {
+    margin-top: 10px;
+    font-size: 1.1rem;
+    color: #ffd700;
+    min-height: 1.5rem;
+    text-align: center;
+    border-right: 2px solid transparent;
+    padding-right: 5px;
+    letter-spacing: 2.5px;
+    transition: border-color 0.2s;
+}
+
+/* Class พิเศษที่จะใส่ผ่าน JS เมื่อเริ่มพิมพ์ */
+.splash-school-name.is-typing {
+    border-right-color: #ffd700;
+    /* เพิ่ม Animation กระพริบ (ถ้าต้องการ) */
+    animation: blinkCursor 0.8s infinite;
+}
+
+@keyframes blinkCursor {
+    50% { border-right-color: transparent; }
 }
 
 .splash-screen.fade-out {
     opacity: 0;
-    visibility: hidden;
-    /* พื้นหลังหายไปไวๆ พร้อมกัน */
-    transition: opacity 0.6s ease-in-out, visibility 0.6s;
-}
-
-.splash-content {
-    text-align: center;
-    transform: translateY(0);
-    opacity: 1;
-    transition: transform 0.6s ease-out, opacity 0.6s ease-out;
-}
-
-/* --- ซูมพุ่งแบบติดเทอร์โบ --- */
-.splash-screen.fade-out .splash-content {
-    transform: scale(15);
-    opacity: 0;
-    /* ลดเวลาเหลือ 0.6 วินาที เพื่อความสะใจ */
-    /* cubic-bezier(0.9, 0, 0.1, 1) ทำให้ช่วงแรกพุ่งเหมือนโดนดีด */
-    transition:
-        transform 0.6s cubic-bezier(0.9, 0, 0.1, 1),
-        opacity 0.4s ease-in;
-}
-
-.splash-logo-title {
-    font-size: clamp(3rem, 10vw, 5rem);
-    font-weight: 800;
-    letter-spacing: 6px;
-    background: linear-gradient(135deg, var(--school-white) 30%, var(--accent-gold) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 25px var(--gold-glow));
-    animation: splashLogoPulse 2s infinite ease-in-out alternate;
-    /* แอนิเมชันเรืองแสง */
-    margin-bottom: 10px;
-}
-
-.splash-school-name {
-    color: var(--school-white);
-    font-size: clamp(10px, 2.5vw, 14px);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    opacity: 0.8;
-    margin-bottom: 30px;
-}
-
-/* เพิ่มเติมจาก Loading Popup เดิม */
-#target-app-name {
-    animation: fadeInOut 1.5s infinite ease-in-out;
-}
-
-@keyframes fadeInOut {
-
-    0%,
-    100% {
-        opacity: 0.5;
-    }
-
-    50% {
-        opacity: 1;
-    }
+    pointer-events: none;
 }
 
 /* ปรับ Spinner ให้ดูพรีเมียมขึ้น */
@@ -1016,11 +1096,13 @@ header {
 
 /* Container ปรับให้เข้าคู่กับ Search */
 .install-fab-container {
-    display: none; /* เริ่มต้นซ่อนไว้ */
+    display: none;
+    /* เริ่มต้นซ่อนไว้ */
     justify-content: center;
     align-items: center;
     width: 100%;
-    z-index: 9999 !important; /* ให้ลอยอยู่เหนือทุกอย่าง */
+    z-index: 9999 !important;
+    /* ให้ลอยอยู่เหนือทุกอย่าง */
 }
 
 /* ตัวปุ่มวงกลม - ใช้ดีไซน์เดียวกับ search-btn */
@@ -1028,27 +1110,34 @@ header {
     width: 44px;
     height: 44px;
     /* ไล่เฉดสีม่วงเข้มไปม่วงสว่าง */
-    background: linear-gradient(-45deg, 
-        #2a0052, /* ม่วงมืดสุด */
-        #4d0099, /* ม่วงเข้ม */
-        #7b2ff7, /* ม่วงสว่าง */
-        #4d0099  /* วนกลับมาม่วงเข้มเพื่อให้รอยต่อบรรจบกัน */
-    );
-    
+    background: linear-gradient(-45deg,
+            #2a0052,
+            /* ม่วงมืดสุด */
+            #4d0099,
+            /* ม่วงเข้ม */
+            #7b2ff7,
+            /* ม่วงสว่าง */
+            #4d0099
+            /* วนกลับมาม่วงเข้มเพื่อให้รอยต่อบรรจบกัน */
+        );
+
     background-size: 400% 400%;
-    animation: gradient-flow 8s ease-in-out infinite; /* ปรับเวลาให้ช้าลงเพื่อความนวล */
-    
-    border: 2px solid #ffd700; /* เส้นขอบสีทอง (Gold) */
+    animation: gradient-flow 8s ease-in-out infinite;
+    /* ปรับเวลาให้ช้าลงเพื่อความนวล */
+
+    border: 2px solid #ffd700;
+    /* เส้นขอบสีทอง (Gold) */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff; /* ไอคอนสีขาว */
+    color: #ffffff;
+    /* ไอคอนสีขาว */
     cursor: pointer;
-    
+
     /* เงาสีทองจางๆ */
-    box-shadow: 0 4px 15px rgba(255, 222, 32, 0.3); 
-    
+    box-shadow: 0 4px 15px rgba(255, 222, 32, 0.3);
+
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
@@ -1057,15 +1146,20 @@ header {
 .install-fab::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
     pointer-events: none;
 }
 
 .install-fab:hover {
-    background: linear-gradient(-45deg, #4d0099, #8d56e7, #e2d1ff, #8d56e7, #ffe066); /* สีเข้มขึ้นตอน Hover */
+    background: linear-gradient(-45deg, #4d0099, #8d56e7, #e2d1ff, #8d56e7, #ffe066);
+    /* สีเข้มขึ้นตอน Hover */
     background-size: 400% 400%;
-    animation: gradient-flow 10s ease infinite; /* เร็วขึ้นเล็กน้อยตอน Hover */
+    animation: gradient-flow 10s ease infinite;
+    /* เร็วขึ้นเล็กน้อยตอน Hover */
     border-color: #ffd700;
 }
 
@@ -1074,9 +1168,17 @@ header {
 }
 
 @keyframes gradient-flow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .install-fab::after {
@@ -1096,6 +1198,7 @@ header {
         transform: scale(1);
         opacity: 0.5;
     }
+
     100% {
         transform: scale(1.6);
         opacity: 0;
@@ -1155,8 +1258,10 @@ header {
 .fab-icon-circle {
     width: 30px;
     height: 30px;
-    background: rgba(255, 255, 255, 0.1); /* วงกลมไอคอนโปร่งแสง */
-    border: 1px solid rgba(255, 215, 0, 0.5); /* ขอบทองบางๆ */
+    background: rgba(255, 255, 255, 0.1);
+    /* วงกลมไอคอนโปร่งแสง */
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    /* ขอบทองบางๆ */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1164,7 +1269,8 @@ header {
 }
 
 .fab-text {
-    color: #f0f0f0; /* ขาวนวลๆ ไม่สว่างจ้าจนปวดตา */
+    color: #f0f0f0;
+    /* ขาวนวลๆ ไม่สว่างจ้าจนปวดตา */
     font-weight: 300;
 }
 
@@ -1172,8 +1278,10 @@ header {
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
