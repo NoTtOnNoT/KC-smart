@@ -8,7 +8,6 @@ const ASSETS_TO_CACHE = [
   './KClogo.png',
   './KCsmart.png',
   './KCsmartปก.png',
-  './screenshot1.png',
   // รายการรูปในโฟลเดอร์
   './KCsmartpic/pic1.webp',
   './KCsmartpic/pic2.webp',
