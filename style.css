@@ -161,8 +161,8 @@ header {
 
 .school-name {
     color: var(--accent-gold);
-    font-size: clamp(10px, 2.5vw, 14px) !important;
-    letter-spacing: 1px;
+    font-size: clamp(10px, 2.5vw, 15px) !important;
+    letter-spacing: 1.5px;
     opacity: 0.8;
     margin-top: 8px;
 
@@ -499,20 +499,126 @@ body:not(.app-loaded) {
     }
 }
 
-/* หน้าจอโหลด */
 .splash-screen {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #0a051a !important;
-    /* บังคับพื้นหลังเข้ม */
+    /* พื้นหลังไล่เฉดสีม่วงเข้มไปดำสนิท พร้อมมิติความลึก */
+    background: radial-gradient(circle at center, #2a0f4a 0%, #080312 100%) !important;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000000;
-    transition: opacity 0.8s ease-in-out;
+    transition: opacity 1.5s ease-in-out; /* Fade out ช้าลง */
+    overflow: hidden;
+    transition: opacity 1.2s ease, transform 1.2s ease, filter 1.2s ease;
+    will-change: opacity, transform, filter; /* ช่วยให้ Browser คำนวณ GPU ล่วงหน้า จะลื่นขึ้นมาก */
+}
+
+/* Base Wave Layer */
+.splash-screen::before,
+.splash-screen::after,
+.splash-screen .wave-layer {
+    content: ""; /* ใช้ content สำหรับ pseudo-elements */
+    position: absolute;
+    width: 400vw; /* ทำให้คลื่นใหญ่ขึ้นมาก */
+    height: 400vw;
+    top: 75%; /* ปรับให้คลื่นดูเหมือนมาจากด้านล่างมากขึ้น */
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 40% 45% 42% 47%; /* เพิ่มความไม่สมมาตรให้คลื่นดูเป็นธรรมชาติ */
+    pointer-events: none;
+    filter: blur(10px); /* เพิ่ม Blur เพื่อความนุ่มนวลและมิติ */
+}
+
+/* Wave Layer 1: Deep Violet - Background */
+.splash-screen::before {
+    background: rgba(80, 20, 150, 0.15); /* ม่วงเข้ม */
+    animation: rotateWave 25s linear infinite;
+    z-index: 1;
+    transform: translateX(-50%) rotate(0deg) scale(1.1); /* ขยายและหมุนช้าๆ */
+    opacity: 0.8;
+}
+
+/* Wave Layer 2: Glowing Amethyst - Mid-ground */
+.splash-screen::after {
+    background: rgba(138, 43, 226, 0.1); /* ม่วงอมชมพู */
+    animation: rotateWave 30s linear infinite reverse; /* หมุนกลับทาง */
+    z-index: 2;
+    top: 70%;
+    border-radius: 47% 42% 45% 40%;
+    box-shadow: 0 0 100px rgba(138, 43, 226, 0.3), 0 0 200px rgba(138, 43, 226, 0.1); /* เพิ่มแสงเรืองรอง */
+    opacity: 0.7;
+}
+
+/* Wave Layer 3: Golden Shimmer - Foreground */
+.splash-screen .wave-layer { /* ใช้ class แยกเพื่อ layer ที่ 3 */
+    background: rgba(255, 215, 0, 0.03); /* ทองประกายจางๆ */
+    animation: rotateWave 35s linear infinite;
+    z-index: 3;
+    top: 65%;
+    border-radius: 42% 47% 40% 45%;
+    box-shadow: 0 0 80px rgba(255, 215, 0, 0.1), 0 0 150px rgba(255, 215, 0, 0.05); /* แสงทองสว่าง */
+    opacity: 0.6;
+}
+
+/* Ambient Glows: สร้างจุดแสงเรืองรองเพิ่มความลึก */
+.splash-screen .ambient-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px); /* เบลอหนักๆ ให้เหมือนหมอกแสง */
+    opacity: 0.4;
+    z-index: 0;
+}
+
+.splash-screen .ambient-glow.top-left {
+    width: 600px;
+    height: 600px;
+    background: rgba(138, 43, 226, 0.2);
+    top: -20%;
+    left: -20%;
+    animation: pulseGlow 10s ease-in-out infinite alternate;
+}
+
+.splash-screen .ambient-glow.bottom-right {
+    width: 800px;
+    height: 800px;
+    background: rgba(255, 215, 0, 0.1);
+    bottom: -30%;
+    right: -30%;
+    animation: pulseGlow 12s ease-in-out infinite alternate-reverse;
+}
+
+
+/* Keyframe for Wave Rotation */
+@keyframes rotateWave {
+    0% {
+        transform: translate(-50%, 0) rotate(0deg) scale(1);
+    }
+    50% {
+        transform: translate(-50%, 5%) rotate(180deg) scale(1.05); /* เพิ่มการขยับขึ้นลงเล็กน้อย */
+    }
+    100% {
+        transform: translate(-50%, 0) rotate(360deg) scale(1);
+    }
+}
+
+/* Keyframe for Ambient Glow Pulse */
+@keyframes pulseGlow {
+    0% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
 }
 
 .splash-anim-wrapper .logo-title {
@@ -629,7 +735,7 @@ body:not(.app-loaded) {
 
 /* จังหวะ 2: กางข้อความออกและถ่างโลโก้ */
 .show-text .splash-anim-wrapper .logo-title {
-    gap: 15px;
+    gap: 10px;
 }
 
 .show-text .splash-text-container {
@@ -648,13 +754,13 @@ body:not(.app-loaded) {
 /* ชื่อโรงเรียน */
 .splash-school-name {
     margin-top: 10px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #ffd700;
     min-height: 1.5rem;
     text-align: center;
     border-right: 2px solid transparent;
     padding-right: 5px;
-    letter-spacing: 1px;
+    letter-spacing: 0.9px;
     transition: border-color 0.2s;
 }
 
@@ -662,7 +768,7 @@ body:not(.app-loaded) {
 @media (min-width: 768px) {
     .splash-school-name {
         margin-top: 10px;
-        font-size: 1.25rem;
+        font-size: 1.2rem;
         color: #ffd700;
         min-height: 1.5rem;
         text-align: center;
@@ -688,7 +794,8 @@ body:not(.app-loaded) {
 
 .splash-screen.fade-out {
     opacity: 0;
-    pointer-events: none;
+    /* ย้ายไปข้างหลังและห้ามคลิก */
+    pointer-events: none; 
 }
 
 /* ปรับ Spinner ให้ดูพรีเมียมขึ้น */
@@ -1095,11 +1202,12 @@ header {
     /* โค้ด Gradient เดิมของคุณ */
     font-size: clamp(2.5rem, 8vw, 3.5rem);
     font-weight: 800;
-    letter-spacing: 4px;
+    letter-spacing: 2.5px;
     background: linear-gradient(to bottom, #fff 40%, var(--accent-gold));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.4));
+    white-space: nowrap;
 }
 
 .inner-logo {

@@ -27,7 +27,6 @@ const apps = [
 ];
 
 // [ส่วนที่ 2] ฟังก์ชันสร้าง Grid
-// [ส่วนที่ 2] ฟังก์ชันสร้าง Grid (ปรับให้สร้างแต่ยังไม่โชว์ทันที)
 function createAppGrid() {
     const grid = document.getElementById('main-grid');
     const popup = document.getElementById('loading-popup');
