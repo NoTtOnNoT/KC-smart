@@ -1,7 +1,3 @@
-import { inject } from "@vercel/analytics"
-
-inject()
-
 // [ส่วนที่ 1] ข้อมูลแอปทั้งหมด
 const apps = [
     { n: "ตารางเรียน", u: "https://studentskc.sadaokc.com/", img: "KCsmartpic/pic1.webp" },
