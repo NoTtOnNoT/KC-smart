@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>KC SMART - Loading Screen</title>
+
+    <link rel="stylesheet" href="style.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS เพิ่มเติมเฉพาะหน้านี้ เพื่อให้ Splash Screen แสดงค้างไว้โชว์ */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* ป้องกันการเลื่อนหน้าจอ */
+            background-color: #0a051a; /* สีพื้นหลังหลักของแอป */
+        }
+
+        /* บังคับให้ Splash Screen แสดงผลตลอดเวลา (ไม่หายไปเองเหมือนหน้า index) */
+        .splash-screen {
+            display: flex !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+        }
+
+        /* ตกแต่ง cursor พิมพ์ดีด (ถ้าใน style.css ยังไม่มี) */
+        .splash-school-name.is-typing::after {
+            content: '|';
+            animation: blink 0.7s infinite;
+            margin-left: 2px;
+            color: #ffd700;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <div class="ambient-glow top-left"></div>
+            <div class="ambient-glow bottom-right"></div>
+            
+            <div class="wave-layer"></div>
+            
+            <div class="logo-wrapper splash-anim-wrapper">
+                <h1 class="logo-title">
+                    <img src="KClogo.png" class="inner-logo splash-logo" alt="KC Logo">
+                    
+                    <div class="splash-text-container">
+                        <span class="text-glow">KC SMART</span>
+                    </div>
+                    
+                    <img src="KC-smart.png" class="inner-logo splash-logo" alt="KC Smart Icon">
+                </h1>
+            </div>
+            
+            <p id="typing-text" class="splash-school-name"></p>
+        </div>
+    </div>
+
+    <script src="load-script.js"></script>
+
+</body>
+</html>

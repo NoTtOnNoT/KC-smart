@@ -37,6 +37,11 @@
             "name": "KC Smart",
             "url": "./index.html",
             "description": "KC Smart | Sadao Khanchai"
+        },
+        {
+            "name": "Loading Screen",
+            "url": "./load.html",
+            "description": "KC Smart | Sadao Khanchai"
         }
     ]
 }
