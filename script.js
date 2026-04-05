@@ -11,7 +11,7 @@ const apps = [
     { n: "คู่มือนักเรียน", u: "https://script.google.com/macros/s/AKfycbwCVMLiKr2RmWXHMeohO6tdGjuaNeeASn8PGm6zGjlDqgLFwIdbyoae7hfmErAG3MulvQ/exec", img: "KCsmartpic/pic9.webp" },
     { n: "แจ้งข่าวสาร", u: "https://script.google.com/macros/s/AKfycbz1rmB_ZaYszuwFHAvpMP6oAS7IVGr93KV2QuFhsKRqR-jrUBcE-slfzM6gXE5Nr9eu/exec", img: "KCsmartpic/pic10.webp" },
     { n: "ห้องสมุดออนไลน์", u: "http://khanchai.vlcloud.net/", img: "KCsmartpic/pic11.webp" },
-    { n: "งานทะเบียน", u: "#", img: "KCsmartpic/pic23.webp" },
+    { n: "งานทะเบียน", u: "https://sites.google.com/view/sadaokc-registrar", img: "KCsmartpic/pic23.webp" },
     { n: "ดูเกรดมัธยม", u: "http://www.dograde.online/khanchai/", img: "KCsmartpic/pic12.webp" },
     { n: "ภาพกิจกรรม", u: "https://script.google.com/macros/s/AKfycbz_rtqBkrrFVoDmIkGHzAldYU1BpMBjp16gTsGxLcoueiygrEAMK_0qS2eaEELNPOYW/exec", img: "KCsmartpic/pic13.webp" },
     { n: "วารสารโรงเรียน", u: "https://khanchai.ac.th/ebook", img: "KCsmartpic/pic14.webp" },
@@ -174,69 +174,58 @@ async function initApp() {
 document.addEventListener('DOMContentLoaded', () => {
     // รันเฉพาะ Splash/Init ก่อน เพื่อความเร็วในการตอบสนองแรก
     initApp();
+
+    // เรียกชุดควบคุม Search UI ที่ปลอดภัย
+    initSearchControls();
 });
 
-// ควบคุมปุ่มค้นหา
-const searchBox = document.getElementById('searchBox');
-const searchToggle = document.getElementById('searchToggle');
-const searchInput = document.getElementById('appSearch');
-const mainFooter = document.querySelector('.special-footer');
+function initSearchControls() {
+    const searchBox = document.getElementById('searchBox');
+    const searchToggle = document.getElementById('searchToggle');
+    const searchInput = document.getElementById('appSearch');
+    const mainFooter = document.querySelector('.special-footer');
 
-searchToggle.addEventListener('click', function (e) {
-    e.preventDefault();
+    if (!searchBox || !searchToggle || !searchInput || !mainFooter) {
+        console.warn('Search UI หรือ footer ไม่ครบ');
+        return;
+    }
 
-    // เช็คว่ามี mainFooter ไหมก่อนรัน
-    if (!mainFooter) return;
-
-    const isExpanding = !mainFooter.classList.contains('expanded');
-    mainFooter.classList.toggle('expanded');
-
-    if (isExpanding) {
-        // ใช้ชื่อ searchInput ให้ตรงกับที่ประกาศไว้ข้างบน
-        setTimeout(() => {
-            if (searchInput) searchInput.focus();
-        }, 300);
-    } else {
-        if (searchInput) {
-            searchInput.blur();
+    const toggleSearch = (show) => {
+        if (show) {
+            mainFooter.classList.add('expanded');
+            searchBox.classList.add('active');
+            setTimeout(() => searchInput.focus(), 300);
+        } else {
+            mainFooter.classList.remove('expanded');
+            searchBox.classList.remove('active');
             searchInput.value = '';
+            filterApps('');
         }
-    }
-});
+    };
 
-// (ตัวเลือก) ปิดหน้าจอค้นหาเมื่อกดปุ่ม ESC
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && mainFooter.classList.contains('expanded')) {
-        mainFooter.classList.remove('expanded');
-    }
-});
+    searchToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const isExpanding = !mainFooter.classList.contains('expanded');
+        toggleSearch(isExpanding);
+    });
 
-// คลิกเปิด-ปิด
-searchToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    searchBox.classList.toggle('active');
-    if (searchBox.classList.contains('active')) {
-        setTimeout(() => searchInput.focus(), 300);
-    } else {
-        // เมื่อปิด ให้เคลียร์ช่องค้นหาและรีเซ็ตการกรอง
-        searchInput.value = '';
-        filterApps('');
-    }
-});
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mainFooter.classList.contains('expanded')) {
+            toggleSearch(false);
+        }
+    });
 
-// คลิกข้างนอกให้หดกลับ
-document.addEventListener('click', (e) => {
-    if (!searchBox.contains(e.target)) {
-        searchBox.classList.remove('active');
-        searchInput.value = ''; // เคลียร์ช่องค้นหาเมื่อปิด
-        filterApps(''); // รีเซ็ตการกรอง
-    }
-});
+    document.addEventListener('click', (e) => {
+        if (!searchBox.contains(e.target) && !searchToggle.contains(e.target)) {
+            toggleSearch(false);
+        }
+    });
 
-// ระบบค้นหา (กรองข้อมูล)
-searchInput.addEventListener('input', function () {
-    filterApps(this.value);
-});
+    searchInput.addEventListener('input', function () {
+        filterApps(this.value);
+    });
+}
 
 // ฟังก์ชันสำหรับกรองข้อมูลแอป (คุณต้องแก้ไข Class ให้ตรงกับของเดิม)
 function filterApps(query) {
@@ -264,12 +253,14 @@ function filterApps(query) {
 }
 
 const header = document.querySelector('header');
-header.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+if (header) {
+    header.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     });
-});
+}
 
 const buttons = document.querySelectorAll('button, .line-button');
 buttons.forEach(btn => {
