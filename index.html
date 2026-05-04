@@ -46,6 +46,7 @@
 
         <body ontouchstart></body>
         <div id="splash-screen" class="splash-screen">
+            <div id="skip-splash" class="skip-minimal">- skip loading -</div>
             <div class="splash-content">
                 <div class="ambient-glow top-left"></div>
                 <div class="ambient-glow bottom-right"></div>
@@ -115,6 +116,20 @@
                     </button>
                 </div>
             </div>
+
+            <div class="report-container">
+                <button type="button" class="report-fab" id="openReport"
+                    aria-label="Report Issue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </button>
+            </div>
         </div>
         <div id="loading-popup" class="loading-popup">
             <div class="popup-content">
@@ -161,6 +176,118 @@
                 </div>
             </div>
         </div>
+        <div id="reportModal" class="kc-smart-overlay">
+            <div class="kc-smart-modal-card">
+                <div class="kc-smart-modal-header">
+                    <div class="kc-smart-status-dot"></div>
+                    <button id="closeReport"
+                        class="kc-smart-close-btn">&times;</button>
+                </div>
+
+                <div class="kc-smart-modal-body">
+                    <div id="creditView" class="kc-smart-view active">
+                        <div class="kc-smart-brand-container">
+                            <img src="KClogo.png" alt="School Logo"
+                                class="kc-smart-dev-logo">
+                            <div class="kc-smart-brand-divider"></div>
+                            <img src="KC-smart.png" alt="SMTE Logo"
+                                class="kc-smart-dev-logo">
+                        </div>
+                        <div class="kc-smart-credit-wrapper">
+                            <h2
+                                class="kc-smart-design-label">ออกแบบและพัฒนาโดย</h2>
+                            <h1
+                                class="kc-smart-main-title">นักเรียนโครงการห้องเรียนพิเศษ
+                                SMTE</h1>
+                            <p class="kc-smart-desc-text">Science Mathematics Technology and Environment</p>
+                        </div>
+                        <div class="kc-smart-horizontal-line"></div>
+                        <div class="kc-smart-action-area">
+                            <button type="button" id="nextToReport"
+                                class="kc-smart-hero-button">
+                                <div class="kc-smart-btn-icon-box">
+                                    <svg viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"><path
+                                            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </div>
+                                <div class="kc-smart-btn-content">
+                                    <span class="kc-smart-btn-primary">แจ้งปัญหา
+                                        & เสนอแนะ</span>
+                                    <span class="kc-smart-btn-secondary">Support
+                                        Center</span>
+                                </div>
+                                <svg class="kc-smart-btn-arrow"
+                                    viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="3"><path
+                                        d="M9 18l6-6-6-6"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="reportView" class="kc-smart-view">
+                        <h2 class="kc-smart-form-title">ส่งข้อมูลแจ้งปัญหา</h2>
+                        <form id="reportForm" class="kc-smart-form">
+                            <div class="kc-smart-input-group">
+                                <textarea id="reportDetail"
+                                    placeholder="มีปัญหาอะไรในการใช้เว็บไซต์นี้... บอกเราได้เลยจ้าา"
+                                    required></textarea>
+                            </div>
+                            <div class="kc-smart-form-footer">
+                                <button type="button" id="backToCredit"
+                                    class="kc-smart-back-link">ย้อนกลับ</button>
+                                <div style="display: flex; gap: 10px;">
+                                    <button type="button" id="viewAllReports"
+                                        class="kc-smart-secondary-btn">
+                                        <svg width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"><path
+                                                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle
+                                                cx="12" cy="12"
+                                                r="3"></circle></svg>
+                                    </button>
+                                    <button type="submit" id="submitBtn"
+                                        class="kc-smart-submit-btn">
+                                        <span>ส่งข้อมูล</span>
+                                        <div class="kc-smart-loader"
+                                            id="loader"></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="listView" class="kc-smart-view">
+                        <h2 class="kc-smart-form-title">รายการที่มีการแจ้ง</h2>
+                        <div id="reportListContainer"
+                            class="kc-smart-list-container">
+                            <p
+                                style="color: #6a6e82; text-align: center;">กำลังโหลดข้อมูล...</p>
+                        </div>
+                        <div class="kc-smart-form-footer">
+                            <button type="button" id="backToForm"
+                                class="kc-smart-back-link">ย้อนกลับ</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="statusToast" class="status-toast">
+            <div class="toast-content">
+                <div id="toastIcon" class="toast-icon"></div>
+                <span id="toastMessage"></span>
+            </div>
+        </div>
+        <script
+            src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+
+        <script
+            src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+        <script
+            src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
         <script src="script.js"></script>
         <script defer src="/_vercel/insights/script.js"></script>
     </body>

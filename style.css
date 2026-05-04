@@ -1,1529 +1,2369 @@
 /* --- ปรับปรุงสีตัวแปรให้ตรงกับธีม Splash Screen --- */
 :root {
-    --primary-bg: #0a051a;
-    --school-purple: #4a148c;
-    --school-white: #ffffff;
-    --accent-gold: #ffd600;
-    --gold-glow: rgba(255, 214, 0, 0.4);
-    /* เพิ่มตัวแปรนี้ */
+  --primary-bg: #0a051a;
+  --school-purple: #4a148c;
+  --school-white: #ffffff;
+  --accent-gold: #ffd600;
+  --gold-glow: rgba(255, 214, 0, 0.4);
+  /* เพิ่มตัวแปรนี้ */
 
-    /* Responsive Sizes */
-    --icon-size: clamp(68px, 9vw, 90px);
-    --grid-gap-v: clamp(30px, 6vh, 50px);
-    --grid-gap-h: clamp(15px, 3vw, 30px);
+  /* Responsive Sizes */
+  --icon-size: clamp(68px, 9vw, 90px);
+  --grid-gap-v: clamp(30px, 6vh, 50px);
+  --grid-gap-h: clamp(15px, 3vw, 30px);
 }
 
 /* --- ป้องกันทุกการกดค้างและเลือกข้อความ --- */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 html,
 body {
-    /* เปลี่ยนจาก height: 100vh เป็น min-height */
-    min-height: 100%;
-    /* ปล่อยให้ height เป็น auto เพื่อให้เนื้อหาดันตัวได้อิสระ */
-    height: auto;
-    /* บังคับให้การเลื่อนนิ้วลื่นเหมือนแอป Native */
-    -webkit-overflow-scrolling: touch;
-    /* ลดการขัดขวางการเลื่อน */
-    overscroll-behavior-y: auto;
+  /* เปลี่ยนจาก height: 100vh เป็น min-height */
+  min-height: 100%;
+  /* ปล่อยให้ height เป็น auto เพื่อให้เนื้อหาดันตัวได้อิสระ */
+  height: auto;
+  /* บังคับให้การเลื่อนนิ้วลื่นเหมือนแอป Native */
+  -webkit-overflow-scrolling: touch;
+  /* ลดการขัดขวางการเลื่อน */
+  overscroll-behavior-y: auto;
 }
 
 body {
-    font-family: 'Kanit', sans-serif;
-    color: #fff;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
+  font-family: "Kanit", sans-serif;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
 
-    /* แก้ไขตรงนี้: ใช้พื้นหลังสีเข้มเป็นตัวยืนพื้นก่อน */
-    background-color: #0a051a;
+  /* แก้ไขตรงนี้: ใช้พื้นหลังสีเข้มเป็นตัวยืนพื้นก่อน */
+  background-color: #0a051a;
 
-    /* ใส่ Gradient และกำหนดให้ Fixed อยู่กับที่ */
-    background: linear-gradient(-45deg, #0a051a, #1a0a33, #4a148c, #000000);
-    background-size: 400% 400%;
-    background-attachment: fixed;
-    /* สำคัญมาก: กันจอขาวตอนเลื่อน */
+  /* ใส่ Gradient และกำหนดให้ Fixed อยู่กับที่ */
+  background: linear-gradient(-45deg, #0a051a, #1a0a33, #4a148c, #000000);
+  background-size: 400% 400%;
+  background-attachment: fixed;
+  /* สำคัญมาก: กันจอขาวตอนเลื่อน */
 
-    animation: gradientBG 15s ease infinite;
-    scrollbar-width: none;
+  animation: gradientBG 15s ease infinite;
+  scrollbar-width: none;
 
-    /* เปิดโหมดเลื่อนแบบไหลลื่นสำหรับ iOS (Rubber banding effect) */
-    -webkit-overflow-scrolling: touch;
+  /* เปิดโหมดเลื่อนแบบไหลลื่นสำหรับ iOS (Rubber banding effect) */
+  -webkit-overflow-scrolling: touch;
 
-    /* ปรับแต่งความลื่นไหลของการเรนเดอร์ */
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
+  /* ปรับแต่งความลื่นไหลของการเรนเดอร์ */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 html {
-    background-color: #0a051a;
+  background-color: #0a051a;
 
-    /* สีเดียวกับพื้นหลังหลักของคุณ */
-    height: 100%;
-    scroll-behavior: smooth;
-    /* ทำให้การกระโดดไปตาม anchor link นุ่มนวลขึ้น */
-    -webkit-text-size-adjust: 100%;
-    /* ป้องกันฟอนต์กระตุกเวลาเปลี่ยนแนวตั้งแนวนอน */
+  /* สีเดียวกับพื้นหลังหลักของคุณ */
+  height: 100%;
+  scroll-behavior: smooth;
+  /* ทำให้การกระโดดไปตาม anchor link นุ่มนวลขึ้น */
+  -webkit-text-size-adjust: 100%;
+  /* ป้องกันฟอนต์กระตุกเวลาเปลี่ยนแนวตั้งแนวนอน */
 }
 
 @keyframes gradientBG {
-    0% {
-        background-position: 0% 50%;
-    }
+  0% {
+    background-position: 0% 50%;
+  }
 
-    50% {
-        background-position: 100% 50%;
-    }
+  50% {
+    background-position: 100% 50%;
+  }
 
-    100% {
-        background-position: 0% 50%;
-    }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .bg-blobs,
 .blob,
 .inner-logo {
-    /* บังคับให้ใช้ GPU ในการประมวลผล (Layer Promotion) */
-    transform: translateZ(0);
-    will-change: transform;
+  /* บังคับให้ใช้ GPU ในการประมวลผล (Layer Promotion) */
+  transform: translateZ(0);
+  will-change: transform;
 
-    /* ปิดการดักจับ Event ของเมาส์/นิ้ว ถ้าเป็นแค่ของตกแต่ง เพื่อลดภาระการคำนวณ */
-    pointer-events: none;
+  /* ปิดการดักจับ Event ของเมาส์/นิ้ว ถ้าเป็นแค่ของตกแต่ง เพื่อลดภาระการคำนวณ */
+  pointer-events: none;
 }
 
 /* --- พื้นหลัง Blobs --- */
 .bg-blobs {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
 }
 
 .blob {
-    position: absolute;
-    width: 250px;
-    height: 250px;
-    background: radial-gradient(circle, rgba(106, 27, 154, 0.4) 0%, transparent 70%);
-    border-radius: 50%;
-    animation: floatBlob 20s infinite alternate;
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(
+    circle,
+    rgba(106, 27, 154, 0.4) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  animation: floatBlob 20s infinite alternate;
 }
 
 @keyframes floatBlob {
-    from {
-        transform: translate(-10%, -10%);
-    }
+  from {
+    transform: translate(-10%, -10%);
+  }
 
-    to {
-        transform: translate(120%, 120%);
-    }
+  to {
+    transform: translate(120%, 120%);
+  }
 }
 
 header {
-    padding: 50px 20px 30px;
-    text-align: center;
+  padding: 50px 20px 30px;
+  text-align: center;
 }
 
 .logo-title {
-    font-size: clamp(2.5rem, 8vw, 3.5rem);
-    font-weight: 600;
-    letter-spacing: 4px;
-    background: linear-gradient(to bottom, #fff 40%, var(--accent-gold));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-    animation: floatLogo 4s ease-in-out infinite;
-    filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.4));
+  font-size: clamp(2.5rem, 8vw, 3.5rem);
+  font-weight: 600;
+  letter-spacing: 4px;
+  background: linear-gradient(to bottom, #fff 40%, var(--accent-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  animation: floatLogo 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.4));
 }
 
 @keyframes floatLogo {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
 
-    0%,
-    100% {
-        transform: translateY(0) scale(1);
-    }
-
-    50% {
-        transform: translateY(-10px) scale(1.05);
-    }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
 }
 
 .school-name {
-    color: var(--accent-gold);
-    font-size: clamp(10px, 2.5vw, 15px) !important;
-    letter-spacing: 1.5px;
-    opacity: 0.8;
-    margin-top: 8px;
+  color: var(--accent-gold);
+  font-size: clamp(10px, 2.5vw, 15px) !important;
+  letter-spacing: 1.5px;
+  opacity: 0.8;
+  margin-top: 8px;
 
-    /* เพิ่ม 3 บรรทัดนี้ */
-    white-space: nowrap;
-    /* บังคับไม่ให้ขึ้นบรรทัดใหม่ */
-    overflow: hidden;
-    /* ซ่อนส่วนที่ล้นหน้าจอ */
-    text-overflow: ellipsis;
-    /* ถ้าล้นให้แสดงเป็น ... (หรือลบออกถ้าอยากให้โชว์เต็ม) */
+  /* เพิ่ม 3 บรรทัดนี้ */
+  white-space: nowrap;
+  /* บังคับไม่ให้ขึ้นบรรทัดใหม่ */
+  overflow: hidden;
+  /* ซ่อนส่วนที่ล้นหน้าจอ */
+  text-overflow: ellipsis;
+  /* ถ้าล้นให้แสดงเป็น ... (หรือลบออกถ้าอยากให้โชว์เต็ม) */
 
-    width: 100%;
-    /* กำหนดความกว้าง */
-    padding: 0 10px;
-    /* เว้นระยะขอบซ้ายขวาเล็กน้อย */
+  width: 100%;
+  /* กำหนดความกว้าง */
+  padding: 0 10px;
+  /* เว้นระยะขอบซ้ายขวาเล็กน้อย */
 }
 
 /* --- ระบบ Grid ที่สมดุล (4 ถึง 8 คอลัมน์) --- */
 .app-grid {
-    display: grid;
-    /* เริ่มต้น 4 คอลัมน์สำหรับ Mobile */
-    grid-template-columns: repeat(4, 1fr);
+  display: grid;
+  /* เริ่มต้น 4 คอลัมน์สำหรับ Mobile */
+  grid-template-columns: repeat(4, 1fr);
 
-    /* ระยะห่าง: แนวตั้ง 25px (กำลังดีไม่ห่างเกิน) แนวนอน 8px */
-    gap: 25px 8px;
+  /* ระยะห่าง: แนวตั้ง 25px (กำลังดีไม่ห่างเกิน) แนวนอน 8px */
+  gap: 25px 8px;
 
-    /* Padding: เผื่อด้านล่าง 120px กันปุ่ม Footer ทับไอคอน */
-    padding: 20px 15px 100px 15px;
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    justify-items: center;
-    align-items: start;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-    /* ให้ Grid ปรับตัวนุ่มนวล */
+  /* Padding: เผื่อด้านล่าง 120px กันปุ่ม Footer ทับไอคอน */
+  padding: 20px 15px 100px 15px;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  justify-items: center;
+  align-items: start;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  /* ให้ Grid ปรับตัวนุ่มนวล */
 }
 
 /* --- การปรับแต่ง Item และการขยายรูปภาพ --- */
 .app-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
 .app-item img,
 .app-item .icon {
-    /* ใช้ clamp เพื่อให้ขนาดค่อยๆ ใหญ่ขึ้นตามความกว้างจอโดยอัตโนมัติ */
-    width: clamp(52px, 12vw, 75px);
-    height: clamp(52px, 12vw, 75px);
-    margin-bottom: 8px;
-    object-fit: contain;
-    /* เพิ่มความละมุนเวลาเปลี่ยน Breakpoint */
-    transition: width 0.3s ease, height 0.3s ease, transform 0.2s ease;
+  /* ใช้ clamp เพื่อให้ขนาดค่อยๆ ใหญ่ขึ้นตามความกว้างจอโดยอัตโนมัติ */
+  width: clamp(52px, 12vw, 75px);
+  height: clamp(52px, 12vw, 75px);
+  margin-bottom: 8px;
+  object-fit: contain;
+  /* เพิ่มความละมุนเวลาเปลี่ยน Breakpoint */
+  transition:
+    width 0.3s ease,
+    height 0.3s ease,
+    transform 0.2s ease;
 }
 
 .app-item span {
-    font-size: clamp(10px, 2.5vw, 13px);
-    /* ฟอนต์ขยายตามจอเล็กน้อย */
-    line-height: 1.2;
-    color: #fff;
-    font-weight: 300;
-    word-break: break-word;
-    /* จำกัดชื่อแอปไม่ให้เกิน 2 บรรทัด (Optional) */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  font-size: clamp(10px, 2.5vw, 13px);
+  /* ฟอนต์ขยายตามจอเล็กน้อย */
+  line-height: 1.2;
+  color: #fff;
+  font-weight: 300;
+  word-break: break-word;
+  /* จำกัดชื่อแอปไม่ให้เกิน 2 บรรทัด (Optional) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* --- Responsive Breakpoints (4 -> 8 คอลัมน์) --- */
 
 /* จอเริ่มกว้าง (Mobile Large) */
 @media (min-width: 480px) {
-    .app-grid {
-        grid-template-columns: repeat(5, 1fr);
-        gap: 30px 12px;
-    }
+  .app-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px 12px;
+  }
 }
 
 /* Tablet ขนาดเล็ก */
 @media (min-width: 620px) {
-    .app-grid {
-        grid-template-columns: repeat(6, 1fr);
-        gap: 35px 15px;
-    }
+  .app-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 35px 15px;
+  }
 }
 
 /* Tablet มาตรฐาน */
 @media (min-width: 760px) {
-    .app-grid {
-        grid-template-columns: repeat(7, 1fr);
-        padding: 30px 30px 30px 20px;
-    }
+  .app-grid {
+    grid-template-columns: repeat(7, 1fr);
+    padding: 30px 30px 30px 20px;
+  }
 }
 
 /* Desktop (สูงสุด 8 คอลัมน์) */
 @media (min-width: 900px) {
-    .app-grid {
-        grid-template-columns: repeat(8, 1fr);
-        gap: 40px 20px;
-        padding: 45px 25px 30px 25px;
-    }
+  .app-grid {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 40px 20px;
+    padding: 45px 25px 30px 25px;
+  }
+}
+
+/* --- Mobile performance friendly (ตันเฉพาะถ้าใช้มือถือ) --- */
+@media (max-width: 768px) {
+  body {
+    background-attachment: scroll;
+    background-size: cover;
+    animation: none;
+  }
+
+  .bg-blobs,
+  .blob,
+  .inner-logo {
+    animation: none;
+    transform: none;
+  }
+
+  .app-card {
+    transition:
+      transform 0.15s ease,
+      opacity 0.15s ease;
+  }
+
+  .icon-container {
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+    box-shadow:
+      0 8px 16px rgba(0, 0, 0, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.15);
+  }
 }
 
 /* --- Interaction Effects (เพิ่มความพรีเมียม) --- */
 @media (hover: hover) {
-    .app-item:hover img {
-        transform: translateY(-5px) scale(1.08);
-        /* ลอยขึ้นและขยายจิดเดียว */
-        filter: drop-shadow(0 5px 15px rgba(255, 255, 255, 0.2));
-    }
+  .app-item:hover img {
+    transform: translateY(-5px) scale(1.08);
+    /* ลอยขึ้นและขยายจิดเดียว */
+    filter: drop-shadow(0 5px 15px rgba(255, 255, 255, 0.2));
+  }
 }
 
 .app-item:active {
-    transform: scale(0.92);
-    /* เอฟเฟกต์ตอนจิ้มจะยุบตัวลง */
+  transform: scale(0.92);
+  /* เอฟเฟกต์ตอนจิ้มจะยุบตัวลง */
 }
 
 body:not(.app-loaded) {
-    overflow: hidden;
+  overflow: hidden;
 }
 
 .app-card {
-    /* 1. เตรียมสถานะเริ่มต้น (ซ่อนไว้และดันลงข้างล่าง) */
-    opacity: 0;
-    transform: translate3d(0, 20px, 0);
+  /* 1. เตรียมสถานะเริ่มต้น (ซ่อนไว้และดันลงข้างล่าง) */
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
 
-    /* 2. ใช้ GPU ช่วยประมวลผล */
-    will-change: transform, opacity;
-    backface-visibility: hidden;
+  /* 2. ใช้ GPU ช่วยประมวลผล */
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 
-    /* 3. Layout ปกติของคุณ */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    width: 100%;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
+  /* 3. Layout ปกติของคุณ */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 /* 4. สั่งให้รัน Animation เฉพาะตอนที่หน้าโหลดจางไปแล้วเท่านั้น */
 .app-loaded .app-card {
-    /* ใช้ cubic-bezier เพื่อความนุ่มนวลแบบแอป iPhone */
-    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* ใช้ cubic-bezier เพื่อความนุ่มนวลแบบแอป iPhone */
+  animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translate3d(0, 20px, 0);
-    }
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
 
-    to {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-    }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .icon-container {
-    width: var(--icon-size);
-    height: var(--icon-size);
-    border-radius: 22%;
-    /* ทรงโค้งมนแบบ iOS พรีเมียม */
-    position: relative;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.3));
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5), inset 0 2px 3px rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+  width: var(--icon-size);
+  height: var(--icon-size);
+  border-radius: 22%;
+  /* ทรงโค้งมนแบบ iOS พรีเมียม */
+  position: relative;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.18),
+    rgba(0, 0, 0, 0.3)
+  );
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.5),
+    inset 0 2px 3px rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
 }
 
 .icon-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
 }
 
 .icon-container::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -150%;
-    width: 100%;
-    height: 200%;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transform: rotate(30deg);
-    transition: 0.6s;
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -150%;
+  width: 100%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transform: rotate(30deg);
+  transition: 0.6s;
 }
 
 .icon-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 50%;
-    background: linear-gradient(to bottom,
-            rgba(255, 255, 255, 0.2) 0%,
-            rgba(255, 255, 255, 0.05) 100%);
-    z-index: 1;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  z-index: 1;
 }
 
 .app-label {
-    margin-top: 10px;
-    /* ฟอนต์ขยายเล็กน้อยตามความใหญ่ของไอคอน */
-    font-size: clamp(0.65rem, 1.3vw, 0.78rem);
-    color: rgba(255, 255, 255, 0.9);
-    text-align: center;
-    font-weight: 300;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  margin-top: 10px;
+  /* ฟอนต์ขยายเล็กน้อยตามความใหญ่ของไอคอน */
+  font-size: clamp(0.65rem, 1.3vw, 0.78rem);
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  font-weight: 300;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ค้นหา .app-card:active ในโค้ดเดิมแล้วแทนที่ด้วยตัวนี้ */
 .app-card:active .icon-container {
-    transform: scale(0.9) translateY(4px);
-    /* ปุ่มยุบลงและขยับลงตามแรงกด */
-    filter: brightness(0.8);
-    /* สีดูลึกลง */
-    box-shadow:
-        0 4px 10px rgba(0, 0, 0, 0.5),
-        inset 0 4px 10px rgba(0, 0, 0, 0.4);
-    /* เงาด้านในเพิ่มมิติ */
-    transition: all 0.1s ease;
-    /* จังหวะกดต้องตอบสนองไว (0.1s) */
+  transform: scale(0.9) translateY(4px);
+  /* ปุ่มยุบลงและขยับลงตามแรงกด */
+  filter: brightness(0.8);
+  /* สีดูลึกลง */
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.5),
+    inset 0 4px 10px rgba(0, 0, 0, 0.4);
+  /* เงาด้านในเพิ่มมิติ */
+  transition: all 0.1s ease;
+  /* จังหวะกดต้องตอบสนองไว (0.1s) */
 }
 
 /* เพิ่มแอนิเมชันให้ชื่อแอปตอนกด */
 .app-card:active .app-label {
-    transform: scale(0.95);
-    opacity: 0.8;
+  transform: scale(0.95);
+  opacity: 0.8;
 }
 
 .dock-container {
-    width: 100%;
-    /* ลด padding-top ให้เหลือแค่พอแยกจาก Grid */
-    /* และลด padding-bottom ให้เหลือ 120px เพื่อให้เลื่อนพ้นปุ่ม LINE ที่ลอยอยู่ */
-    padding: 20px 0 150px 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: transparent;
-    box-sizing: border-box;
+  width: 100%;
+  /* ลด padding-top ให้เหลือแค่พอแยกจาก Grid */
+  /* และลด padding-bottom ให้เหลือ 120px เพื่อให้เลื่อนพ้นปุ่ม LINE ที่ลอยอยู่ */
+  padding: 20px 0 150px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  box-sizing: border-box;
 }
 
 .dock {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 25px;
-    padding: 12px 25px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 25px;
+  padding: 12px 25px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
 }
 
 .copyright {
-    font-size: 0.65rem;
-    opacity: 0.6;
-    letter-spacing: 1px;
+  font-size: 0.65rem;
+  opacity: 0.6;
+  letter-spacing: 1px;
 }
 
 /* เพิ่มส่วนนี้เข้าไปใหม่ */
 @media (hover: hover) {
-    .app-card:hover .icon-container {
-        transform: translateY(-8px) scale(1.05);
-        /* ลอยขึ้นและขยายใหญ่เล็กน้อย */
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6),
-            0 0 15px var(--accent-gold);
-        /* เพิ่มแสงเรืองสีทอง */
-        border-color: var(--accent-gold);
-    }
+  .app-card:hover .icon-container {
+    transform: translateY(-8px) scale(1.05);
+    /* ลอยขึ้นและขยายใหญ่เล็กน้อย */
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.6),
+      0 0 15px var(--accent-gold);
+    /* เพิ่มแสงเรืองสีทอง */
+    border-color: var(--accent-gold);
+  }
 
-    .app-card:hover .icon-container::after {
-        left: 150%;
-        /* ให้แสง Shine วิ่งผ่านเวลาเอาเมาส์ชี้ */
-        transition: 0.6s ease-in-out;
-    }
+  .app-card:hover .icon-container::after {
+    left: 150%;
+    /* ให้แสง Shine วิ่งผ่านเวลาเอาเมาส์ชี้ */
+    transition: 0.6s ease-in-out;
+  }
 
-    .app-card:hover .app-label {
-        color: var(--accent-gold);
-        /* เปลี่ยนชื่อแอปเป็นสีทองตอนชี้ */
-        transform: translateY(-2px);
-    }
+  .app-card:hover .app-label {
+    color: var(--accent-gold);
+    /* เปลี่ยนชื่อแอปเป็นสีทองตอนชี้ */
+    transform: translateY(-2px);
+  }
 }
 
 /* สร้างแอนิเมชันใหม่ */
 @keyframes goldPulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(255, 214, 0, 0.4);
-    }
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 214, 0, 0.4);
+  }
 
-    70% {
-        box-shadow: 0 0 0 15px rgba(255, 214, 0, 0);
-    }
+  70% {
+    box-shadow: 0 0 0 15px rgba(255, 214, 0, 0);
+  }
 
-    100% {
-        box-shadow: 0 0 0 0 rgba(255, 214, 0, 0);
-    }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 214, 0, 0);
+  }
 }
 
 /* วิธีใช้: เอาคลาส pulse ไปใส่ใน HTML ของไอคอนที่ต้องการให้เรืองแสง */
 .icon-container.pulse {
-    animation: goldPulse 2s infinite;
-    border-color: var(--accent-gold);
+  animation: goldPulse 2s infinite;
+  border-color: var(--accent-gold);
 }
 
 /* สร้าง Effect แสงทองเรืองแสงรอบไอคอนเป็นระยะ */
 @keyframes goldShine {
-    0% {
-        filter: drop-shadow(0 0 5px rgba(255, 214, 0, 0.2));
-    }
+  0% {
+    filter: drop-shadow(0 0 5px rgba(255, 214, 0, 0.2));
+  }
 
-    50% {
-        filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.5));
-    }
+  50% {
+    filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.5));
+  }
 
-    100% {
-        filter: drop-shadow(0 0 5px rgba(255, 214, 0, 0.2));
-    }
+  100% {
+    filter: drop-shadow(0 0 5px rgba(255, 214, 0, 0.2));
+  }
 }
 
 .splash-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* พื้นหลังไล่เฉดสีม่วงเข้มไปดำสนิท พร้อมมิติความลึก */
-    background: radial-gradient(circle at center, #2a0f4a 0%, #080312 100%) !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000000;
-    transition: opacity 1.5s ease-in-out; /* Fade out ช้าลง */
-    overflow: hidden;
-    transition: opacity 1.2s ease, transform 1.2s ease, filter 1.2s ease;
-    will-change: opacity, transform, filter; /* ช่วยให้ Browser คำนวณ GPU ล่วงหน้า จะลื่นขึ้นมาก */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* พื้นหลังไล่เฉดสีม่วงเข้มไปดำสนิท พร้อมมิติความลึก */
+  background: radial-gradient(
+    circle at center,
+    #2a0f4a 0%,
+    #080312 100%
+  ) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000000;
+  transition: opacity 1.5s ease-in-out; /* Fade out ช้าลง */
+  overflow: hidden;
+  transition:
+    opacity 1.2s ease,
+    transform 1.2s ease,
+    filter 1.2s ease;
+  will-change:
+    opacity, transform, filter; /* ช่วยให้ Browser คำนวณ GPU ล่วงหน้า จะลื่นขึ้นมาก */
 }
 
 /* Base Wave Layer */
 .splash-screen::before,
 .splash-screen::after,
 .splash-screen .wave-layer {
-    content: ""; /* ใช้ content สำหรับ pseudo-elements */
-    position: absolute;
-    width: 400vw; /* ทำให้คลื่นใหญ่ขึ้นมาก */
-    height: 400vw;
-    top: 75%; /* ปรับให้คลื่นดูเหมือนมาจากด้านล่างมากขึ้น */
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 40% 45% 42% 47%; /* เพิ่มความไม่สมมาตรให้คลื่นดูเป็นธรรมชาติ */
-    pointer-events: none;
-    filter: blur(10px); /* เพิ่ม Blur เพื่อความนุ่มนวลและมิติ */
+  content: ""; /* ใช้ content สำหรับ pseudo-elements */
+  position: absolute;
+  width: 400vw; /* ทำให้คลื่นใหญ่ขึ้นมาก */
+  height: 400vw;
+  top: 75%; /* ปรับให้คลื่นดูเหมือนมาจากด้านล่างมากขึ้น */
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 40% 45% 42% 47%; /* เพิ่มความไม่สมมาตรให้คลื่นดูเป็นธรรมชาติ */
+  pointer-events: none;
+  filter: blur(10px); /* เพิ่ม Blur เพื่อความนุ่มนวลและมิติ */
 }
 
 /* Wave Layer 1: Deep Violet - Background */
 .splash-screen::before {
-    background: rgba(80, 20, 150, 0.15); /* ม่วงเข้ม */
-    animation: rotateWave 25s linear infinite;
-    z-index: 1;
-    transform: translateX(-50%) rotate(0deg) scale(1.1); /* ขยายและหมุนช้าๆ */
-    opacity: 0.8;
+  background: rgba(80, 20, 150, 0.15); /* ม่วงเข้ม */
+  animation: rotateWave 25s linear infinite;
+  z-index: 1;
+  transform: translateX(-50%) rotate(0deg) scale(1.1); /* ขยายและหมุนช้าๆ */
+  opacity: 0.8;
 }
 
 /* Wave Layer 2: Glowing Amethyst - Mid-ground */
 .splash-screen::after {
-    background: rgba(138, 43, 226, 0.1); /* ม่วงอมชมพู */
-    animation: rotateWave 30s linear infinite reverse; /* หมุนกลับทาง */
-    z-index: 2;
-    top: 70%;
-    border-radius: 47% 42% 45% 40%;
-    box-shadow: 0 0 100px rgba(138, 43, 226, 0.3), 0 0 200px rgba(138, 43, 226, 0.1); /* เพิ่มแสงเรืองรอง */
-    opacity: 0.7;
+  background: rgba(138, 43, 226, 0.1); /* ม่วงอมชมพู */
+  animation: rotateWave 30s linear infinite reverse; /* หมุนกลับทาง */
+  z-index: 2;
+  top: 70%;
+  border-radius: 47% 42% 45% 40%;
+  box-shadow:
+    0 0 100px rgba(138, 43, 226, 0.3),
+    0 0 200px rgba(138, 43, 226, 0.1); /* เพิ่มแสงเรืองรอง */
+  opacity: 0.7;
 }
 
 /* Wave Layer 3: Golden Shimmer - Foreground */
-.splash-screen .wave-layer { /* ใช้ class แยกเพื่อ layer ที่ 3 */
-    background: rgba(255, 215, 0, 0.03); /* ทองประกายจางๆ */
-    animation: rotateWave 35s linear infinite;
-    z-index: 3;
-    top: 65%;
-    border-radius: 42% 47% 40% 45%;
-    box-shadow: 0 0 80px rgba(255, 215, 0, 0.1), 0 0 150px rgba(255, 215, 0, 0.05); /* แสงทองสว่าง */
-    opacity: 0.6;
+.splash-screen .wave-layer {
+  /* ใช้ class แยกเพื่อ layer ที่ 3 */
+  background: rgba(255, 215, 0, 0.03); /* ทองประกายจางๆ */
+  animation: rotateWave 35s linear infinite;
+  z-index: 3;
+  top: 65%;
+  border-radius: 42% 47% 40% 45%;
+  box-shadow:
+    0 0 80px rgba(255, 215, 0, 0.1),
+    0 0 150px rgba(255, 215, 0, 0.05); /* แสงทองสว่าง */
+  opacity: 0.6;
 }
 
 /* Ambient Glows: สร้างจุดแสงเรืองรองเพิ่มความลึก */
 .splash-screen .ambient-glow {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px); /* เบลอหนักๆ ให้เหมือนหมอกแสง */
-    opacity: 0.4;
-    z-index: 0;
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px); /* เบลอหนักๆ ให้เหมือนหมอกแสง */
+  opacity: 0.4;
+  z-index: 0;
 }
 
 .splash-screen .ambient-glow.top-left {
-    width: 600px;
-    height: 600px;
-    background: rgba(138, 43, 226, 0.2);
-    top: -20%;
-    left: -20%;
-    animation: pulseGlow 10s ease-in-out infinite alternate;
+  width: 600px;
+  height: 600px;
+  background: rgba(138, 43, 226, 0.2);
+  top: -20%;
+  left: -20%;
+  animation: pulseGlow 10s ease-in-out infinite alternate;
 }
 
 .splash-screen .ambient-glow.bottom-right {
-    width: 800px;
-    height: 800px;
-    background: rgba(255, 215, 0, 0.1);
-    bottom: -30%;
-    right: -30%;
-    animation: pulseGlow 12s ease-in-out infinite alternate-reverse;
+  width: 800px;
+  height: 800px;
+  background: rgba(255, 215, 0, 0.1);
+  bottom: -30%;
+  right: -30%;
+  animation: pulseGlow 12s ease-in-out infinite alternate-reverse;
 }
-
 
 /* Keyframe for Wave Rotation */
 @keyframes rotateWave {
-    0% {
-        transform: translate(-50%, 0) rotate(0deg) scale(1);
-    }
-    50% {
-        transform: translate(-50%, 5%) rotate(180deg) scale(1.05); /* เพิ่มการขยับขึ้นลงเล็กน้อย */
-    }
-    100% {
-        transform: translate(-50%, 0) rotate(360deg) scale(1);
-    }
+  0% {
+    transform: translate(-50%, 0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate(-50%, 5%) rotate(180deg) scale(1.05); /* เพิ่มการขยับขึ้นลงเล็กน้อย */
+  }
+  100% {
+    transform: translate(-50%, 0) rotate(360deg) scale(1);
+  }
 }
 
 /* Keyframe for Ambient Glow Pulse */
 @keyframes pulseGlow {
-    0% {
-        transform: scale(1);
-        opacity: 0.3;
-    }
-    50% {
-        transform: scale(1.1);
-        opacity: 0.5;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 0.3;
-    }
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
 }
 
 .splash-anim-wrapper .logo-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    /* เริ่มต้นชิดกัน */
-    transition: gap 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  /* เริ่มต้นชิดกัน */
+  transition: gap 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .splash-text-slide {
-    display: inline-block;
-    width: 0;
-    /* เริ่มต้นปิดไว้ */
-    overflow: hidden;
-    white-space: nowrap;
-    text-align: center;
-    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-    font-size: 2.2rem;
-    color: #fff;
-    /* ใช้ Class text-glow เดิมของคุณได้เลย */
+  display: inline-block;
+  width: 0;
+  /* เริ่มต้นปิดไว้ */
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 2.2rem;
+  color: #fff;
+  /* ใช้ Class text-glow เดิมของคุณได้เลย */
 }
 
 .splash-logo {
-    /* 1. ขยายขนาดรูป (แนะนำ 100px - 150px สำหรับมือถือ) */
-    width: 120px;
-    height: auto;
-    object-fit: contain;
-    /* ป้องกันรูปบิดเบี้ยว */
+  /* 1. ขยายขนาดรูป (แนะนำ 100px - 150px สำหรับมือถือ) */
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+  /* ป้องกันรูปบิดเบี้ยว */
 
-    opacity: 0;
-    transform: scale(0.5);
-    transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .splash-content {
-    width: 100%;
-    max-width: 100vw;
-    overflow: hidden;
-    padding: 20px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* 2. จัดวางโลโก้และข้อความ */
 .splash-logo-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    transition: gap 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  transition: gap 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* 3. ตั้งค่ารูปโลโก้ (บังคับให้เห็น) */
 .splash-inner-logo {
-    width: 70px;
-    height: 70px;
-    object-fit: contain;
-    opacity: 0;
-    /* เริ่มต้นซ่อน */
-    transform: scale(0.5);
-    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  opacity: 0;
+  /* เริ่มต้นซ่อน */
+  transform: scale(0.5);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* 4. ส่วนของข้อความ KC SMART */
 .splash-text-container {
-    width: 0;
-    /* เริ่มต้นปิดไว้ */
-    overflow: hidden;
-    white-space: nowrap;
-    display: flex;
-    justify-content: center;
-    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 0;
+  /* เริ่มต้นปิดไว้ */
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+  justify-content: center;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-    font-size: clamp(1.5rem, 8vw, 2.5rem);
-    /* ย่อขนาดตามหน้าจออัตโนมัติ */
-    text-align: center;
+  font-size: clamp(1.5rem, 8vw, 2.5rem);
+  /* ย่อขนาดตามหน้าจออัตโนมัติ */
+  text-align: center;
 }
 
 /* ค่าพื้นฐานสำหรับมือถือ */
 .splash-text-container .text-glow {
-    font-size: 2.2rem;
-    color: #ffffff;
-    padding: 0 5px;
+  font-size: 2.2rem;
+  color: #ffffff;
+  padding: 0 5px;
 }
 
 /* ถ้าหน้าจอกว้างกว่า 768px (Tablet/PC) ให้ขยายใหญ่ขึ้น */
 @media (min-width: 768px) {
-    .splash-text-container .text-glow {
-        font-size: 5rem;
-    }
+  .splash-text-container .text-glow {
+    font-size: 5rem;
+  }
 }
 
 .splash-main-text {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: #ffffff;
-    letter-spacing: 2px;
-    /* มั่นใจว่าตัวอักษรไม่โปร่งใส */
-    opacity: 1 !important;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 2px;
+  /* มั่นใจว่าตัวอักษรไม่โปร่งใส */
+  opacity: 1 !important;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
 }
 
 /* --- สถานะสั่งงานจาก JS --- */
 
 /* จังหวะ 1: โลโก้เด้งขึ้นมาชิดกัน */
 .start-anim .splash-logo {
-    opacity: 1;
-    transform: scale(1);
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* จังหวะ 2: กางข้อความออกและถ่างโลโก้ */
 .show-text .splash-anim-wrapper .logo-title {
-    gap: 10px;
+  gap: 10px;
 }
 
 .show-text .splash-text-container {
-    width: 180px;
-    /* ปรับให้พอดีความกว้างตัวหนังสือ */
+  width: 180px;
+  /* ปรับให้พอดีความกว้างตัวหนังสือ */
 }
 
 /* ถ้าหน้าจอกว้างกว่า 768px (Tablet/PC) ให้ขยายใหญ่ขึ้น */
 @media (min-width: 768px) {
-    .show-text .splash-text-container {
-        width: 400px;
-        /* ปรับให้พอดีความกว้างตัวหนังสือ */
-    }
+  .show-text .splash-text-container {
+    width: 400px;
+    /* ปรับให้พอดีความกว้างตัวหนังสือ */
+  }
 }
 
 /* ชื่อโรงเรียน */
 .splash-school-name {
+  margin-top: 10px;
+  font-size: 0.65rem;
+  color: #ffd700;
+  min-height: 1.5rem;
+  text-align: center;
+  border-right: 2px solid transparent;
+  padding-right: 5px;
+  letter-spacing: 0.9px;
+  transition: border-color 0.2s;
+}
+
+@media (min-width: 768px) {
+  .splash-school-name {
     margin-top: 10px;
-    font-size: 0.65rem;
+    font-size: 1.2rem;
     color: #ffd700;
     min-height: 1.5rem;
     text-align: center;
     border-right: 2px solid transparent;
     padding-right: 5px;
-    letter-spacing: 0.9px;
+    letter-spacing: 2.5px;
     transition: border-color 0.2s;
-}
-
-
-@media (min-width: 768px) {
-    .splash-school-name {
-        margin-top: 10px;
-        font-size: 1.2rem;
-        color: #ffd700;
-        min-height: 1.5rem;
-        text-align: center;
-        border-right: 2px solid transparent;
-        padding-right: 5px;
-        letter-spacing: 2.5px;
-        transition: border-color 0.2s;
-    }
+  }
 }
 
 /* Class พิเศษที่จะใส่ผ่าน JS เมื่อเริ่มพิมพ์ */
 .splash-school-name.is-typing {
-    border-right-color: #ffd700;
-    /* เพิ่ม Animation กระพริบ (ถ้าต้องการ) */
-    animation: blinkCursor 0.8s infinite;
+  border-right-color: #ffd700;
+  /* เพิ่ม Animation กระพริบ (ถ้าต้องการ) */
+  animation: blinkCursor 0.8s infinite;
 }
 
 @keyframes blinkCursor {
-    50% {
-        border-right-color: transparent;
-    }
+  50% {
+    border-right-color: transparent;
+  }
 }
 
 .splash-screen.fade-out {
-    opacity: 0;
-    /* ย้ายไปข้างหลังและห้ามคลิก */
-    pointer-events: none; 
+  opacity: 0;
+  /* ย้ายไปข้างหลังและห้ามคลิก */
+  pointer-events: none;
 }
 
 /* ปรับ Spinner ให้ดูพรีเมียมขึ้น */
 .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(255, 214, 0, 0.1);
-    border-top: 3px solid var(--accent-gold);
-    border-radius: 50%;
-    margin: 0 auto;
-    animation: spin 0.8s linear infinite;
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 214, 0, 0.1);
+  border-top: 3px solid var(--accent-gold);
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
 
-    100% {
-        transform: rotate(360deg);
-    }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes splashLogoPulse {
-    0% {
-        filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.2));
-    }
+  0% {
+    filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.2));
+  }
 
-    100% {
-        filter: drop-shadow(0 0 30px rgba(255, 214, 0, 0.6));
-    }
+  100% {
+    filter: drop-shadow(0 0 30px rgba(255, 214, 0, 0.6));
+  }
 }
 
 /* โครงสร้างพื้นหลังของ Popup */
 .loading-popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(10, 5, 26, 0.8);
-    /* พื้นหลังดำม่วงโปร่งแสง */
-    backdrop-filter: blur(8px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-    /* อยู่หน้าสุดเสมอ */
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 5, 26, 0.8);
+  /* พื้นหลังดำม่วงโปร่งแสง */
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  /* อยู่หน้าสุดเสมอ */
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
 }
 
 /* เมื่อสั่งให้โชว์ */
 .loading-popup.active {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 .popup-content {
-    background: linear-gradient(145deg, #1a0a33, #0a051a);
-    padding: 30px 50px;
-    border-radius: 20px;
-    border: 1px solid var(--accent-gold);
-    text-align: center;
-    box-shadow: 0 0 30px rgba(255, 214, 0, 0.2);
+  background: linear-gradient(145deg, #1a0a33, #0a051a);
+  padding: 30px 50px;
+  border-radius: 20px;
+  border: 1px solid var(--accent-gold);
+  text-align: center;
+  box-shadow: 0 0 30px rgba(255, 214, 0, 0.2);
 }
 
 .popup-text {
-    color: var(--accent-gold);
-    margin-top: 15px;
-    font-size: 1rem;
-    font-weight: 300;
-    letter-spacing: 1px;
+  color: var(--accent-gold);
+  margin-top: 15px;
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 1px;
 }
 
 .special-footer {
-    position: fixed;
-    bottom: 22px;
-    left: 50%;
-    transform: translateX(-50%);
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
 
-    /* หัวใจสำคัญ: ปรับขนาดตามเนื้อหาข้างใน */
-    width: fit-content;
-    max-width: 95%;
-    /* กันไม่ให้กว้างเกินจอในมือถือขนาดเล็กมาก */
+  /* หัวใจสำคัญ: ปรับขนาดตามเนื้อหาข้างใน */
+  width: fit-content;
+  max-width: 95%;
+  /* กันไม่ให้กว้างเกินจอในมือถือขนาดเล็กมาก */
 
-    /* สไตล์กรอบ */
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 30px;
+  /* สไตล์กรอบ */
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
 
-    /* การจัดเรียง */
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 9px;
-    /* ปรับ padding ให้กระชับ */
-    box-sizing: border-box;
-    z-index: 1000;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  /* การจัดเรียง */
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 9px;
+  /* ปรับ padding ให้กระชับ */
+  box-sizing: border-box;
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* ตัวปุ่ม LINE */
 .line-button {
-    display: flex;
-    align-items: center;
-    background: #06C755;
-    /* สีเขียว LINE */
-    padding: 8px 10px;
-    /* ลด padding เพื่อให้เล็กลง */
-    border-radius: 50px;
-    text-decoration: none;
-    color: white;
-    font-weight: 500;
-    font-size: 0.9rem;
-    box-shadow: 0 8px 20px rgba(6, 199, 85, 0.3);
-    transition: all 0.3s ease;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 25px;
-    /* ทรงมนเหมือนกล่องค้นหา */
-    height: 44px;
-    /* กำหนดความสูงให้ตายตัว */
-    box-sizing: border-box;
-    font-size: 11px;
-    /* ปรับขนาดฟอนต์ให้พอดี */
-    white-space: nowrap;
-    /* กันข้อความตัดบรรทัด */
+  display: flex;
+  align-items: center;
+  background: #06c755;
+  /* สีเขียว LINE */
+  padding: 8px 10px;
+  /* ลด padding เพื่อให้เล็กลง */
+  border-radius: 50px;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  font-size: 0.9rem;
+  box-shadow: 0 8px 20px rgba(6, 199, 85, 0.3);
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 25px;
+  /* ทรงมนเหมือนกล่องค้นหา */
+  height: 44px;
+  /* กำหนดความสูงให้ตายตัว */
+  box-sizing: border-box;
+  font-size: 11px;
+  /* ปรับขนาดฟอนต์ให้พอดี */
+  white-space: nowrap;
+  /* กันข้อความตัดบรรทัด */
 }
 
 .line-icon-wrapper {
-    width: 15px;
-    height: 15px;
-    margin-right: 10px;
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
 }
 
 .line-icon-wrapper img {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 /* เอฟเฟกต์ตอนกด */
 .line-button:active {
-    transform: scale(0.95);
-    background: #05a346;
+  transform: scale(0.95);
+  background: #05a346;
 }
 
 /* กรณีเปิดบนคอมฯ ให้มีการลอยขึ้น */
 @media (hover: hover) {
-    .line-button:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 25px rgba(6, 199, 85, 0.5);
-    }
+  .line-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(6, 199, 85, 0.5);
+  }
 }
 
 /*ค้นหา*/
 /* Keyframe สำหรับ Glow */
 @keyframes pulse-glow {
-    0% {
-        box-shadow: 0 0 0 rgba(0, 210, 255, 0.4);
-    }
+  0% {
+    box-shadow: 0 0 0 rgba(0, 210, 255, 0.4);
+  }
 
-    50% {
-        box-shadow: 0 0 10px rgba(0, 210, 255, 0.8), 0 0 20px rgba(0, 210, 255, 0.6);
-    }
+  50% {
+    box-shadow:
+      0 0 10px rgba(0, 210, 255, 0.8),
+      0 0 20px rgba(0, 210, 255, 0.6);
+  }
 
-    100% {
-        box-shadow: 0 0 0 rgba(0, 210, 255, 0.4);
-    }
+  100% {
+    box-shadow: 0 0 0 rgba(0, 210, 255, 0.4);
+  }
 }
 
 /* Keyframe สำหรับ Ripple effect */
 @keyframes ripple {
-    0% {
-        transform: scale(0);
-        opacity: 1;
-    }
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
 
-    100% {
-        transform: scale(1);
-        opacity: 0;
-    }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
 }
 
 /* จัดการ Header ให้รองรับตำแหน่งขวาบน */
 header {
-    position: relative;
-    padding: 25px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* จัดโลโก้ไว้กลางหน้า */
+  position: relative;
+  padding: 25px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* จัดโลโก้ไว้กลางหน้า */
 }
 
 /* Container ของปุ่มค้นหา */
 .search-container {
-    margin-top: 0;
-    /* เอา margin ออกเพราะเราใช้ gap ในตัวแม่แทน */
+  margin-top: 0;
+  /* เอา margin ออกเพราะเราใช้ gap ในตัวแม่แทน */
 }
 
 /* ตัวกล่องกระจก (Glassmorphism) */
 .search-box {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    /* ให้ปุ่มไอคอนชิดขวาเสมอ */
-    width: 44px;
-    height: 44px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-    padding: 4px;
-    box-sizing: border-box;
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-    position: relative;
-    /* สำหรับ ripple effect */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  /* ให้ปุ่มไอคอนชิดขวาเสมอ */
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 4px;
+  box-sizing: border-box;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  position: relative;
+  /* สำหรับ ripple effect */
 }
 
 /* เมื่อขยายออก */
 .search-box.active {
-    width: 180px;
-    background: rgba(255, 255, 255, 0.18);
-    /* เข้มขึ้นนิดหน่อย */
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-    /* เงาเข้มขึ้น */
+  width: 180px;
+  background: rgba(255, 255, 255, 0.18);
+  /* เข้มขึ้นนิดหน่อย */
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  /* เงาเข้มขึ้น */
+  transform: translateX(-1.5px);
 }
 
 /* ช่องพิมพ์ */
 .search-input {
-    width: 0;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: white;
-    font-family: 'Kanit', sans-serif;
-    font-size: 0.95rem;
-    padding: 0;
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    /* Smooth fade */
+  width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-family: "Kanit", sans-serif;
+  font-size: 0.95rem;
+  padding: 0;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Smooth fade */
 }
 
 .search-box.active .search-input {
-    width: 100%;
-    padding: 0 12px;
-    opacity: 1;
+  width: 100%;
+  padding: 0 12px;
+  opacity: 1;
 }
 
 /* ปุ่มไอคอนวงกลมสีฟ้า */
 .search-btn {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    background: linear-gradient(-45deg, #7300ff, #b181ff, #ffffff, #b181ff);
-    background-size: 300% 300%;
-    /* ขยายพื้นหลังเพื่อให้มีพื้นที่ในการขยับสี */
-    animation: flowingGradient 4s ease infinite;
-    /* เรียกใช้แอนิเมชันที่สร้างไว้ */
-    border: none;
-    border-radius: 50%;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.4s ease;
-    padding: 0;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    position: relative;
-    overflow: hidden;
-    /* สำหรับ ripple effect */
-    animation: pulse-glow 2s infinite ease-in-out;
-    /* เพิ่ม Glow Animation */
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  background: linear-gradient(-45deg, #7300ff, #b181ff, #ffffff, #b181ff);
+  background-size: 300% 300%;
+  /* ขยายพื้นหลังเพื่อให้มีพื้นที่ในการขยับสี */
+  animation: flowingGradient 4s ease infinite;
+  /* เรียกใช้แอนิเมชันที่สร้างไว้ */
+  border: none;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  padding: 0;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  /* สำหรับ ripple effect */
+  animation: pulse-glow 2s infinite ease-in-out;
+  /* เพิ่ม Glow Animation */
 }
 
 @keyframes flowingGradient {
-    0% {
-        background-position: 0% 50%;
-    }
+  0% {
+    background-position: 0% 50%;
+  }
 
-    50% {
-        background-position: 100% 50%;
-    }
+  50% {
+    background-position: 100% 50%;
+  }
 
-    100% {
-        background-position: 0% 50%;
-    }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .search-btn svg {
-    width: 18px;
-    height: 18px;
-    transition: transform 0.3s ease;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
 }
 
 /* แอนิเมชันเมื่อ Active */
 .search-box.active .search-btn {
-    transform: rotate(90deg) scale(0.95);
-    /* หมุนและยุบตัวเล็กน้อย */
-    background: linear-gradient(135deg, #7300ff, #b181ff, #dcc7ff);
-    box-shadow: 0 6px 15px rgba(167, 119, 227, 0.4);
-    /* เงาใหม่ */
-    animation: none;
-    /* หยุด glow เมื่อ active */
+  transform: rotate(90deg) scale(0.95);
+  /* หมุนและยุบตัวเล็กน้อย */
+  background: linear-gradient(135deg, #7300ff, #b181ff, #dcc7ff);
+  box-shadow: 0 6px 15px rgba(167, 119, 227, 0.4);
+  /* เงาใหม่ */
+  animation: none;
+  /* หยุด glow เมื่อ active */
 }
 
 /* Ripple effect */
 .search-btn:after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.3);
-    /* สี Ripple */
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    transform: scale(0);
-    opacity: 0;
-    transition: none;
-    /* ไม่ต้องมี transition ปกติ */
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  /* สี Ripple */
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  transform: scale(0);
+  opacity: 0;
+  transition: none;
+  /* ไม่ต้องมี transition ปกติ */
 }
 
 .search-btn:active:after {
-    animation: ripple 0.6s ease-out;
-    /* Ripple เมื่อกด */
+  animation: ripple 0.6s ease-out;
+  /* Ripple เมื่อกด */
 }
 
 .search-input::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
 }
 
 @media screen and (max-height: 500px) {
-    .special-footer {
-        bottom: 10px !important;
-        /* บังคับให้อยู่ใกล้ขอบล่างเสมอ */
-    }
+  .special-footer {
+    bottom: 10px !important;
+    /* บังคับให้อยู่ใกล้ขอบล่างเสมอ */
+  }
 }
 
 /* จัดกลุ่มเนื้อหาใน Header ให้เรียงเป็นแถวหน้ากระดาน */
 .header-content {
-    display: flex;
-    align-items: center;
-    /* จัดให้อยู่กลางแนวตั้งพร้อมกัน */
-    justify-content: center;
-    /* จัดให้อยู่กลางแนวนอน */
-    gap: 0;
-    /* ระยะห่างระหว่างรูปกับข้อความ */
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+  display: flex;
+  align-items: center;
+  /* จัดให้อยู่กลางแนวตั้งพร้อมกัน */
+  justify-content: center;
+  /* จัดให้อยู่กลางแนวนอน */
+  gap: 0;
+  /* ระยะห่างระหว่างรูปกับข้อความ */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* ปรับขนาดรูปข้างข้อความ */
 .header-side-img {
-    width: clamp(50px, 8vw, 80px);
-    /* ขนาดรูปปรับตามหน้าจอ */
-    height: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 0 10px rgba(255, 214, 0, 0.3));
-    /* เพิ่มแสงเรืองรองให้เข้ากับธีม */
+  width: clamp(50px, 8vw, 80px);
+  /* ขนาดรูปปรับตามหน้าจอ */
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(255, 214, 0, 0.3));
+  /* เพิ่มแสงเรืองรองให้เข้ากับธีม */
 }
 
 /* ปรับส่วนข้อความไม่ให้ขยับไปไหน */
 .title-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 /* ปรับแต่งพิเศษสำหรับมือถือ (ถ้าจอมันแคบเกินไป) */
 @media (max-width: 480px) {
-    .header-content {
-        gap: 10px;
-        /* ลดระยะห่างบนมือถือ */
-    }
+  .header-content {
+    gap: 10px;
+    /* ลดระยะห่างบนมือถือ */
+  }
 
-    .header-side-img {
-        width: 40px;
-        /* ลดขนาดรูปบนมือถือ */
-    }
+  .header-side-img {
+    width: 40px;
+    /* ลดขนาดรูปบนมือถือ */
+  }
 }
 
 .logo-title {
-    display: inline-flex;
-    /* ทำให้รูปกับข้อความรวมร่างกัน */
-    align-items: center;
-    /* จัดกลางแนวตั้งให้เท่ากัน */
-    justify-content: center;
-    gap: 10px;
-    /* ระยะห่างระหว่างรูปกับตัวอักษร */
+  display: inline-flex;
+  /* ทำให้รูปกับข้อความรวมร่างกัน */
+  align-items: center;
+  /* จัดกลางแนวตั้งให้เท่ากัน */
+  justify-content: center;
+  gap: 10px;
+  /* ระยะห่างระหว่างรูปกับตัวอักษร */
 
-    /* โค้ด Gradient เดิมของคุณ */
-    font-size: clamp(2.5rem, 8vw, 3.5rem);
-    font-weight: 800;
-    letter-spacing: 2.5px;
-    background: linear-gradient(to bottom, #fff 40%, var(--accent-gold));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.4));
-    white-space: nowrap;
+  /* โค้ด Gradient เดิมของคุณ */
+  font-size: clamp(2.5rem, 8vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  background: linear-gradient(to bottom, #fff 40%, var(--accent-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 15px rgba(255, 214, 0, 0.4));
+  white-space: nowrap;
 }
 
 .inner-logo {
-    /* ปรับความสูงให้สัมพันธ์กับขนาดตัวอักษร */
-    height: 0.9em;
-    /* ให้รูปสูงเกือบเท่าตัวอักษรพอดี */
-    width: auto;
-    object-fit: contain;
+  /* ปรับความสูงให้สัมพันธ์กับขนาดตัวอักษร */
+  height: 0.9em;
+  /* ให้รูปสูงเกือบเท่าตัวอักษรพอดี */
+  width: auto;
+  object-fit: contain;
 
-    /* ป้องกันการโดนครอบงำจาก Gradient ของตัวหนังสือ */
-    -webkit-text-fill-color: initial;
+  /* ป้องกันการโดนครอบงำจาก Gradient ของตัวหนังสือ */
+  -webkit-text-fill-color: initial;
 }
 
 /* ปรับระยะห่างระหว่างกลุ่มโลโก้กับชื่อโรงเรียน */
 .school-name {
-    margin-top: 5px;
-    position: relative;
-    z-index: 1;
+  margin-top: 5px;
+  position: relative;
+  z-index: 1;
 }
 
 .inner-logo:first-of-type {
-    height: 1.1em;
-    /* ปรับให้ใหญ่กว่าตัวหนังสือ (เดิม 0.9em) */
-    margin-right: 0;
-    /* เพิ่มระยะห่างทางขวานิดหน่อย */
-    transform: translateY(2px);
+  height: 1.1em;
+  /* ปรับให้ใหญ่กว่าตัวหนังสือ (เดิม 0.9em) */
+  margin-right: 0;
+  /* เพิ่มระยะห่างทางขวานิดหน่อย */
+  transform: translateY(2px);
 
-    /* หากต้องการให้รูปแรกดูลอยเด่นกว่า ให้เพิ่มเงาเฉพาะตัวได้ */
-    filter: drop-shadow(0 0 7px rgba(255, 214, 0, 0.6));
+  /* หากต้องการให้รูปแรกดูลอยเด่นกว่า ให้เพิ่มเงาเฉพาะตัวได้ */
+  filter: drop-shadow(0 0 7px rgba(255, 214, 0, 0.6));
 }
 
 .inner-logo:last-of-type {
-    height: 0.9em;
-    /* ขนาดปกติเท่าเดิม */
-    filter: drop-shadow(0 0 7px rgba(255, 214, 0, 0.6));
-
+  height: 0.9em;
+  /* ขนาดปกติเท่าเดิม */
+  filter: drop-shadow(0 0 7px rgba(255, 214, 0, 0.6));
 }
 
 .app-item,
 .app-card {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    opacity 0.3s ease;
 }
 
 /* Container ปรับให้เข้าคู่กับ Search */
 .install-fab-container {
-    display: none;
-    /* เริ่มต้นซ่อนไว้ */
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    z-index: 9999 !important;
-    /* ให้ลอยอยู่เหนือทุกอย่าง */
+  display: none;
+  /* เริ่มต้นซ่อนไว้ */
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  z-index: 9999 !important;
+  /* ให้ลอยอยู่เหนือทุกอย่าง */
 }
 
 /* ตัวปุ่มวงกลม - ใช้ดีไซน์เดียวกับ search-btn */
 .install-fab {
-    width: 44px;
-    height: 44px;
-    /* ไล่เฉดสีม่วงเข้มไปม่วงสว่าง */
-    background: linear-gradient(-45deg,
-            #2a0052,
-            /* ม่วงมืดสุด */
-            #4d0099,
-            /* ม่วงเข้ม */
-            #7b2ff7,
-            /* ม่วงสว่าง */
-            #4d0099
-            /* วนกลับมาม่วงเข้มเพื่อให้รอยต่อบรรจบกัน */
-        );
+  width: 44px;
+  height: 44px;
+  /* ไล่เฉดสีม่วงเข้มไปม่วงสว่าง */
+  background: linear-gradient(
+    -45deg,
+    #2a0052,
+    /* ม่วงมืดสุด */ #4d0099,
+    /* ม่วงเข้ม */ #7b2ff7,
+    /* ม่วงสว่าง */ #4d0099 /* วนกลับมาม่วงเข้มเพื่อให้รอยต่อบรรจบกัน */
+  );
 
-    background-size: 400% 400%;
-    animation: gradient-flow 8s ease-in-out infinite;
-    /* ปรับเวลาให้ช้าลงเพื่อความนวล */
+  background-size: 400% 400%;
+  animation: gradient-flow 8s ease-in-out infinite;
+  /* ปรับเวลาให้ช้าลงเพื่อความนวล */
 
-    border: 2px solid #ffd700;
-    /* เส้นขอบสีทอง (Gold) */
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    /* ไอคอนสีขาว */
-    cursor: pointer;
+  border: 2px solid #ffd700;
+  /* เส้นขอบสีทอง (Gold) */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  /* ไอคอนสีขาว */
+  cursor: pointer;
 
-    /* เงาสีทองจางๆ */
-    box-shadow: 0 4px 15px rgba(255, 222, 32, 0.3);
+  /* เงาสีทองจางๆ */
+  box-shadow: 0 4px 15px rgba(255, 222, 32, 0.3);
 
-    position: relative;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
 
 .install-fab::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
-    pointer-events: none;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 215, 0, 0.1) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
 }
 
 .install-fab:hover {
-    background: linear-gradient(-45deg, #4d0099, #8d56e7, #e2d1ff, #8d56e7, #ffe066);
-    /* สีเข้มขึ้นตอน Hover */
-    background-size: 400% 400%;
-    animation: gradient-flow 10s ease infinite;
-    /* เร็วขึ้นเล็กน้อยตอน Hover */
-    border-color: #ffd700;
+  background: linear-gradient(
+    -45deg,
+    #4d0099,
+    #8d56e7,
+    #e2d1ff,
+    #8d56e7,
+    #ffe066
+  );
+  /* สีเข้มขึ้นตอน Hover */
+  background-size: 400% 400%;
+  animation: gradient-flow 10s ease infinite;
+  /* เร็วขึ้นเล็กน้อยตอน Hover */
+  border-color: #ffd700;
 }
 
 .install-fab:active {
-    transform: scale(0.98);
+  transform: scale(0.98);
 }
 
 @keyframes gradient-flow {
-    0% {
-        background-position: 0% 50%;
-    }
+  0% {
+    background-position: 0% 50%;
+  }
 
-    50% {
-        background-position: 100% 50%;
-    }
+  50% {
+    background-position: 100% 50%;
+  }
 
-    100% {
-        background-position: 0% 50%;
-    }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .install-fab::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #ffd700;
-    border-radius: 50%;
-    z-index: -1;
-    opacity: 0;
-    animation: gold-pulse 2s infinite;
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #ffd700;
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0;
+  animation: gold-pulse 2s infinite;
 }
 
 @keyframes gold-pulse {
-    0% {
-        transform: scale(1);
-        opacity: 0.5;
-    }
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
 
-    100% {
-        transform: scale(1.6);
-        opacity: 0;
-    }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
 }
 
 /* ไอคอน 📥 */
 .fab-icon {
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
 }
 
 /* Label เล็กๆ ด้านข้าง (ดีไซน์แบบ Minimal) */
 .fab-label {
-    position: absolute;
-    right: 60px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
+  position: absolute;
+  right: 60px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 .install-fab-container:hover .fab-label {
-    opacity: 1;
+  opacity: 1;
 }
 
 .fab-icon-circle {
-    width: 32px;
-    height: 32px;
-    background: #00b900;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    box-shadow: 0 0 10px rgba(0, 185, 0, 0.3);
+  width: 32px;
+  height: 32px;
+  background: #00b900;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 185, 0, 0.3);
 }
 
 /* ข้อความข้างปุ่ม */
 .fab-text {
-    font-size: 14px;
-    font-weight: 400;
-    letter-spacing: 0.5px;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
 .fab-icon-circle {
-    width: 30px;
-    height: 30px;
-    background: rgba(255, 255, 255, 0.1);
-    /* วงกลมไอคอนโปร่งแสง */
-    border: 1px solid rgba(255, 215, 0, 0.5);
-    /* ขอบทองบางๆ */
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  /* วงกลมไอคอนโปร่งแสง */
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  /* ขอบทองบางๆ */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .fab-text {
-    color: #f0f0f0;
-    /* ขาวนวลๆ ไม่สว่างจ้าจนปวดตา */
-    font-weight: 300;
+  color: #f0f0f0;
+  /* ขาวนวลๆ ไม่สว่างจ้าจนปวดตา */
+  font-weight: 300;
 }
 
 /* Modal System */
 .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .modal-overlay.active {
-    display: flex;
-    opacity: 1;
+  display: flex;
+  opacity: 1;
 }
 
 .modal-card {
-    background: linear-gradient(145deg, #1a0b2e, #0f051a);
-    border: 1px solid rgba(255, 215, 0, 0.4);
-    border-radius: 28px;
-    width: 100%;
-    max-width: 350px;
-    padding: 35px 25px;
-    text-align: center;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 15px rgba(115, 0, 255, 0.2);
-    transform: translateY(20px);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: linear-gradient(145deg, #1a0b2e, #0f051a);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  border-radius: 28px;
+  width: 100%;
+  max-width: 350px;
+  padding: 35px 25px;
+  text-align: center;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.8),
+    0 0 15px rgba(115, 0, 255, 0.2);
+  transform: translateY(20px);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .modal-overlay.active .modal-card {
-    transform: translateY(0);
+  transform: translateY(0);
 }
 
 .modal-icon-gold {
-    margin-bottom: 20px;
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.3));
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.3));
 }
 
 .modal-body h3 {
-    color: #ffffff;
-    font-family: 'Kanit', sans-serif;
-    font-size: 22px;
-    margin-bottom: 12px;
-    letter-spacing: 0.5px;
+  color: #ffffff;
+  font-family: "Kanit", sans-serif;
+  font-size: 22px;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
 }
 
 .modal-body p {
-    color: #b181ff;
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1.6;
-    margin-bottom: 30px;
+  color: #b181ff;
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.6;
+  margin-bottom: 30px;
 }
 
 .modal-footer {
-    display: flex;
-    gap: 12px;
+  display: flex;
+  gap: 12px;
 }
 
 .btn-modal-secondary {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #ccc;
-    padding: 14px;
-    border-radius: 16px;
-    font-family: 'Kanit', sans-serif;
-    cursor: pointer;
-    transition: 0.3s;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  padding: 14px;
+  border-radius: 16px;
+  font-family: "Kanit", sans-serif;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 .btn-modal-primary {
-    flex: 2;
-    background: linear-gradient(45deg, #ffd700, #daa520);
-    border: none;
-    color: #1a0b2e;
-    font-weight: 600;
-    padding: 14px;
-    border-radius: 16px;
-    font-family: 'Kanit', sans-serif;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-    transition: 0.3s;
+  flex: 2;
+  background: linear-gradient(45deg, #ffd700, #daa520);
+  border: none;
+  color: #1a0b2e;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: 16px;
+  font-family: "Kanit", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  transition: 0.3s;
 }
 
 .btn-modal-primary:active {
-    transform: scale(0.96);
+  transform: scale(0.96);
 }
+
+.skip-minimal {
+  position: fixed;
+  bottom: 50px; /* ระยะห่างจากขอบล่าง */
+  left: 50%; /* ย้ายมาที่กึ่งกลางซ้าย-ขวา */
+  transform: translateX(-50%); /* สั่งให้ดีดกลับมาตรงกลางตัวมันเองพอดี */
+  z-index: 10000;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 150;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  padding: 15px; /* เพิ่มพื้นที่กดให้กว้างขึ้นนิดหน่อย */
+  white-space: nowrap; /* กันตัวอักษรตัดบรรทัด */
+}
+
+/* เมื่อเอาเมาส์วางหรือนิ้วไปโดน */
+.skip-minimal:hover,
+.skip-minimal:active {
+  color: rgba(255, 255, 255, 0.8);
+  /* เพิ่มการขยายตัวอักษรเบาๆ และรักษาตำแหน่งกลางไว้ */
+  transform: translateX(-50%) scale(1.05);
+  letter-spacing: 0.35em;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* แอนิเมชันตอนปรากฏตัว (Fade In พร้อมลอยขึ้นเบาๆ) */
+@keyframes fadeInCenter {
+  from {
+    opacity: 0;
+    bottom: 40px;
+  }
+  to {
+    opacity: 1;
+    bottom: 50px;
+  }
+}
+
+#skip-splash {
+  animation: fadeInCenter 2s ease-out forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+/* Container สำหรับจัดวาง */
+.report-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ตัวปุ่มวงกลม (FAB) */
+.report-fab {
+  width: 44px; /* ขนาดมาตรฐานเดียวกับปุ่มอื่น */
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1); /* ขาวโปร่งแสง */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(10px); /* เบลอหลังเพิ่มความหรู */
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent; /* ลบสีฟ้าเวลาเน้นบนมือถือ */
+}
+
+/* ขนาดของไอคอน SVG ข้างใน */
+.report-fab svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+}
+
+/* เอฟเฟกต์เวลาเอาเมาส์วาง (Hover) */
+.report-fab:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 218, 68, 0.5); /* เปลี่ยนขอบเป็นสีเหลืองอ่อนๆ */
+  color: #ffda44; /* สีเหลืองแจ้งเตือน */
+  transform: translateY(-2px); /* ลอยขึ้นเล็กน้อย */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* เอฟเฟกต์เวลากด (Active/Touch) */
+.report-fab:active {
+  transform: scale(0.92); /* ยุบตัวลงเล็กน้อยเวลาสัมผัส */
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* --- ส่วนทับพื้นหลัง (Overlay) --- */
+.kc-smart-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  /* ไล่เฉดสีน้ำเงินเข้มจัดแบบ Radial เพื่อสร้างมิติ */
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 8, 25, 0.95) 0%,
+    rgba(0, 2, 8, 0.98) 100%
+  );
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  backdrop-filter: blur(10px); /* เพิ่มความเบลอให้ฉากหลังดูแพง */
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kc-smart-overlay.active {
+  opacity: 1;
+}
+
+/* --- ตัวการ์ด Modal (Ultimate Upgrade) --- */
+.kc-smart-modal-card {
+  position: relative;
+  width: 90%;
+  max-width: 420px;
+  background: #0f111a;
+  border: 1px solid rgba(255, 218, 68, 0.2); /* ขอบทองจางๆ */
+  border-radius: 40px;
+  padding: 40px 30px;
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.9),
+    0 0 50px rgba(255, 218, 68, 0.05);
+  transform: translateY(60px) scale(0.9);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  text-align: center;
+  overflow: hidden; /* สำหรับเอฟเฟกต์แสงวิ่ง */
+}
+
+.kc-smart-overlay.active .kc-smart-modal-card {
+  transform: translateY(0) scale(1);
+}
+
+/* --- ส่วนหัวและสถานะ --- */
+.kc-smart-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: -20px;
+  position: relative;
+  z-index: 2;
+}
+
+.kc-smart-close-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.kc-smart-close-btn:hover {
+  background: #ff4747;
+  border-color: #ff4747;
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 71, 71, 0.4);
+}
+
+/* --- การแสดงโลโก้คู่ --- */
+.kc-smart-brand-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.kc-smart-dev-logo {
+  width: 70px;
+  height: auto;
+  filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+  transition: 0.4s;
+}
+
+.kc-smart-dev-logo:hover {
+  transform: translateY(-5px) scale(1.1);
+}
+
+.kc-smart-brand-divider {
+  width: 1.5px;
+  height: 50px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 218, 68, 0.5),
+    transparent
+  );
+}
+
+/* --- Typography --- */
+.kc-smart-design-label {
+  color: #6a6e82;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-bottom: 15px;
+}
+
+.kc-smart-main-title {
+  background: linear-gradient(to right, #fff, #ffda44, #fff);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.2rem;
+  font-weight: 650;
+  margin-bottom: 15px;
+  animation: shineText 3s linear infinite;
+
+  white-space: nowrap; /* ล็อกไม่ให้ขึ้นบรรทัดใหม่ */
+  overflow: hidden; /* ซ่อนส่วนที่ยาวเกินขอบ */
+  text-overflow: ellipsis; /* ถ้าข้อความยาวเกิน ให้แสดงเป็น ... (Optional) */
+  display: block; /* บังคับให้เป็น block เพื่อให้คำนวณความกว้างได้แม่นยำ */
+  max-width: 100%; /* ป้องกันไม่ให้ดันขอบจอจนเสียทรง */
+}
+
+@keyframes shineText {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.kc-smart-desc-text {
+  color: #a0a4b8;
+  font-size: 0.7rem;
+  line-height: 1.6;
+  font-weight: 280;
+}
+
+.kc-smart-horizontal-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 218, 68, 0.2),
+    transparent
+  );
+  width: 100%;
+  margin: 30px 0;
+}
+
+/* --- ปุ่มกด Hero Button --- */
+.kc-smart-hero-button {
+  display: flex;
+  align-items: center;
+  padding: 22px;
+  background: #161824;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 25px;
+  text-decoration: none;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.kc-smart-hero-button:hover {
+  background: #1c1f30;
+  border-color: #ffda44;
+  transform: translateY(-5px);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 15px rgba(255, 218, 68, 0.1);
+}
+
+.kc-smart-btn-icon-box {
+  width: 54px;
+  height: 54px;
+  /* ไล่เฉดสีให้ดูมีมิติ (ทองสว่างไปทองเข้ม) */
+  background: linear-gradient(135deg, #ffda44 0%, #ffb100 100%);
+  color: #000;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+  position: relative;
+  z-index: 1;
+
+  /* เงาแบบซ้อนเลเยอร์เพื่อให้ดูนูนออกมาจริง ๆ */
+  box-shadow:
+    0 8px 15px rgba(255, 218, 68, 0.2),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.1),
+    inset 0 3px 5px rgba(255, 255, 255, 0.4);
+
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden; /* สำหรับดักแสงที่วิ่งผ่าน */
+}
+
+/* เอฟเฟกต์แสงวิ่งผ่าน (Shine Effect) แบบวนลูป */
+.kc-smart-btn-icon-box::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 20%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: rotate(30deg);
+  transition: 0s;
+  animation: iconShine 4s infinite linear;
+}
+
+/* อนิเมชันตอน Hover (ขยายและเรืองแสง) */
+.kc-smart-hero-button:hover .kc-smart-btn-icon-box {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 25px rgba(255, 218, 68, 0.4);
+  background: linear-gradient(135deg, #fff 0%, #ffda44 100%);
+}
+
+/* อนิเมชันตัว SVG ด้านในให้ขยับเล็กน้อย */
+.kc-smart-btn-icon-box svg {
+  width: 26px;
+  height: 26px;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
+}
+
+.kc-smart-hero-button:hover .kc-smart-btn-icon-box svg {
+  transform: scale(1.1);
+  animation: iconPulse 1.5s infinite;
+}
+
+/* Keyframes สำหรับแสงวิ่ง */
+@keyframes iconShine {
+  0% {
+    left: -60%;
+  }
+  20% {
+    left: 120%;
+  }
+  100% {
+    left: 120%;
+  }
+}
+
+/* Keyframes สำหรับไอคอนเต้นเบาๆ */
+@keyframes iconPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.kc-smart-hero-button:hover .kc-smart-btn-icon-box {
+  transform: rotate(-10deg) scale(1.1);
+  box-shadow: 0 0 20px rgba(255, 218, 68, 0.5);
+}
+
+.kc-smart-btn-content {
+  text-align: left;
+  flex-grow: 1;
+}
+
+.kc-smart-btn-primary {
+  display: block;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap; /* ล็อกไม่ให้ขึ้นบรรทัดใหม่ */
+  overflow: hidden; /* ซ่อนส่วนที่ยาวเกินขอบ */
+  text-overflow: ellipsis; /* ถ้าข้อความยาวเกิน ให้แสดงเป็น ... (Optional) */
+  display: block; /* บังคับให้เป็น block เพื่อให้คำนวณความกว้างได้แม่นยำ */
+  max-width: 100%; /* ป้องกันไม่ให้ดันขอบจอจนเสียทรง */
+}
+
+.kc-smart-btn-secondary {
+  display: block;
+  color: #5d627b;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 4px;
+  white-space: nowrap;       /* ล็อกไม่ให้ขึ้นบรรทัดใหม่ */
+    overflow: hidden;          /* ซ่อนส่วนที่ยาวเกินขอบ */
+    text-overflow: ellipsis;   /* ถ้าข้อความยาวเกิน ให้แสดงเป็น ... (Optional) */
+    display: block;            /* บังคับให้เป็น block เพื่อให้คำนวณความกว้างได้แม่นยำ */
+    max-width: 100%;           /* ป้องกันไม่ให้ดันขอบจอจนเสียทรง */
+}
+
+.kc-smart-btn-arrow {
+  color: rgba(255, 255, 255, 0.2);
+  width: 24px;
+  transition: 0.3s;
+}
+
+.kc-smart-hero-button:hover .kc-smart-btn-arrow {
+  color: #ffda44;
+  transform: translateX(8px);
+}
+
+/* --- การสลับ View (Advanced Animation) --- */
+.kc-smart-view {
+  display: none;
+  opacity: 0;
+}
+
+.kc-smart-view.active {
+  display: block;
+  animation: kc-view-enter 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes kc-view-enter {
+  from {
+    opacity: 0;
+    transform: translateX(30px) scale(0.95);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+#reportView {
+  padding: 10px 5px;
+}
+
+/* หัวข้อ (Title) ให้ดูแพงขึ้น */
+.kc-smart-form-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #fff 0%, #ffd700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+
+.kc-smart-input-group textarea {
+  width: 100%;
+  min-height: 150px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 18px;
+  color: #fff;
+  font-family: "Kanit", sans-serif;
+  font-size: 0.85rem !important;
+  line-height: 1.6;
+  resize: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.kc-smart-input-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 300;
+}
+
+/* เอฟเฟกต์ตอนกดพิมพ์ (Focus) */
+.kc-smart-input-group textarea:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.1),
+    inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.kc-smart-input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.kc-smart-input-group select,
+.kc-smart-input-group textarea,
+.kc-smart-input-group input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 15px 18px;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.3s;
+}
+
+.kc-smart-input-group textarea {
+  height: 120px;
+}
+
+.kc-smart-input-group select:focus,
+.kc-smart-input-group textarea:focus,
+.kc-smart-input-group input:focus {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: #ffda44;
+  box-shadow: 0 0 15px rgba(255, 218, 68, 0.1);
+}
+
+.kc-smart-form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+}
+
+.kc-smart-back-link {
+  background: rgba(255, 255, 255, 0.05); /* พื้นหลังจางๆ แบบ Glass */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* ขอบบางๆ ให้ดูมีขอบเขต */
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  font-weight: 400;
+  cursor: pointer;
+
+  /* ปรับทรงให้เป็นปุ่มที่ดูดี */
+  padding: 8px 18px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* อนิเมชันการตอบสนอง */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* เอฟเฟกต์ตอน Hover (เอาเมาส์วาง/นิ้วแตะค้าง) */
+.kc-smart-back-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* เอฟเฟกต์ตอนกดจริง (Active State) */
+.kc-smart-back-link:active {
+  transform: translateY(0) scale(0.95); /* ปุ่มยุบลงไปเล็กน้อยเหมือนกดจริง */
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.1s;
+}
+
+/* แถม: เพิ่มไอคอนลูกศรย้อนกลับเล็กๆ หน้าข้อความ (ทางเลือก) */
+.kc-smart-back-link::before {
+  content: "←";
+  margin-right: 8px;
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.kc-smart-back-link:hover::before {
+  transform: translateX(-3px); /* ลูกศรขยับถอยหลังเล็กน้อยตอน Hover */
+}
+
+.kc-smart-submit-btn {
+  background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+  border: none;
+  color: #000;
+  font-weight: 600;
+  padding: 0 25px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(184, 134, 11, 0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.kc-smart-submit-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 25px rgba(184, 134, 11, 0.4);
+}
+
+.kc-smart-submit-btn:active {
+  transform: translateY(0);
+}
+
+.kc-smart-loader {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top: 2px solid #000;
+  border-radius: 50%;
+  display: none;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ปุ่มรอง (ไอคอนดูลูกตา) */
+.kc-smart-secondary-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.kc-smart-secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.05);
+}
+
+/* Container สำหรับรายการปัญหา */
+.kc-smart-list-container {
+  max-height: 250px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  padding-right: 5px;
+  text-align: left;
+}
+
+.kc-smart-list-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.kc-smart-list-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 218, 68, 0.2);
+  border-radius: 10px;
+}
+
+/* ตัวการ์ดรายการปัญหาแต่ละอัน */
+.kc-report-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px 15px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: #fff;
+  border-left: 3px solid #ffda44;
+  animation: kc-fade-in 0.3s ease;
+}
+
+.kc-report-time {
+  display: block;
+  font-size: 0.7rem;
+  color: #6a6e82;
+  margin-top: 5px;
+}
+
+/* Toast Notification - Professional Version */
+.status-toast {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -100%); /* ซ่อนไว้เหนือจอ */
+  background: rgba(15, 12, 30, 0.85); /* เข้มขึ้นและใสขึ้นแบบ Glassmorphism */
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+
+  /* เส้นขอบแบบไฮเอนด์ (Border Gradient Light) */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 16px; /* ไม่เป็นวงรีเกินไป ให้ดูเหมือน Card */
+  z-index: 10001;
+
+  /* Motion: นิ่งและกระชับ (Ease-out แบบ Apple) */
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadow แบบซ้อนเลเยอร์เพื่อให้ดูมีความลึกสมจริง */
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    0 15px 35px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
+
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+  justify-content: center;
+}
+
+.status-toast.active {
+  transform: translate(-50%, 40px); /* เลื่อนลงมาค้างไว้ */
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  font-size: 0.95rem;
+}
+
+/* ปรับปรุง Icon ให้ดูเป็นส่วนหนึ่งของระบบ ไม่ใช่ Emoji ลอยๆ */
+.toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.toast-success .toast-icon {
+  background: #34c759;
+  color: #fff;
+}
+.toast-error .toast-icon {
+  background: #ff3b30;
+  color: #fff;
+}
+
+/* เมื่อ Footer ขยาย (กำลังค้นหา) ให้ซ่อนลูกๆ ตัวอื่นที่ไม่ใช่ search-container */
+.special-footer.expanded > *:not(.search-container) {
+    opacity: 0;
+    pointer-events: none; /* กดไม่ได้ */
+    transform: scale(0.8);
+    transition: all 0.3s ease;
+    width: 0; /* บีบพื้นที่ไม่ให้แย่ง Search Box */
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* ปรับให้ search-container ขยายเต็มพื้นที่เมื่อปุ่มอื่นหายไป */
+.special-footer.expanded .search-container {
+    flex-grow: 1;
+    transition: all 0.3s ease;
+}
+
+/* สไตล์พื้นฐานขององค์ประกอบใน Footer เพื่อให้ตอนโชว์/ซ่อนดูนุ่มนวล */
+.special-footer > * {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* เมื่อเปิดค้นหา (ขยาย Search) */
+.special-footer.expanded {
+    gap: 0; /* ลดช่องว่างให้เหลือ 0 เพื่อให้ Search Box ชิดขอบที่สุด */
+}
+
