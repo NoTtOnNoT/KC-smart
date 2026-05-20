@@ -8,9 +8,9 @@ const apps = [
     img: "KCsmartpic/pic1.webp",
   },
   {
-    n: "ตารางสอน",
+    n: "ตารางสอนครู",
     u: "https://teacherkc.sadaokc.com/",
-    img: "KCsmartpic/pic2.webp",
+    img: "KCsmartpic/pic25.webp",
   },
   {
     n: "ตารางสอบ",
@@ -23,19 +23,14 @@ const apps = [
     img: "KCsmartpic/pic4.webp",
   },
   {
-    n: "Portfolio",
-    u: "https://doportkc.sadaokc.com/",
-    img: "KCsmartpic/pic5.webp",
+    n: "KC LearnUp",
+    u: "https://kclearnup.sadaokc.com/",
+    img: "KCsmartpic/pic7.webp",
   },
   {
     n: "คำนวณเกรด",
     u: "https://calgrade.sadaokc.com/",
     img: "KCsmartpic/pic6.webp",
-  },
-  {
-    n: "KC LearnUp",
-    u: "https://kclearnup.sadaokc.com/",
-    img: "KCsmartpic/pic7.webp",
   },
   {
     n: "รายชื่อนักเรียน",
@@ -48,14 +43,19 @@ const apps = [
     img: "KCsmartpic/pic9.webp",
   },
   {
-    n: "แจ้งข่าวสาร",
-    u: "https://script.google.com/macros/s/AKfycbz1rmB_ZaYszuwFHAvpMP6oAS7IVGr93KV2QuFhsKRqR-jrUBcE-slfzM6gXE5Nr9eu/exec",
-    img: "KCsmartpic/pic10.webp",
+    n: "% มาเรียน",
+    u: "https://search.kc-lovecare.com/",
+    img: "KCsmartpic/pic19.webp",
   },
   {
-    n: "ห้องสมุดออนไลน์",
-    u: "http://khanchai.vlcloud.net/",
-    img: "KCsmartpic/pic11.webp",
+    n: "KC ScoreHub",
+    u: "https://myscores.sadaokc.com/",
+    img: "KCsmartpic/pic24.webp",
+  },
+  {
+    n: "KC Care",
+    u: "https://line.me/R/ti/p/@370dvdpj",
+    img: "KCsmartpic/pic26.webp",
   },
   {
     n: "งานทะเบียน",
@@ -68,19 +68,19 @@ const apps = [
     img: "KCsmartpic/pic12.webp",
   },
   {
+    n: "ดูเกรดปวช.",
+    u: "https://script.google.com/macros/s/AKfycbxfEjNfbTZ86Dw1ekrIkz08KO9cwie1zV2khA5GiyeqgMBqCkJ6JESREzrpaVmDYiDQfA/exec",
+    img: "KCsmartpic/pic15.webp",
+  },
+  {
     n: "ภาพกิจกรรม",
     u: "https://script.google.com/macros/s/AKfycbz_rtqBkrrFVoDmIkGHzAldYU1BpMBjp16gTsGxLcoueiygrEAMK_0qS2eaEELNPOYW/exec",
     img: "KCsmartpic/pic13.webp",
   },
   {
-    n: "วารสารโรงเรียน",
-    u: "https://khanchai.ac.th/ebook",
-    img: "KCsmartpic/pic14.webp",
-  },
-  {
-    n: "ดูเกรดปวช.",
-    u: "https://script.google.com/macros/s/AKfycbxfEjNfbTZ86Dw1ekrIkz08KO9cwie1zV2khA5GiyeqgMBqCkJ6JESREzrpaVmDYiDQfA/exec",
-    img: "KCsmartpic/pic15.webp",
+    n: "เพจสภา",
+    u: "https://www.facebook.com/share/1Ha43rKgzp/",
+    img: "KCsmartpic/pic18.webp",
   },
   {
     n: "เพจโรงเรียน",
@@ -93,29 +93,29 @@ const apps = [
     img: "KCsmartpic/pic17.webp",
   },
   {
-    n: "เพจสภา",
-    u: "https://www.facebook.com/share/1Ha43rKgzp/",
-    img: "KCsmartpic/pic18.webp",
-  },
-  {
-    n: "KC ScoreHub",
-    u: "https://myscores.sadaokc.com/",
-    img: "KCsmartpic/pic24.webp",
-  },
-  {
-    n: "% มาเรียน",
-    u: "https://search.kc-lovecare.com/",
-    img: "KCsmartpic/pic19.webp",
-  },
-  {
-    n: "โควตา ม.4",
-    u: "https://quotam4.sadaokc.com/",
-    img: "KCsmartpic/pic20.webp",
+    n: "วารสารโรงเรียน",
+    u: "https://khanchai.ac.th/ebook",
+    img: "KCsmartpic/pic14.webp",
   },
   {
     n: "ผ้าอนามัย",
     u: "https://freepads.sadaokc.com/",
     img: "KCsmartpic/pic21.webp",
+  },
+  {
+    n: "Portfolio",
+    u: "https://doportkc.sadaokc.com/",
+    img: "KCsmartpic/pic5.webp",
+  },
+  {
+    n: "แจ้งข่าวสาร",
+    u: "https://script.google.com/macros/s/AKfycbz1rmB_ZaYszuwFHAvpMP6oAS7IVGr93KV2QuFhsKRqR-jrUBcE-slfzM6gXE5Nr9eu/exec",
+    img: "KCsmartpic/pic10.webp",
+  },
+  {
+    n: "ห้องสมุดออนไลน์",
+    u: "http://khanchai.vlcloud.net/",
+    img: "KCsmartpic/pic11.webp",
   },
   {
     n: "แก้ 0/ร/มผ",
