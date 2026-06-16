@@ -34,7 +34,7 @@ const apps = [
   },
   {
     n: "รายชื่อนักเรียน",
-    u: "https://script.google.com/macros/s/AKfycbwjFJ_Sw9fy8ciWUqccQ9ypdJgPsgtJ_c6Ab5cB0ACz21ybMu6lPmcEbuVdVrEhW4gQ/exec",
+    u: "https://namestukc.sadaokc.com/",
     img: "KCsmartpic/pic8.webp",
   },
   {
