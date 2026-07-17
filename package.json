@@ -1,4 +1,11 @@
 {
+  "name": "kc-smart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
     "express": "^5.2.1",
