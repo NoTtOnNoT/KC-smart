@@ -1,11 +1,9 @@
 const { TelegramClient } = require("telegram");
 const { StringSession } = require("telegram/sessions");
-const { initializeApp, cert } = require('firebase-admin/app');
-const { getMessaging } = require('firebase-admin/messaging');
-const { getDatabase } = require('firebase-admin/database');
 const { NewMessage } = require("telegram/events"); 
 const express = require('express');
 const cors = require('cors');
+const admin = require('firebase-admin'); // import ตัวหลักที่นี่
 
 // --- Setup Express ---
 const app = express();
@@ -21,16 +19,16 @@ try {
     serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS);
 } catch (e) {
     console.error("❌ Firebase Credentials Error:", e.message);
-    process.exit(1); // หยุดการทำงานถ้า Config พลาด
+    process.exit(1); 
 }
 
 // --- Initialize Firebase ---
-initializeApp({
-  credential: cert(serviceAccount),
-  databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app"
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 
-const db = getDatabase();
+const db = admin.database();
 
 // --- 1. ข้อมูลการเชื่อมต่อ Telegram ---
 const apiId = 39376007; 
@@ -49,17 +47,17 @@ async function sendToAllDevices(text) {
       return;
     }
 
-    // แก้ไขตรงนี้ครับ: ดึงค่า token ออกมาจาก object ข้างใน
+    // ดึงค่า token ออกมาจาก object ข้างใน
     const tokens = Object.values(data)
                          .map(item => item.token)
-                         .filter(token => token); // กรองเอาเฉพาะที่มีค่า
+                         .filter(token => token); 
 
     if (tokens.length === 0) {
       console.log("⚠️ ไม่พบข้อมูล Token ภายใน Database");
       return;
     }
 
-    // ส่วนที่เหลือเหมือนเดิม (ส่ง batch ทีละ 500)
+    // ส่ง batch ทีละ 500
     for (let i = 0; i < tokens.length; i += 500) {
       const batch = tokens.slice(i, i + 500);
       const message = {
@@ -83,7 +81,7 @@ app.post('/register-token', async (req, res) => {
   const { token } = req.body;
   if (!token) return res.status(400).send("No token provided");
   try {
-    await db.ref('devices/' + token).set({ token: token, updatedAt: Date.now() });
+    await db.ref('fcm_tokens/' + Date.now()).set({ token: token, device: "Android", timestamp: Date.now() });
     res.status(200).send("Token registered");
   } catch (err) {
     res.status(500).send("Error saving token");
@@ -112,32 +110,29 @@ app.get('/ping', (req, res) => res.status(200).send('เซิร์ฟเวอ
     console.log("🟢 [Telegram] เชื่อมต่อสำเร็จ!");
 
     client.addEventHandler(async (event) => {
-  const message = event.message;
-  
-  // 1. ตรวจสอบว่าได้รับข้อความหรือไม่ (แม้จะไม่ใช่ข้อความ text ก็ตาม)
-  if (!message) return;
-  
-  console.log("📥 [DEBUG] ได้รับ Event ใหม่! ข้อความ:", message.text);
+      const message = event.message;
+      
+      if (!message) return;
+      
+      console.log("📥 [DEBUG] ได้รับ Event ใหม่! ข้อความ:", message.text);
 
-  if (!message.text) return;
+      if (!message.text) return;
 
-  try {
-    const sender = await message.getSender();
-    
-    // ดูชื่อ sender ใน log เพื่อเช็คว่าเราจับชื่อถูกไหม
-    const username = sender && sender.username ? sender.username : "ไม่มี Username";
-    console.log(`📥 [DEBUG] ข้อความจาก: ${username} (ID: ${message.senderId})`);
-    
-    if (username === TARGET_BOT_USERNAME || username === 'KCSmartAlert_bot') {
-        console.log(`🚀 พบข้อความจากบอท กำลังส่งเข้า Firebase: ${message.text}`);
-        await sendToAllDevices(message.text);
-    } else {
-        console.log(`ℹ️ ข้อความจาก ${username} ไม่ใช่เป้าหมาย ข้ามไป`);
-    }
-  } catch (err) {
-    console.error("❌ เกิดข้อผิดพลาดในการตรวจสอบข้อความ:", err.message);
-  }
-}, new NewMessage({}));
+      try {
+        const sender = await message.getSender();
+        const username = sender && sender.username ? sender.username : "ไม่มี Username";
+        console.log(`📥 [DEBUG] ข้อความจาก: ${username} (ID: ${message.senderId})`);
+        
+        if (username === TARGET_BOT_USERNAME || username === 'KCSmartAlert_bot') {
+            console.log(`🚀 พบข้อความจากบอท กำลังส่งเข้า Firebase: ${message.text}`);
+            await sendToAllDevices(message.text);
+        } else {
+            console.log(`ℹ️ ข้อความจาก ${username} ไม่ใช่เป้าหมาย ข้ามไป`);
+        }
+      } catch (err) {
+        console.error("❌ เกิดข้อผิดพลาดในการตรวจสอบข้อความ:", err.message);
+      }
+    }, new NewMessage({}));
 
   } catch (connectError) {
     console.error("❌ ไม่สามารถเชื่อมต่อกับ Telegram ได้:", connectError.message);
