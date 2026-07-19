@@ -41,7 +41,7 @@ initializeApp({
       const sender = await message.getSender();
       if (sender && sender.username === 'Kc_broadcast_Bot_bot') { 
         const text = message.text;
-        console.log(`🔔 มีแจ้งเตือนใหม่จากบอทครู: "${text}"`);
+        console.log(`🔔 มีแจ้งเตือนใหม่: "${text}"`);
 
         // 4. ส่ง Web Push หาผู้ใช้เว็บทุกคนผ่าน Firebase (Topic: announcements)
         const pushMessage = {
