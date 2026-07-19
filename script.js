@@ -542,7 +542,9 @@ buttons.forEach((btn) => {
   });
 })();
 
-// โค้ดเดิมของคุณ (ปรับแต่งให้เรียกฟังก์ชันขอสิทธิ์เพิ่ม)
+// ========================================================
+// [แก้ไขใหม่] ชุดควบคุม Service Worker และการขอสิทธิ์แจ้งเตือน (Fix iOS)
+// ========================================================
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
@@ -550,11 +552,66 @@ if ("serviceWorker" in navigator) {
       .then((reg) => {
         console.log("Service Worker Registered!", reg);
         
-        // 🎯 เรียกฟังก์ชันขออนุญาตแจ้งเตือนหลังจากลงทะเบียน SW สำเร็จ
-        askNotificationPermission(reg);
+        // ตรวจสอบว่าเป็นอุปกรณ์ iOS (iPhone / iPad) หรือไม่
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        
+        if (isIOS) {
+          // 🍎 ถ้าเป็น iOS บังคับเข้าสู่กระบวนการแบบมีปฏิสัมพันธ์ (User Gesture)
+          initIOSNotificationFlow(reg);
+        } else {
+          // 🤖 Android / PC ปล่อยให้ทำงานอัตโนมัติเหมือนเดิม
+          askNotificationPermission(reg);
+        }
       })
       .catch((err) => console.log("Service Worker Registration Failed:", err));
   });
+}
+
+// 📱 ฟังก์ชันพิเศษสำหรับเปิดระบบแจ้งเตือนบน iOS ตามกฎของ Apple
+function initIOSNotificationFlow(reg) {
+  // เช็คว่าผู้ใช้เปิดแอปจากหน้าจอโฮม (Standalone) หรือยัง
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  
+  if (!isStandalone) {
+    console.log("🍎 iOS Mode: ผู้ใช้ยังไม่ได้เพิ่มลงหน้าจอโฮม ระบบแจ้งเตือนของ iOS จะถูกปิดไว้");
+    return;
+  }
+  
+  // ถ้ายังไม่เคยอนุญาตสิทธิ์แจ้งเตือน ให้สร้าง Banner แจ้งให้กดเปิดสิทธิ์
+  if (Notification.permission === "default") {
+    // ป้องกันไม่ให้สร้าง Banner ซ้ำซ้อน
+    if (document.getElementById("ios-notify-banner")) return;
+
+    const alertBanner = document.createElement("div");
+    alertBanner.id = "ios-notify-banner";
+    alertBanner.innerHTML = `
+      <div style="position: fixed; top: 20px; left: 5%; width: 90%; background: #ff4757; color: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 99999; display: flex; justify-content: space-between; align-items: center; font-family: sans-serif; animation: slideIn 0.3s ease;">
+        <span style="font-size: 0.9rem; font-weight: bold;">📢 เปิดรับแจ้งเตือนข่าวสารโรงเรียนด่วน!</span>
+        <button id="btnEnableIOSNotify" style="background: white; color: #ff4757; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">เปิดใช้งาน</button>
+      </div>
+    `;
+    document.body.appendChild(alertBanner);
+    
+    // ดักจับ Event การกดปุ่ม (User Gesture ที่ iOS ต้องการ)
+    document.getElementById("btnEnableIOSNotify").addEventListener("click", () => {
+      if (navigator.vibrate) navigator.vibrate(20);
+      
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          console.log("iOS อนุญาตการแจ้งเตือนแล้ว! 🎉");
+          getFCMToken(reg); // ดึง Token ขึ้นฐานข้อมูล
+          alertBanner.remove();
+        } else {
+          console.warn("iOS ปฏิเสธการแจ้งเตือน 😢");
+          alertBanner.remove();
+        }
+      });
+    });
+  } else if (Notification.permission === "granted") {
+    // ถ้าเคยยอมรับสิทธิ์ไปแล้ว สามารถรันดึง Token/เช็คซ่อมแซมตัวเองได้ทันที
+    getFCMToken(reg);
+  }
 }
 
 // 1. ฟังก์ชันส่งคำขออนุญาตแจ้งเตือน
