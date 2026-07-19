@@ -568,48 +568,117 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// 📱 ฟังก์ชันพิเศษสำหรับเปิดระบบแจ้งเตือนบน iOS ตามกฎของ Apple
+// 📱 ฟังก์ชันพิเศษสำหรับ iOS: เปิดระบบแจ้งเตือนด้วย UI สุดหรู (Premium Elegant Style)
 function initIOSNotificationFlow(reg) {
-  // เช็คว่าผู้ใช้เปิดแอปจากหน้าจอโฮม (Standalone) หรือยัง
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   
   if (!isStandalone) {
-    console.log("🍎 iOS Mode: ผู้ใช้ยังไม่ได้เพิ่มลงหน้าจอโฮม ระบบแจ้งเตือนของ iOS จะถูกปิดไว้");
+    console.log("🍎 iOS Mode: ระบบแจ้งเตือนจะเปิดใช้งานเมื่ออยู่บนหน้าจอโฮมเท่านั้น");
     return;
   }
   
-  // ถ้ายังไม่เคยอนุญาตสิทธิ์แจ้งเตือน ให้สร้าง Banner แจ้งให้กดเปิดสิทธิ์
   if (Notification.permission === "default") {
-    // ป้องกันไม่ให้สร้าง Banner ซ้ำซ้อน
-    if (document.getElementById("ios-notify-banner")) return;
+    if (document.getElementById("kc-premium-notify-prompt")) return;
 
-    const alertBanner = document.createElement("div");
-    alertBanner.id = "ios-notify-banner";
-    alertBanner.innerHTML = `
-      <div style="position: fixed; top: 20px; left: 5%; width: 90%; background: #ff4757; color: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 99999; display: flex; justify-content: space-between; align-items: center; font-family: sans-serif; animation: slideIn 0.3s ease;">
-        <span style="font-size: 0.9rem; font-weight: bold;">📢 เปิดรับแจ้งเตือนข่าวสารโรงเรียนด่วน!</span>
-        <button id="btnEnableIOSNotify" style="background: white; color: #ff4757; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem;">เปิดใช้งาน</button>
-      </div>
+    // 1. สร้างและฝัง CSS Animation สวย ๆ เข้าไปใน Head
+    const styleTag = document.createElement("style");
+    styleTag.innerHTML = `
+      @keyframes kcElasticSlideUp {
+        0% { transform: translate(-50%, 120%) scale(0.9); opacity: 0; }
+        70% { transform: translate(-50%, -10px) scale(1.02); opacity: 0.9; }
+        100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+      }
+      @keyframes kcPulseGlow {
+        0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.6), 0 4px 12px rgba(99, 102, 241, 0.3); }
+        70% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0), 0 4px 12px rgba(99, 102, 241, 0.3); }
+        100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0), 0 4px 12px rgba(99, 102, 241, 0.3); }
+      }
+      @keyframes kcFloatIcon {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-4px) rotate(5deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+      }
+      .kc-glass-card {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: 0 20px 40px rgba(31, 38, 135, 0.12), 
+                    0 8px 16px rgba(0, 0, 0, 0.04),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        z-index: 99999;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        animation: kcElasticSlideUp 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+      .kc-btn-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        animation: kcPulseGlow 2s infinite;
+        text-align: center;
+      }
+      .kc-btn-primary:active {
+        transform: scale(0.97);
+        opacity: 0.9;
+      }
     `;
-    document.body.appendChild(alertBanner);
+    document.head.appendChild(styleTag);
+
+    // 2. สร้างโครงสร้าง HTML สำหรับตัว Prompt ลอยสุดหรู
+    const promptElement = document.createElement("div");
+    promptElement.id = "kc-premium-notify-prompt";
+    promptElement.className = "kc-glass-card";
+    promptElement.innerHTML = `
+      <div style="display: flex; gap: 14px; align-items: center;">
+        <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; animation: kcFloatIcon 3s ease-in-out infinite;">
+          <span style="font-size: 24px;">🔔</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px; flex: 1;">
+          <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #1e1b4b;">เปิดระบบแจ้งเตือน</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: #4b5563; line-height: 1.3;">ติดตามข่าวสารจาก KC_broadcast_Bot</p>
+        </div>
+      </div>
+      <button id="btnEnableIOSNotify" class="kc-btn-primary">เปิดรับการแจ้งเตือน</button>
+    `;
+    document.body.appendChild(promptElement);
     
-    // ดักจับ Event การกดปุ่ม (User Gesture ที่ iOS ต้องการ)
+    // 3. ดักฟัง Event คลิกเพื่อขออนุมัติสิทธิ์ (สอดคล้องกับกฎ User Gesture ของ Apple)
     document.getElementById("btnEnableIOSNotify").addEventListener("click", () => {
-      if (navigator.vibrate) navigator.vibrate(20);
-      
       Notification.requestPermission().then((permission) => {
+        console.log("ผลการขอสิทธิ์แจ้งเตือนบน iOS:", permission);
         if (permission === "granted") {
-          console.log("iOS อนุญาตการแจ้งเตือนแล้ว! 🎉");
-          getFCMToken(reg); // ดึง Token ขึ้นฐานข้อมูล
-          alertBanner.remove();
-        } else {
-          console.warn("iOS ปฏิเสธการแจ้งเตือน 😢");
-          alertBanner.remove();
+          getFCMToken(reg); // ดีด Token ขึ้น Firebase ทันที
         }
+        
+        // แอนิเมชันตอนปิดตัวลงแบบนุ่มนวลก่อนลบ Element ทิ้ง
+        promptElement.style.transition = "all 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045)";
+        promptElement.style.transform = "translate(-50%, 130%) scale(0.9)";
+        promptElement.style.opacity = "0";
+        setTimeout(() => {
+          promptElement.remove();
+        }, 400);
       });
     });
+
   } else if (Notification.permission === "granted") {
-    // ถ้าเคยยอมรับสิทธิ์ไปแล้ว สามารถรันดึง Token/เช็คซ่อมแซมตัวเองได้ทันที
+    // ถ้าเคยได้สิทธิ์แล้ว เข้าโหมดซ่อมแซมและเช็กข้อมูลตัวเองใน Database ได้เลย
     getFCMToken(reg);
   }
 }
