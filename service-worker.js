@@ -1,3 +1,8 @@
+// บังคับให้ Service Worker ตัวใหม่ทำงานทันที ไม่ต้องรอลูกค้าปิดแอปเก่า
+self.addEventListener('install', event => {
+  self.skipWaiting();
+});
+
 // ==========================================
 // 1. ส่วนของ FIREBASE BACKGROUND MESSAGING
 // ==========================================
