@@ -49,6 +49,7 @@ const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");
 const TARGET_BOT_USERNAME = 'KCSmartAlert_bot';
 
 // --- ฟังก์ชันส่ง Multicast (Firebase) ---
+// เปลี่ยนจากเดิมในฟังก์ชัน sendToAllDevices เป็นแบบนี้ครับ
 async function sendToAllDevices(text) {
     try {
         const snapshot = await db.ref('fcm_tokens').once('value');
@@ -70,6 +71,7 @@ async function sendToAllDevices(text) {
 
         console.log(`🚀 กำลังส่งแจ้งเตือนไปยัง ${tokens.length} เครื่อง...`);
 
+        // แบ่งกลุ่มละ 500 ตามเดิม
         for (let i = 0; i < tokens.length; i += 500) {
             const batch = tokens.slice(i, i + 500);
             const message = {
@@ -80,7 +82,8 @@ async function sendToAllDevices(text) {
                 tokens: batch
             };
 
-            const response = await admin.messaging().sendMulticast(message);
+            // เปลี่ยนตรงนี้ครับ!
+            const response = await admin.messaging().sendEachForMulticast(message);
             console.log(`✅ ส่งสำเร็จ ${response.successCount} เครื่อง, ล้มเหลว ${response.failureCount} เครื่อง`);
         }
     } catch (err) {
