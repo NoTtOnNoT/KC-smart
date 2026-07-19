@@ -2,27 +2,78 @@ const { TelegramClient } = require("telegram");
 const { StringSession } = require("telegram/sessions");
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getMessaging } = require('firebase-admin/messaging');
+const { getDatabase } = require('firebase-admin/database');
 const { NewMessage } = require("telegram/events"); 
 const express = require('express');
+const cors = require('cors');
+
+// --- ประกาศ app ตั้งแต่ตรงนี้ ---
+const app = express();
+app.use(cors()); 
+app.use(express.json()); 
 
 // 1. ข้อมูลการเชื่อมต่อ Telegram
 const apiId = 39376007; 
 const apiHash = "4bbfdf3c89267e34312cd5cec276442d"; 
-// ดึงจาก Environment Variable บน Render โดยตรง
-const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");// 🔍 กำหนดเป้าหมายที่ต้องการดักจับ (เลือกใช้อย่างใดอย่างหนึ่ง)
-const TARGET_BOT_USERNAME = 'KCSmartAlert_bot'; // ชื่อ username ของบอตที่ส่งมา (ไม่ต้องใส่ @)
-// const TARGET_CHAT_ID = '123456789'; // หรือใส่รหัส ID ของแชต/กลุ่มตรงๆ (ถ้าทราบ)
+const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");
+const TARGET_BOT_USERNAME = 'KCSmartAlert_bot';
 
 // 2. ตั้งค่า Firebase Admin
-const path = require('path');
 const serviceAccount = require('/etc/secrets/kc-smart-firebase-adminsdk-fbsvc-02c865dc06.json');
 initializeApp({
-  credential: cert(serviceAccount)
+  credential: cert(serviceAccount),
+  databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 
-const app = express();
+const db = getDatabase();
 const PORT = process.env.PORT || 3000;
 
+// --- ฟังก์ชันส่ง Multicast ---
+async function sendToAllDevices(text) {
+  try {
+    const snapshot = await db.ref('devices').once('value');
+    const data = snapshot.val();
+
+    if (!data) {
+      console.log("⚠️ ไม่มี Token ใน Database เลย ข้ามการส่ง");
+      return;
+    }
+
+    const tokens = Object.keys(data); 
+
+    for (let i = 0; i < tokens.length; i += 500) {
+      const batch = tokens.slice(i, i + 500);
+      const message = {
+        notification: {
+          title: '📢 มีแจ้งเตือนใหม่จากระบบ!',
+          body: text
+        },
+        tokens: batch
+      };
+
+      const response = await getMessaging().sendMulticast(message);
+      console.log(`🚀 ส่งสำเร็จ ${response.successCount} เครื่อง, ล้มเหลว ${response.failureCount} เครื่อง`);
+    }
+  } catch (err) {
+    console.error("❌ เกิดข้อผิดพลาดในการส่ง Multicast:", err.message);
+  }
+}
+
+// --- API สำหรับ PWA ---
+app.post('/register-token', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).send("No token provided");
+  try {
+    await db.ref('devices/' + token).set({ token: token, updatedAt: Date.now() });
+    res.status(200).send("Token registered");
+  } catch (err) {
+    res.status(500).send("Error saving token");
+  }
+});
+
+app.get('/ping', (req, res) => res.status(200).send('เซิร์ฟเวอร์ตื่นอยู่จ้า! 🟢'));
+
+// --- ระบบ Telegram Client ---
 (async () => {
   console.log("⏳ กำลังเชื่อมต่อ Telegram...");
   
@@ -39,71 +90,30 @@ const PORT = process.env.PORT || 3000;
       onError: (err) => console.error("⚠️ Client Start Error:", err.message),
     });
 
-    console.log("🟢 [Telegram] เชื่อมต่อสำเร็จและพร้อมดักฟังข้อความแล้ว!");
+    console.log("🟢 [Telegram] เชื่อมต่อสำเร็จ!");
 
-    // 3. ดักจับข้อความใหม่
     client.addEventHandler(async (event) => {
       const message = event.message;
       if (!message || !message.text) return;
 
+      console.log("📥 [DEBUG] พบข้อความใหม่จาก:", message.senderId);
+
       try {
-        // ดึงข้อมูลผู้ส่งในรูปแบบ Entity (ปลอดภัยและไม่ทำให้สคริปต์ค้างช้า)
         const sender = await message.getSender();
-        const text = message.text;
-        
-        // ตรวจสอบว่ามีข้อมูลผู้ส่งหรือไม่
-        if (!sender) return;
-
-        // เช็คเงื่อนไข: ดักจับเฉพาะข้อความจากบอตโรงเรียนที่เรากำหนดไว้
-        const isTargetBot = sender.username && sender.username.toLowerCase() === TARGET_BOT_USERNAME.toLowerCase();
-        const isTargetId = sender.id && sender.id.toString() === (typeof TARGET_CHAT_ID !== 'undefined' ? TARGET_CHAT_ID : '');
-
-        if (isTargetBot || isTargetId) {
-          console.log(`📥 [พบข้อความตรงเงื่อนไข]: "${text}"`);
-
-          // 4. ส่ง Web Push หาผู้ใช้เว็บทุกคนผ่าน Firebase
-          const pushMessage = {
-            notification: {
-              title: '📢 มีแจ้งเตือนใหม่จากระบบ!',
-              body: text
-            },
-            topic: 'announcements'
-          };
-
-          const response = await getMessaging().send(pushMessage);
-          console.log('🚀 ยิง Web Push สำเร็จ! ID:', response);
+        // ถ้าเช็ค username ไม่ผ่าน ให้ลองเช็ค sender.id หรือ log ดูว่ามันคืออะไร
+        if (sender && (sender.username === TARGET_BOT_USERNAME || sender.username === 'KCSmartAlert_bot')) {
+            console.log(`🚀 พบข้อความจากบอท กำลังส่งเข้า Firebase: ${message.text}`);
+            await sendToAllDevices(message.text);
         }
-
       } catch (err) {
-        console.error("❌ เกิดข้อผิดพลาดในการประมวลผลข้อความ:", err.message);
+        console.error("❌ เกิดข้อผิดพลาดในการประมวลผล:", err.message);
       }
     }, new NewMessage({}));
 
-    // 🛡️ ป้องกันคีย์ค้าง: ตัดการเชื่อมต่ออย่างปลอดภัยเมื่อเซิร์ฟเวอร์โดนสั่งปิด (Render Restart)
-    process.on('SIGINT', async () => {
-      console.log('⏳ กำลังปิดการเชื่อมต่อ Telegram...');
-      await client.disconnect();
-      process.exit(0);
-    });
-    
-    process.on('SIGTERM', async () => {
-      console.log('⏳ กำลังปิดการเชื่อมต่อ Telegram...');
-      await client.disconnect();
-      process.exit(0);
-    });
-
   } catch (connectError) {
     console.error("❌ ไม่สามารถเชื่อมต่อกับ Telegram ได้:", connectError.message);
-    if (connectError.message.includes("AUTH_KEY_DUPLICATED")) {
-      console.error("🚨 รหัสล็อกอินซ้ำซ้อน! กรุณาปิดสคริปต์นี้บนเครื่องคอมพิวเตอร์ของคุณ หรือทำ Clear cache บน Render");
-    }
   }
 })();
-
-// 5. เซิร์ฟเวอร์สำหรับ UptimeRobot
-app.get('/ping', (req, res) => {
-  res.status(200).send('เซิร์ฟเวอร์ตื่นอยู่จ้า! 🟢');
-});
 
 app.listen(PORT, () => {
   console.log(`📡 ระบบเว็บปลุกทำงานที่พอร์ต ${PORT}`);
