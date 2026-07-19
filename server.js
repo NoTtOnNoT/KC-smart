@@ -41,7 +41,7 @@ const TARGET_BOT_USERNAME = 'KCSmartAlert_bot';
 // --- ฟังก์ชันส่ง Multicast ---
 async function sendToAllDevices(text) {
   try {
-    const snapshot = await db.ref('devices').once('value');
+    const snapshot = await db.ref('fcm_tokens').once('value');
     const data = snapshot.val();
 
     if (!data) {
@@ -49,8 +49,17 @@ async function sendToAllDevices(text) {
       return;
     }
 
-    const tokens = Object.keys(data); 
+    // แก้ไขตรงนี้ครับ: ดึงค่า token ออกมาจาก object ข้างใน
+    const tokens = Object.values(data)
+                         .map(item => item.token)
+                         .filter(token => token); // กรองเอาเฉพาะที่มีค่า
 
+    if (tokens.length === 0) {
+      console.log("⚠️ ไม่พบข้อมูล Token ภายใน Database");
+      return;
+    }
+
+    // ส่วนที่เหลือเหมือนเดิม (ส่ง batch ทีละ 500)
     for (let i = 0; i < tokens.length; i += 500) {
       const batch = tokens.slice(i, i + 500);
       const message = {
@@ -61,7 +70,7 @@ async function sendToAllDevices(text) {
         tokens: batch
       };
 
-      const response = await getMessaging().sendMulticast(message);
+      const response = await admin.messaging().sendMulticast(message);
       console.log(`🚀 ส่งสำเร็จ ${response.successCount} เครื่อง, ล้มเหลว ${response.failureCount} เครื่อง`);
     }
   } catch (err) {
