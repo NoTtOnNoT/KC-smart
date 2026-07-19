@@ -103,25 +103,32 @@ app.get('/ping', (req, res) => res.status(200).send('เซิร์ฟเวอ
     console.log("🟢 [Telegram] เชื่อมต่อสำเร็จ!");
 
     client.addEventHandler(async (event) => {
-      const message = event.message;
-      if (!message || !message.text) return;
+  const message = event.message;
+  
+  // 1. ตรวจสอบว่าได้รับข้อความหรือไม่ (แม้จะไม่ใช่ข้อความ text ก็ตาม)
+  if (!message) return;
+  
+  console.log("📥 [DEBUG] ได้รับ Event ใหม่! ข้อความ:", message.text);
 
-      try {
-        const sender = await message.getSender();
-        
-        // ตรวจสอบ Sender แบบปลอดภัย
-        const username = sender && sender.username ? sender.username : "";
-        
-        if (username === TARGET_BOT_USERNAME || username === 'KCSmartAlert_bot') {
-            console.log(`🚀 พบข้อความจากบอท: ${message.text}`);
-            await sendToAllDevices(message.text);
-        } else {
-            console.log(`ℹ️ ได้รับข้อความจาก: ${username || 'Unknown'} (ข้ามการส่ง)`);
-        }
-      } catch (err) {
-        console.error("❌ เกิดข้อผิดพลาดในการตรวจสอบข้อความ:", err.message);
-      }
-    }, new NewMessage({}));
+  if (!message.text) return;
+
+  try {
+    const sender = await message.getSender();
+    
+    // ดูชื่อ sender ใน log เพื่อเช็คว่าเราจับชื่อถูกไหม
+    const username = sender && sender.username ? sender.username : "ไม่มี Username";
+    console.log(`📥 [DEBUG] ข้อความจาก: ${username} (ID: ${message.senderId})`);
+    
+    if (username === TARGET_BOT_USERNAME || username === 'KCSmartAlert_bot') {
+        console.log(`🚀 พบข้อความจากบอท กำลังส่งเข้า Firebase: ${message.text}`);
+        await sendToAllDevices(message.text);
+    } else {
+        console.log(`ℹ️ ข้อความจาก ${username} ไม่ใช่เป้าหมาย ข้ามไป`);
+    }
+  } catch (err) {
+    console.error("❌ เกิดข้อผิดพลาดในการตรวจสอบข้อความ:", err.message);
+  }
+}, new NewMessage({}));
 
   } catch (connectError) {
     console.error("❌ ไม่สามารถเชื่อมต่อกับ Telegram ได้:", connectError.message);
