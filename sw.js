@@ -1,8 +1,3 @@
-// บังคับให้ Service Worker ตัวใหม่ทำงานทันที ไม่ต้องรอลูกค้าปิดแอปเก่า
-self.addEventListener('install', event => {
-  self.skipWaiting();
-});
-
 // ==========================================
 // 1. นำเข้า Firebase SDK สำหรับ Service Worker
 // ==========================================
@@ -24,7 +19,7 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 // ==========================================
-// 2. ส่วนของ PWA Caching (โค้ดเดิมของคุณ)
+// 2. ส่วนของ PWA Caching
 // ==========================================
 const CACHE_NAME = 'kc-smart-v1.2'; // อัปเดตเวอร์ชันเพื่อรีเฟรชระบบ
 const ASSETS_TO_CACHE = [
@@ -62,6 +57,7 @@ const ASSETS_TO_CACHE = [
   './KCsmartpic/pic24.webp'
 ];
 
+// ยุบรวม event 'install' ไว้ที่เดียวกัน
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -69,6 +65,7 @@ self.addEventListener('install', (event) => {
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
+  // บังคับให้ Service Worker ตัวใหม่ทำงานทันที ไม่ต้องรอลูกค้าปิดแอปเก่า
   self.skipWaiting();
 });
 
@@ -96,7 +93,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   let title = '📢 มีแจ้งเตือนใหม่!';
   let body = 'มีข่าวสารใหม่จาก KC_broadcast_Bot';
-  let icon = './KCsmartปก.png'; // ไอคอนเริ่มต้น
+  let icon = './KCsmartปก.png'; 
 
   if (event.data) {
     try {

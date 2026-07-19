@@ -1,4 +1,3 @@
-// 1. ประกาศ Firebase Config หน้าบ้าน (ใช้ชุดเดียวกับใน sw.js)
 const firebaseConfig = {
   apiKey: "AIzaSyA8G5AS0EOAwFSh6krkiZlOrxEZ_pwL2ng",
   authDomain: "kc-smart.firebaseapp.com",
@@ -14,10 +13,6 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 const messaging = firebase.messaging();
-
-// ========================================================
-// ต่อด้วยโค้ดเดิมของคุณด้านล่าง (if ("serviceWorker" in navigator) {...})
-// ========================================================
 
 let isAppInitialized = false;
 
@@ -404,10 +399,6 @@ buttons.forEach((btn) => {
   });
 });
 
-// ==========================================
-// ระบบติดตั้งแอป KC SMART (Ultimate Hybrid Version - Fixed iPadOS)
-// ==========================================
-
 (function () {
   // 1. ประกาศตัวแปรหลัก
   let deferredPrompt = null;
@@ -441,8 +432,6 @@ buttons.forEach((btn) => {
       }, 300);
     }
   };
-
-  // --- เริ่มต้นการทำงาน (Hybrid Logic) ---
 
   const initInstallUI = () => {
     // ถ้าติดตั้งแอปแล้ว ไม่ต้องทำอะไรต่อ
@@ -542,9 +531,6 @@ buttons.forEach((btn) => {
   });
 })();
 
-// ========================================================
-// [แก้ไขใหม่] ชุดควบคุม Service Worker และการขอสิทธิ์แจ้งเตือน (Fix iOS)
-// ========================================================
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
@@ -557,31 +543,53 @@ if ("serviceWorker" in navigator) {
                       (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
         
         if (isIOS) {
-          // 🍎 ถ้าเป็น iOS บังคับเข้าสู่กระบวนการแบบมีปฏิสัมพันธ์ (User Gesture)
           initIOSNotificationFlow(reg);
         } else {
-          // 🤖 Android / PC ปล่อยให้ทำงานอัตโนมัติเหมือนเดิม
           askNotificationPermission(reg);
         }
+
+        // ==========================================
+        // 🌟 [แก้ไขจุดที่ 2] เพิ่มตัวดักรับข้อความตอนเปิดแอปอยู่ (Foreground)
+        // ==========================================
+        messaging.onMessage((payload) => {
+          console.log("ได้รับแจ้งเตือนขณะเปิดแอป:", payload);
+          if (payload.notification) {
+            const title = payload.notification.title || "ประกาศจากโรงเรียน";
+            const body = payload.notification.body || "";
+            
+            // เรียกใช้ฟังก์ชัน Toast แจ้งเตือนที่คุณทำไว้
+            if (typeof showStatus === "function") {
+              showStatus(`📢 ${title}: ${body}`, true);
+            } else {
+              alert(`${title}\n${body}`);
+            }
+          }
+        });
+        // ==========================================
+
       })
       .catch((err) => console.log("Service Worker Registration Failed:", err));
   });
 }
 
-// 📱 ฟังก์ชันพิเศษสำหรับ iOS: เปิดระบบแจ้งเตือนด้วย UI สุดหรู (Premium Elegant Style)
+// 📱 ฟังก์ชันควบคุมระบบแจ้งเตือน iOS (เวอร์ชันฉลาด รู้ทันตอนโดนปิดในการตั้งค่า)
 function initIOSNotificationFlow(reg) {
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   
   if (!isStandalone) {
-    console.log("🍎 iOS Mode: ระบบแจ้งเตือนจะเปิดใช้งานเมื่ออยู่บนหน้าจอโฮมเท่านั้น");
+    console.log("🍎 iOS Mode: ต้องเปิดจากหน้าจอโฮมเท่านั้น");
     return;
   }
   
-  if (Notification.permission === "default") {
-    if (document.getElementById("kc-premium-notify-prompt")) return;
+  // ลบ Prompt เก่าออกก่อนป้องกันการซ้อนกัน
+  if (document.getElementById("kc-premium-notify-prompt")) {
+    document.getElementById("kc-premium-notify-prompt").remove();
+  }
 
-    // 1. สร้างและฝัง CSS Animation สวย ๆ เข้าไปใน Head
+  // 1. ฝัง CSS Styles สำหรับทั้งสองกรณี (ขอสิทธิ์ใหม่ หรือ แนะนำวิธีเปิด)
+  if (!document.getElementById("kc-notify-styles")) {
     const styleTag = document.createElement("style");
+    styleTag.id = "kc-notify-styles";
     styleTag.innerHTML = `
       @keyframes kcElasticSlideUp {
         0% { transform: translate(-50%, 120%) scale(0.9); opacity: 0; }
@@ -593,11 +601,6 @@ function initIOSNotificationFlow(reg) {
         70% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0), 0 4px 12px rgba(99, 102, 241, 0.3); }
         100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0), 0 4px 12px rgba(99, 102, 241, 0.3); }
       }
-      @keyframes kcFloatIcon {
-        0% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-4px) rotate(5deg); }
-        100% { transform: translateY(0px) rotate(0deg); }
-      }
       .kc-glass-card {
         position: fixed;
         bottom: 24px;
@@ -605,17 +608,15 @@ function initIOSNotificationFlow(reg) {
         transform: translateX(-50%);
         width: 90%;
         max-width: 400px;
-        background: rgba(255, 255, 255, 0.82);
+        background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
         border: 1px solid rgba(255, 255, 255, 0.5);
         border-radius: 24px;
-        padding: 20px;
-        box-shadow: 0 20px 40px rgba(31, 38, 135, 0.12), 
-                    0 8px 16px rgba(0, 0, 0, 0.04),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        padding: 22px;
+        box-shadow: 0 20px 45px rgba(31, 38, 135, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6);
         z-index: 99999;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         display: flex;
         flex-direction: column;
         gap: 16px;
@@ -630,57 +631,95 @@ function initIOSNotificationFlow(reg) {
         font-weight: 600;
         font-size: 0.95rem;
         cursor: pointer;
-        transition: all 0.2s ease;
         animation: kcPulseGlow 2s infinite;
         text-align: center;
       }
-      .kc-btn-primary:active {
-        transform: scale(0.97);
-        opacity: 0.9;
+      .kc-btn-secondary {
+        background: #f3f4f6;
+        color: #4b5563;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 14px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        text-align: center;
       }
     `;
     document.head.appendChild(styleTag);
+  }
 
-    // 2. สร้างโครงสร้าง HTML สำหรับตัว Prompt ลอยสุดหรู
-    const promptElement = document.createElement("div");
-    promptElement.id = "kc-premium-notify-prompt";
-    promptElement.className = "kc-glass-card";
+  const promptElement = document.createElement("div");
+  promptElement.id = "kc-premium-notify-prompt";
+  promptElement.className = "kc-glass-card";
+
+  // 2. แยกการทำงานตามสถานะสิทธิ์ของระบบ iOS
+  if (Notification.permission === "denied") {
+    // 🚨 [กรณีที่ 1] โดนบล็อกสิทธิ์อยู่: แสดงไกด์สอนผู้ใช้ไปเปิดใน Settings
+    promptElement.innerHTML = `
+      <div style="display: flex; gap: 14px; align-items: flex-start;">
+        <div style="background: #fee2e2; width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <span style="font-size: 22px;">⚠️</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #991b1b;">การแจ้งเตือนถูกปิดอยู่</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: #4b5563; line-height: 1.4;">เนื่องจากคุณปิดสิทธิ์ไว้ในระบบตั้งค่าของเครื่อง โปรดเปิดสิทธิ์ตามวิธีด้านล่างนี้เพื่อรับข่าวสารด่วน:</p>
+          
+          <div style="margin-top: 8px; background: rgba(0,0,0,0.04); padding: 10px; border-radius: 10px; font-size: 0.8rem; color: #374151; display: flex; flex-direction: column; gap: 4px;">
+            <div>1️⃣ เปิดแอป <b>"การตั้งค่า" (Settings)</b> ของ iPhone</div>
+            <div>2️⃣ ไปที่เมนู <b>"การแจ้งเตือน" (Notifications)</b></div>
+            <div>3️⃣ ค้นหาแอป <b>"KC Smart"</b> แล้วกดเปิด <b>"อนุญาต"</b></div>
+          </div>
+        </div>
+      </div>
+      <button id="btnCloseIOSPrompt" class="kc-btn-secondary">รับทราบ</button>
+    `;
+    document.body.appendChild(promptElement);
+
+    document.getElementById("btnCloseIOSPrompt").addEventListener("click", () => {
+      closePromptSmoothly(promptElement);
+    });
+
+  } else if (Notification.permission === "default") {
+    // 🔔 [กรณีที่ 2] สถานะปกติ ยังไม่ได้เลือก: ขอสิทธิ์ตามปกติ
     promptElement.innerHTML = `
       <div style="display: flex; gap: 14px; align-items: center;">
-        <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; animation: kcFloatIcon 3s ease-in-out infinite;">
-          <span style="font-size: 24px;">🔔</span>
+        <div style="background: #e0e7ff; width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <span style="font-size: 22px;">🔔</span>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 2px; flex: 1;">
-          <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #1e1b4b;">เปิดระบบแจ้งเตือน</h4>
-          <p style="margin: 0; font-size: 0.85rem; color: #4b5563; line-height: 1.3;">ติดตามข่าวสารจาก KC_broadcast_Bot</p>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #1e1b4b;">เปิดระบบแจ้งเตือนอัจฉริยะ</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: #4b5563; line-height: 1.3;">ไม่พลาดข่าวสารสำคัญ ผลการเรียน และประกาศด่วนจาก KC Smart PWA</p>
         </div>
       </div>
       <button id="btnEnableIOSNotify" class="kc-btn-primary">เปิดรับการแจ้งเตือน</button>
     `;
     document.body.appendChild(promptElement);
-    
-    // 3. ดักฟัง Event คลิกเพื่อขออนุมัติสิทธิ์ (สอดคล้องกับกฎ User Gesture ของ Apple)
+
     document.getElementById("btnEnableIOSNotify").addEventListener("click", () => {
       Notification.requestPermission().then((permission) => {
-        console.log("ผลการขอสิทธิ์แจ้งเตือนบน iOS:", permission);
         if (permission === "granted") {
-          getFCMToken(reg); // ดีด Token ขึ้น Firebase ทันที
+          getFCMToken(reg);
+          closePromptSmoothly(promptElement);
+        } else if (permission === "denied") {
+          // ถ้าเผลอกดปฏิเสธหน้าต่างระบบ ให้รีเฟรชหน้าต่างแจ้งเตือนเปลี่ยนเป็นโหมดคู่มือทันที
+          initIOSNotificationFlow(reg);
         }
-        
-        // แอนิเมชันตอนปิดตัวลงแบบนุ่มนวลก่อนลบ Element ทิ้ง
-        promptElement.style.transition = "all 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045)";
-        promptElement.style.transform = "translate(-50%, 130%) scale(0.9)";
-        promptElement.style.opacity = "0";
-        setTimeout(() => {
-          promptElement.remove();
-        }, 400);
       });
     });
-
+    
   } else if (Notification.permission === "granted") {
-    // ถ้าเคยได้สิทธิ์แล้ว เข้าโหมดซ่อมแซมและเช็กข้อมูลตัวเองใน Database ได้เลย
+    // 🎉 [กรณีที่ 3] อนุญาตอยู่แล้ว: รันระบบซ่อมแซม Token ไปตามปกติ
     getFCMToken(reg);
   }
+}
+
+// ฟังก์ชันเสริมสำหรับทำแอนิเมชันสไลด์การ์ดลงนุ่มนวลก่อนปิด
+function closePromptSmoothly(el) {
+  el.style.transition = "all 0.4s cubic-bezier(0.6, -0.28, 0.735, 0.045)";
+  el.style.transform = "translate(-50%, 130%) scale(0.9)";
+  el.style.opacity = "0";
+  setTimeout(() => el.remove(), 400);
 }
 
 // 1. ฟังก์ชันส่งคำขออนุญาตแจ้งเตือน
@@ -701,7 +740,6 @@ function askNotificationPermission(reg) {
   }
 }
 
-// 2. ฟังก์ชันดึง FCM Token และตรวจสอบสถานะใน Database (ฉบับอัปเกรดซ่อมแซมตัวเองได้)
 function getFCMToken(reg) {
   messaging.getToken({ 
     vapidKey: "BGJa_Jny-1OLkMSdTNcv-xhkaxGqLnH8RTXWFCDb-mIudG02l4HfwaRRy3frG5DT_fKmTbUn29DkhukOpt07ptw", 
@@ -712,47 +750,50 @@ function getFCMToken(reg) {
       console.log("🔥 FCM Token ของเครื่องนี้คือ:", currentToken);
       
       const savedToken = localStorage.getItem("saved_fcm_token");
-      const savedKey = localStorage.getItem("saved_fcm_key"); // ดึงคีย์อ้างอิงของ Firebase มาเช็ก
+      const savedKey = localStorage.getItem("saved_fcm_key");
 
-      // 📦 ฟังก์ชันภายในสำหรับสั่งอัปโหลดข้อมูลใหม่
+      // 📦 ฟังก์ชันสำหรับสั่งอัปโหลดข้อมูลใหม่
       const uploadTokenNew = () => {
+        // 🌟 [แก้ไขจุดที่ 1] ปรับการเช็กอุปกรณ์ iOS/iPadOS ให้แม่นยำขึ้น
+        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        
+        const deviceLabel = navigator.userAgent.includes("Android") 
+          ? "Android" 
+          : isIOSDevice 
+            ? "iOS (iPhone/iPad)" 
+            : "PC/Other";
+
         database.ref("fcm_tokens").push({
           token: currentToken,
-          device: navigator.userAgent.includes("Android") ? "Android" : navigator.userAgent.includes("iPhone") ? "iPhone" : "PC/Other",
+          device: deviceLabel,
           timestamp: firebase.database.ServerValue.TIMESTAMP
         })
         .then((ref) => {
-          // สำคัญมาก: บันทึกทั้ง Token และคีย์ ID ที่ Firebase เจนใหม่ออกมาลงเครื่อง
           localStorage.setItem("saved_fcm_token", currentToken);
           localStorage.setItem("saved_fcm_key", ref.key); 
-          console.log("💾 บันทึกบ้านเลขที่ (Token) ลง Firebase เรียบร้อยพร้อมใช้งาน!");
+          console.log("💾 บันทึก Token ลง Firebase เรียบร้อย!");
         })
         .catch((dbErr) => {
           console.error("❌ บันทึก Token ลงฐานข้อมูลไม่สำเร็จ:", dbErr);
         });
       };
 
-      // 🔍 เริ่มกระบวนการเช็กสถานะ
+      // 🔍 [แก้ไขจุดที่ 3] ตรวจสอบความซ้ำซ้อนจากฐานข้อมูลจริง ป้องกันกรณีกดล้างแคชเครื่อง
       if (savedToken === currentToken && savedKey) {
-        // ถ้ารหัส Token ตรงกันและเคยมีคีย์แล้ว ให้วิ่งไปถาม Database ของจริงว่ายังอยู่ไหม
         database.ref("fcm_tokens/" + savedKey).once("value")
         .then((snapshot) => {
           if (snapshot.exists()) {
             console.log("ℹ️ Token นี้มีอยู่ในระบบฐานข้อมูลแล้ว ไม่ต้องส่งซ้ำ");
           } else {
-            // 🚨 เคสที่คุณกดลบในตาราง ข้อมูล snapshot จะเป็นมินัล (ไม่มีอยู่จริง)
-            console.warn("⚠️ พบว่า Token หายไปจาก Database! กำลังกู้คืนและเพิ่มกลับให้ใหม่...");
-            uploadTokenNew();
+            console.warn("⚠️ พบว่า Token หายไปจากคีย์เดิม! กำลังตรวจสอบระบบซ้ำ...");
+            verifyTokenDirectlyInDB(currentToken, uploadTokenNew);
           }
         })
-        .catch((err) => {
-          // เผื่อเกิดเหตุขัดข้องทางเน็ตเวิร์ก ให้พยายามอัปโหลดใหม่เพื่อความปลอดภัยไว้ก่อน
-          console.error("เช็คสถานะจากฐานข้อมูลไม่สำเร็จ:", err);
-          uploadTokenNew();
-        });
+        .catch(() => uploadTokenNew());
       } else {
-        // ถ้าเป็นเครื่องใหม่เอี่ยม หรือเป็นเครื่องที่ Token เพิ่งอัปเดตใหม่ ให้แอดเข้าตารางทันที
-        uploadTokenNew();
+        // ถ้าค่าใน LocalStorage ไม่มี ให้ไปค้นหาใน DB ก่อนว่าเคยผูกไปหรือยัง ก่อนจะกด Push ใหม่
+        verifyTokenDirectlyInDB(currentToken, uploadTokenNew);
       }
       
     } else {
@@ -761,6 +802,25 @@ function getFCMToken(reg) {
   })
   .catch((err) => {
     console.error("เกิดข้อผิดพลาดในการดึง Token:", err);
+  });
+}
+
+function verifyTokenDirectlyInDB(token, uploadCallback) {
+  database.ref("fcm_tokens").orderByChild("token").equalTo(token).once("value")
+  .then((snapshot) => {
+    if (snapshot.exists()) {
+      console.log("ℹ️ เจอ Token ซ้ำในฐานข้อมูลจากประวัติเก่า ดึงคีย์กลับมาบันทึกลงเครื่องให้ใหม่");
+      const existingKey = Object.keys(snapshot.val())[0];
+      localStorage.setItem("saved_fcm_token", token);
+      localStorage.setItem("saved_fcm_key", existingKey);
+    } else {
+      // ถ้าไม่มีในระบบจริง ๆ ค่อยอัปโหลดใหม่
+      uploadCallback();
+    }
+  })
+  .catch(() => {
+    // หากติดสิทธิ์หรือไม่ได้ทำ Indexing ให้สั่งอัปโหลดเซฟไว้ก่อน
+    uploadCallback();
   });
 }
 
