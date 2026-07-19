@@ -66,3 +66,65 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// ==========================================
+// 4. ดักจับ Notification (Web Push / FCM)
+// ==========================================
+self.addEventListener('push', (event) => {
+  let title = '📢 มีแจ้งเตือนใหม่!';
+  let body = 'มีข่าวสารใหม่จาก KC_broadcast_Bot';
+  let icon = './KClogo.png'; // ไอคอนที่จะแสดงในแจ้งเตือน
+
+  if (event.data) {
+    try {
+      // แปลงข้อมูลเป็น JSON (กรณีส่งมาจาก Firebase / Node.js)
+      const data = event.data.json();
+      
+      // ดักจับโครงสร้างข้อความจาก Firebase Cloud Messaging
+      if (data.notification) {
+        title = data.notification.title || title;
+        body = data.notification.body || body;
+        icon = data.notification.icon || icon;
+      } else if (data.data) {
+        title = data.data.title || title;
+        body = data.data.body || body;
+      } else {
+        body = event.data.text();
+      }
+    } catch (e) {
+      // ถ้าข้อมูลที่ส่งมาไม่ใช่ JSON ให้มองเป็นข้อความธรรมดา
+      body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: body,
+    icon: icon,
+    badge: './KClogo.png', // ไอคอนเล็กๆ บน Status bar ของแอนดรอยด์
+    vibrate: [200, 100, 200], // รูปแบบการสั่น (สั่น-หยุด-สั่น)
+    data: {
+      url: '/' // ลิงก์ที่จะเปิดเมื่อผู้ใช้กดที่ข้อความแจ้งเตือน
+    }
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// ==========================================
+// 5. เมื่อผู้ใช้คลิกที่ตัวแจ้งเตือน
+// ==========================================
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close(); // ปิดแจ้งเตือนเมื่อคลิก
+  
+  // ให้เปิดหน้าเว็บหรือดึงหน้าเว็บเดิมขึ้นมาแสดง
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      if (clientList.length > 0) {
+        return clientList[0].focus();
+      }
+      return clients.openWindow(event.notification.data.url);
+    })
+  );
+});
