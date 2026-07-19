@@ -576,18 +576,37 @@ function askNotificationPermission(reg) {
 }
 
 // 2. ฟังก์ชันดึง FCM Token (ที่อยู่ของเครื่องนี้) เพื่อเอาไปผูกกับบอท Telegram
+// 2. ฟังก์ชันดึง FCM Token เพื่อเอาไปผูกกับบอท Telegram (เวอร์ชันอัปเกรด)
 function getFCMToken(reg) {
-  // *หมายเหตุ: ต้องมั่นใจว่าใน script.js มีการประกาศ const messaging = firebase.messaging(); ไว้แล้วนะคร้บ
   messaging.getToken({ 
-    vapidKey: "BGJa_Jny-1OLkMSdTNcv-xhkaxGqLnH8RTXWFCDb-mIudG02l4HfwaRRy3frG5DT_fKmTbUn29DkhukOpt07ptw", // 👈 เอาคู่กุญแจสาธารณะมาจากหน้า Project Settings > Cloud Messaging ใน Firebase Console
+    vapidKey: "BGJa_Jny-1OLkMSdTNcv-xhkaxGqLnH8RTXWFCDb-mIudG02l4HfwaRRy3frG5DT_fKmTbUn29DkhukOpt07ptw", 
     serviceWorkerRegistration: reg 
   })
   .then((currentToken) => {
     if (currentToken) {
       console.log("🔥 FCM Token ของเครื่องนี้คือ:", currentToken);
       
-      // 💡 [จุดสำคัญ] คุณต้องเขียนโค้ดส่ง currentToken นี้ไปเก็บที่ Database ของคุณ 
-      // เพื่อให้ Node.js Bridge หรือ Telegram Bot รู้ว่าจะต้องยิงแจ้งเตือนมาที่เครื่องไหน
+      // 💾 ส่ง Token ไปเก็บใน Firebase Realtime Database อัตโนมัติ
+      // ตรวจสอบก่อนว่า Token นี้เคยบันทึกไปหรือยัง เพื่อป้องกันการบันทึกซ้ำทุกครั้งที่รีเฟรช
+      if (localStorage.getItem("saved_fcm_token") !== currentToken) {
+        
+        database.ref("fcm_tokens").push({
+          token: currentToken,
+          device: navigator.userAgent.includes("Android") ? "Android" : navigator.userAgent.includes("iPhone") ? "iPhone" : "PC/Other",
+          timestamp: firebase.database.ServerValue.TIMESTAMP
+        })
+        .then(() => {
+          // เซฟลงเครื่องผู้ใช้ว่าบันทึกสำเร็จแล้ว
+          localStorage.setItem("saved_fcm_token", currentToken);
+          console.log("💾 บันทึกบ้านเลขที่ (Token) ลง Firebase เรียบร้อยพร้อมใช้งาน!");
+        })
+        .catch((dbErr) => {
+          console.error("❌ บันทึก Token ลงฐานข้อมูลไม่สำเร็จ:", dbErr);
+        });
+
+      } else {
+        console.log("ℹ️ Token นี้ถูกบันทึกในระบบอยู่แล้ว ไม่ต้องส่งซ้ำ");
+      }
       
     } else {
       console.log("ไม่สามารถดึง Token ได้ โปรดเช็กสิทธิ์แจ้งเตือนบนเบราว์เซอร์");

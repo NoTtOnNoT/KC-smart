@@ -281,29 +281,27 @@
             </div>
         </div>
         <!-- Google tag (gtag.js) -->
-        <script async
-            src="https://www.googletagmanager.com/gtag/js?id=G-27TXWY21V2"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-27TXWY21V2"></script>
         <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-27TXWY21V2');
+        </script>
 
-  gtag('config', 'G-27TXWY21V2');
-</script>
-        <script
-            src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+        <!-- ─── เริ่มต้นชุด Firebase SDK v9.23.0 Compat (แก้ไขตรงนี้) ─── -->
+        <!-- 1. ไลบรารีหลัก Firebase App -->
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 
-        <script
-            src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+        <!-- 2. ไลบรารี Realtime Database -->
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-        <script
-            src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+        <!-- 3. ไลบรารี Cloud Firestore (สำหรับเก็บข้อมูลฟอร์มแจ้งปัญหา) -->
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-        <!-- นำเข้า Firebase SDK สำหรับหน้าบ้าน (วางก่อน script.js) -->
-        <script
-            src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-        <script
-            src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+        <!-- 4. ไลบรารี Firebase Messaging (สำหรับรับการแจ้งเตือน Push Notification) -->
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+        <!-- ─── สิ้นสุดชุด Firebase SDK ─── -->
 
         <script src="script.js"></script>
         <script defer src="/_vercel/insights/script.js"></script>
