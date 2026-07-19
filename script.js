@@ -548,9 +548,6 @@ if ("serviceWorker" in navigator) {
           askNotificationPermission(reg);
         }
 
-        // ==========================================
-        // 🌟 [แก้ไขจุดที่ 2] เพิ่มตัวดักรับข้อความตอนเปิดแอปอยู่ (Foreground)
-        // ==========================================
         messaging.onMessage((payload) => {
           console.log("ได้รับแจ้งเตือนขณะเปิดแอป:", payload);
           if (payload.notification) {
@@ -565,7 +562,6 @@ if ("serviceWorker" in navigator) {
             }
           }
         });
-        // ==========================================
 
       })
       .catch((err) => console.log("Service Worker Registration Failed:", err));
@@ -688,8 +684,8 @@ function initIOSNotificationFlow(reg) {
           <span style="font-size: 22px;">🔔</span>
         </div>
         <div style="display: flex; flex-direction: column; gap: 2px;">
-          <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #1e1b4b;">เปิดระบบแจ้งเตือนอัจฉริยะ</h4>
-          <p style="margin: 0; font-size: 0.85rem; color: #4b5563; line-height: 1.3;">ไม่พลาดข่าวสารสำคัญ ผลการเรียน และประกาศด่วนจาก KC Smart PWA</p>
+          <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #1e1b4b;">KC_broadcast_Bot</h4>
+          <p style="margin: 0; font-size: 0.85rem; color: #4b5563; line-height: 1.3;">เปิดการแจ้งเตือน เพื่อรับขาวสารใหม่ๆได้ก่อนใครที่ KC Smart</p>
         </div>
       </div>
       <button id="btnEnableIOSNotify" class="kc-btn-primary">เปิดรับการแจ้งเตือน</button>
