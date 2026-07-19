@@ -7,27 +7,36 @@ const { NewMessage } = require("telegram/events");
 const express = require('express');
 const cors = require('cors');
 
-// --- ประกาศ app ตั้งแต่ตรงนี้ ---
+// --- Setup Express ---
 const app = express();
 app.use(cors()); 
 app.use(express.json()); 
 
-// 1. ข้อมูลการเชื่อมต่อ Telegram
-const apiId = 39376007; 
-const apiHash = "4bbfdf3c89267e34312cd5cec276442d"; 
-const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");
-const TARGET_BOT_USERNAME = 'KCSmartAlert_bot';
+const PORT = process.env.PORT || 3000;
 
-// 2. ตั้งค่า Firebase Admin
-const serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS);
+// --- Load Firebase Credentials ---
+let serviceAccount;
+try {
+    if (!process.env.FIREBASE_CREDENTIALS) throw new Error("FIREBASE_CREDENTIALS environment variable is missing!");
+    serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS);
+} catch (e) {
+    console.error("❌ Firebase Credentials Error:", e.message);
+    process.exit(1); // หยุดการทำงานถ้า Config พลาด
+}
 
+// --- Initialize Firebase ---
 initializeApp({
   credential: cert(serviceAccount),
   databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 
 const db = getDatabase();
-const PORT = process.env.PORT || 3000;
+
+// --- 1. ข้อมูลการเชื่อมต่อ Telegram ---
+const apiId = 39376007; 
+const apiHash = "4bbfdf3c89267e34312cd5cec276442d"; 
+const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");
+const TARGET_BOT_USERNAME = 'KCSmartAlert_bot';
 
 // --- ฟังก์ชันส่ง Multicast ---
 async function sendToAllDevices(text) {
@@ -97,17 +106,20 @@ app.get('/ping', (req, res) => res.status(200).send('เซิร์ฟเวอ
       const message = event.message;
       if (!message || !message.text) return;
 
-      console.log("📥 [DEBUG] พบข้อความใหม่จาก:", message.senderId);
-
       try {
         const sender = await message.getSender();
-        // ถ้าเช็ค username ไม่ผ่าน ให้ลองเช็ค sender.id หรือ log ดูว่ามันคืออะไร
-        if (sender && (sender.username === TARGET_BOT_USERNAME || sender.username === 'KCSmartAlert_bot')) {
-            console.log(`🚀 พบข้อความจากบอท กำลังส่งเข้า Firebase: ${message.text}`);
+        
+        // ตรวจสอบ Sender แบบปลอดภัย
+        const username = sender && sender.username ? sender.username : "";
+        
+        if (username === TARGET_BOT_USERNAME || username === 'KCSmartAlert_bot') {
+            console.log(`🚀 พบข้อความจากบอท: ${message.text}`);
             await sendToAllDevices(message.text);
+        } else {
+            console.log(`ℹ️ ได้รับข้อความจาก: ${username || 'Unknown'} (ข้ามการส่ง)`);
         }
       } catch (err) {
-        console.error("❌ เกิดข้อผิดพลาดในการประมวลผล:", err.message);
+        console.error("❌ เกิดข้อผิดพลาดในการตรวจสอบข้อความ:", err.message);
       }
     }, new NewMessage({}));
 
