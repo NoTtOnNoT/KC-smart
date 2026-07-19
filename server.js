@@ -39,7 +39,7 @@ initializeApp({
 
     try {
       const sender = await message.getSender();
-      if (sender && sender.username === 'Kc_broadcast_Bot_bot') { 
+      if (sender && sender.username === 'KCSmartAlert_bot') { 
         const text = message.text;
         console.log(`🔔 มีแจ้งเตือนใหม่: "${text}"`);
 
