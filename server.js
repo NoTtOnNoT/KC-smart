@@ -3,7 +3,7 @@ const { StringSession } = require("telegram/sessions");
 const { NewMessage } = require("telegram/events");
 const express = require('express');
 const cors = require('cors');
-const admin = require('firebase-admin'); // Import ตัวหลักที่นี่
+const admin = require('firebase-admin');
 
 // --- Setup Express ---
 const app = express();
@@ -25,13 +25,11 @@ try {
 }
 
 // --- Initialize Firebase ---
-// ตรวจสอบก่อนว่ามีการ Initialize ไปหรือยัง เพื่อป้องกัน Error ตอน Hot-reload
-if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app"
-    });
-}
+// ลบเงื่อนไขเช็ค admin.apps.length ออก เพื่อป้องกัน Error
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app"
+});
 
 const db = admin.database();
 
@@ -63,7 +61,6 @@ async function sendToAllDevices(text) {
 
         console.log(`🚀 กำลังส่งแจ้งเตือนไปยัง ${tokens.length} เครื่อง...`);
 
-        // ส่งทีละ batch เพื่อป้องกันข้อจำกัดของ Firebase
         for (let i = 0; i < tokens.length; i += 500) {
             const batch = tokens.slice(i, i + 500);
             const message = {
@@ -87,7 +84,6 @@ app.post('/register-token', async (req, res) => {
     const { token } = req.body;
     if (!token) return res.status(400).send("No token provided");
     try {
-        // บันทึก Token ลงใน database ด้วย key เป็น timestamp
         await db.ref('fcm_tokens/' + Date.now()).set({ 
             token: token, 
             device: "Android", 
@@ -121,7 +117,6 @@ app.get('/ping', (req, res) => res.status(200).send('เซิร์ฟเวอ
 
         console.log("🟢 [Telegram] เชื่อมต่อสำเร็จ!");
 
-        // ดักจับข้อความใหม่
         client.addEventHandler(async (event) => {
             const message = event.message;
             if (!message || !message.text) return;
@@ -130,7 +125,6 @@ app.get('/ping', (req, res) => res.status(200).send('เซิร์ฟเวอ
                 const sender = await message.getSender();
                 const username = sender && sender.username ? sender.username : "ไม่มี Username";
                 
-                // ตรวจสอบว่าเป็นบอทที่เราต้องการไหม
                 if (username === TARGET_BOT_USERNAME || username === 'KCSmartAlert_bot') {
                     console.log(`🚀 พบข้อความจากบอท กำลังส่งเข้า Firebase: ${message.text}`);
                     await sendToAllDevices(message.text);
