@@ -8,15 +8,14 @@ const express = require('express');
 // 1. ข้อมูลการเชื่อมต่อ Telegram
 const apiId = 39376007; 
 const apiHash = "4bbfdf3c89267e34312cd5cec276442d"; 
-const sessionText = process.env.TELEGRAM_SESSION || "1BQANOTEuMTA4LjU2LjE2NgG7nqnw3S0GPaGazrUIT5jG+/4JbcedYQughIp3MOwFJUSEuI9hu8hcRHsZ2O004Xy1B/UuRuZ7kuu83yNuL8CXtyh13UoVB1MoO4Iwy/WSHxSilxc8MZCJ7O7jH/MKIFN7JluT+ew7Ti407GRRx5cMUsUqic9lPfVl91oV1hmZwoeABrCflWhsFGI3ORpuILO14Z8xeIQaWZLFr/eoOQO4yOspTKSuCCxEzYsL6RYrdW5PRsTsLDaiAI2j4IAh8xS6BAK714WLaVVx4l/sYdWOwCp2B57u15jfqt/bpfYjIA4e39vFlRpKLvEyvnX8HpiEbBnQ0A5dJLDaoUDkaqt0bw==";
-const stringSession = new StringSession(sessionText);
-
-// 🔍 กำหนดเป้าหมายที่ต้องการดักจับ (เลือกใช้อย่างใดอย่างหนึ่ง)
+// ดึงจาก Environment Variable บน Render โดยตรง
+const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");// 🔍 กำหนดเป้าหมายที่ต้องการดักจับ (เลือกใช้อย่างใดอย่างหนึ่ง)
 const TARGET_BOT_USERNAME = 'KCSmartAlert_bot'; // ชื่อ username ของบอตที่ส่งมา (ไม่ต้องใส่ @)
 // const TARGET_CHAT_ID = '123456789'; // หรือใส่รหัส ID ของแชต/กลุ่มตรงๆ (ถ้าทราบ)
 
 // 2. ตั้งค่า Firebase Admin
-const serviceAccount = require('./kc-smart-firebase-adminsdk-fbsvc-02c865dc06.json');
+const path = require('path');
+const serviceAccount = require('/etc/secrets/kc-smart-firebase-adminsdk-fbsvc-02c865dc06.json');
 initializeApp({
   credential: cert(serviceAccount)
 });
