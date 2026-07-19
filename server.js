@@ -1,3 +1,5 @@
+console.log("🚀 Server is starting..."); // เพิ่มบรรทัดนี้บรรทัดแรกสุดเลยครับ
+
 const { TelegramClient } = require("telegram");
 const { StringSession } = require("telegram/sessions");
 const { NewMessage } = require("telegram/events");
