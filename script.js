@@ -575,8 +575,7 @@ function askNotificationPermission(reg) {
   }
 }
 
-// 2. ฟังก์ชันดึง FCM Token (ที่อยู่ของเครื่องนี้) เพื่อเอาไปผูกกับบอท Telegram
-// 2. ฟังก์ชันดึง FCM Token เพื่อเอาไปผูกกับบอท Telegram (เวอร์ชันอัปเกรด)
+// 2. ฟังก์ชันดึง FCM Token และตรวจสอบสถานะใน Database (ฉบับอัปเกรดซ่อมแซมตัวเองได้)
 function getFCMToken(reg) {
   messaging.getToken({ 
     vapidKey: "BGJa_Jny-1OLkMSdTNcv-xhkaxGqLnH8RTXWFCDb-mIudG02l4HfwaRRy3frG5DT_fKmTbUn29DkhukOpt07ptw", 
@@ -586,26 +585,48 @@ function getFCMToken(reg) {
     if (currentToken) {
       console.log("🔥 FCM Token ของเครื่องนี้คือ:", currentToken);
       
-      // 💾 ส่ง Token ไปเก็บใน Firebase Realtime Database อัตโนมัติ
-      // ตรวจสอบก่อนว่า Token นี้เคยบันทึกไปหรือยัง เพื่อป้องกันการบันทึกซ้ำทุกครั้งที่รีเฟรช
-      if (localStorage.getItem("saved_fcm_token") !== currentToken) {
-        
+      const savedToken = localStorage.getItem("saved_fcm_token");
+      const savedKey = localStorage.getItem("saved_fcm_key"); // ดึงคีย์อ้างอิงของ Firebase มาเช็ก
+
+      // 📦 ฟังก์ชันภายในสำหรับสั่งอัปโหลดข้อมูลใหม่
+      const uploadTokenNew = () => {
         database.ref("fcm_tokens").push({
           token: currentToken,
           device: navigator.userAgent.includes("Android") ? "Android" : navigator.userAgent.includes("iPhone") ? "iPhone" : "PC/Other",
           timestamp: firebase.database.ServerValue.TIMESTAMP
         })
-        .then(() => {
-          // เซฟลงเครื่องผู้ใช้ว่าบันทึกสำเร็จแล้ว
+        .then((ref) => {
+          // สำคัญมาก: บันทึกทั้ง Token และคีย์ ID ที่ Firebase เจนใหม่ออกมาลงเครื่อง
           localStorage.setItem("saved_fcm_token", currentToken);
+          localStorage.setItem("saved_fcm_key", ref.key); 
           console.log("💾 บันทึกบ้านเลขที่ (Token) ลง Firebase เรียบร้อยพร้อมใช้งาน!");
         })
         .catch((dbErr) => {
           console.error("❌ บันทึก Token ลงฐานข้อมูลไม่สำเร็จ:", dbErr);
         });
+      };
 
+      // 🔍 เริ่มกระบวนการเช็กสถานะ
+      if (savedToken === currentToken && savedKey) {
+        // ถ้ารหัส Token ตรงกันและเคยมีคีย์แล้ว ให้วิ่งไปถาม Database ของจริงว่ายังอยู่ไหม
+        database.ref("fcm_tokens/" + savedKey).once("value")
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            console.log("ℹ️ Token นี้มีอยู่ในระบบฐานข้อมูลแล้ว ไม่ต้องส่งซ้ำ");
+          } else {
+            // 🚨 เคสที่คุณกดลบในตาราง ข้อมูล snapshot จะเป็นมินัล (ไม่มีอยู่จริง)
+            console.warn("⚠️ พบว่า Token หายไปจาก Database! กำลังกู้คืนและเพิ่มกลับให้ใหม่...");
+            uploadTokenNew();
+          }
+        })
+        .catch((err) => {
+          // เผื่อเกิดเหตุขัดข้องทางเน็ตเวิร์ก ให้พยายามอัปโหลดใหม่เพื่อความปลอดภัยไว้ก่อน
+          console.error("เช็คสถานะจากฐานข้อมูลไม่สำเร็จ:", err);
+          uploadTokenNew();
+        });
       } else {
-        console.log("ℹ️ Token นี้ถูกบันทึกในระบบอยู่แล้ว ไม่ต้องส่งซ้ำ");
+        // ถ้าเป็นเครื่องใหม่เอี่ยม หรือเป็นเครื่องที่ Token เพิ่งอัปเดตใหม่ ให้แอดเข้าตารางทันที
+        uploadTokenNew();
       }
       
     } else {
