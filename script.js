@@ -558,7 +558,7 @@ function askNotificationPermission(reg) {
 function getFCMToken(reg) {
   // *หมายเหตุ: ต้องมั่นใจว่าใน script.js มีการประกาศ const messaging = firebase.messaging(); ไว้แล้วนะคร้บ
   messaging.getToken({ 
-    vapidKey: "YOUR_PUBLIC_VAPID_KEY", // 👈 เอาคู่กุญแจสาธารณะมาจากหน้า Project Settings > Cloud Messaging ใน Firebase Console
+    vapidKey: "BGJa_Jny-1OLkMSdTNcv-xhkaxGqLnH8RTXWFCDb-mIudG02l4HfwaRRy3frG5DT_fKmTbUn29DkhukOpt07ptw", // 👈 เอาคู่กุญแจสาธารณะมาจากหน้า Project Settings > Cloud Messaging ใน Firebase Console
     serviceWorkerRegistration: reg 
   })
   .then((currentToken) => {

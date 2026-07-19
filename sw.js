@@ -91,7 +91,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   let title = '📢 มีแจ้งเตือนใหม่!';
   let body = 'มีข่าวสารใหม่จาก KC_broadcast_Bot';
-  let icon = './KClogo.png'; 
+  let icon = './KCsmartปก.png'; // ไอคอนเริ่มต้น
 
   if (event.data) {
     try {
