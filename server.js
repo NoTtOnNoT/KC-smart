@@ -19,7 +19,7 @@ const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");
 const TARGET_BOT_USERNAME = 'KCSmartAlert_bot';
 
 // 2. ตั้งค่า Firebase Admin
-const serviceAccount = require('/etc/secrets/kc-smart-firebase-adminsdk-fbsvc-02c865dc06.json');
+const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG_JSON);
 initializeApp({
   credential: cert(serviceAccount),
   databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app"
