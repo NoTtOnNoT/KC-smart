@@ -7,6 +7,12 @@ const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 
+if (!admin || !admin.credential) {
+    console.error("❌ CRITICAL: firebase-admin ไม่สามารถโหลดได้! กำลังตรวจสอบ...");
+    // ถ้าใช้ v12 แล้วยังพัง ให้ลองเช็คว่ามันโหลดแบบนี้ไหม
+    // กรณีนี้เราปล่อยให้โปรแกรมพังเพื่อดู Log รอบหน้า
+}
+
 // --- Setup Express ---
 const app = express();
 app.use(cors());
