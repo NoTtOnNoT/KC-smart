@@ -1,3 +1,24 @@
+// 1. ประกาศ Firebase Config หน้าบ้าน (ใช้ชุดเดียวกับใน sw.js)
+const firebaseConfig = {
+  apiKey: "AIzaSyA8G5AS0EOAwFSh6krkiZlOrxEZ_pwL2ng",
+  authDomain: "kc-smart.firebaseapp.com",
+  databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kc-smart",
+  storageBucket: "kc-smart.firebasestorage.app",
+  messagingSenderId: "972939980061",
+  appId: "1:972939980061:web:3a114c024c9ed19a4545f4"
+};
+
+// 2. สั่งให้ Firebase เริ่มทำงานหน้าบ้าน
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const messaging = firebase.messaging();
+
+// ========================================================
+// ต่อด้วยโค้ดเดิมของคุณด้านล่าง (if ("serviceWorker" in navigator) {...})
+// ========================================================
+
 let isAppInitialized = false;
 
 // [ส่วนที่ 1] ข้อมูลแอปทั้งหมด
@@ -602,21 +623,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
-
-// [ส่วนที่ 1] Firebase Configuration (อยู่นอกสุด)
-const firebaseConfig = {
-  apiKey: "AIzaSyA8G5AS0EOAwFSh6krkiZlOrxEZ_pwL2ng",
-  authDomain: "kc-smart.firebaseapp.com",
-  databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "kc-smart",
-  storageBucket: "kc-smart.firebasestorage.app",
-  messagingSenderId: "972939980061",
-  appId: "1:972939980061:web:3a114c024c9ed19a4545f4"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
 
 // Global Database Reference
 const database = firebase.database();
