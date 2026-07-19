@@ -36,6 +36,7 @@ try {
 // ลบเงื่อนไขเช็ค admin.apps.length ออก เพื่อป้องกัน Error
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
+    projectId: serviceAccount.project_id, // <--- เพิ่มบรรทัดนี้เข้าไปครับ (ดึงจาก JSON)
     databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 
