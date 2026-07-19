@@ -90,6 +90,7 @@ self.addEventListener('fetch', (event) => {
 // ==========================================
 // 3. ดักจับ Notification (รองรับทั้ง FCM และ DevTools)
 // ==========================================
+// ในส่วนของ sw.js ตรง event listener 'push'
 self.addEventListener('push', (event) => {
   let title = '📢 มีแจ้งเตือนใหม่!';
   let body = 'มีข่าวสารใหม่จาก KC_broadcast_Bot';
@@ -97,17 +98,16 @@ self.addEventListener('push', (event) => {
 
   if (event.data) {
     try {
-      const data = event.data.json();
-      if (data.notification) {
-        title = data.notification.title || title;
-        body = data.notification.body || body;
-        icon = data.notification.icon || icon;
-      } else if (data.data) {
-        title = data.data.title || title;
-        body = data.data.body || body;
-      } else {
-        body = event.data.text();
-      }
+      const payload = event.data.json(); // ข้อมูลที่ส่งมาคือ payload
+      
+      // เราส่งมาเป็น data:{title, body, icon} 
+      // ใน FCM payload ข้อมูลจะอยู่ใน payload.data
+      const data = payload.data || {}; 
+
+      title = data.title || title;
+      body = data.body || body;
+      icon = data.icon || icon; // ดึง icon จาก data ได้เลย
+      
     } catch (e) {
       body = event.data.text();
     }
@@ -115,7 +115,7 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: body,
-    icon: icon,
+    icon: icon, // ใช้ไอคอนที่ดึงมา
     badge: './KClogo.png', 
     vibrate: [200, 100, 200], 
     data: {
