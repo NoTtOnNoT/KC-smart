@@ -113,10 +113,16 @@ self.addEventListener('push', (event) => {
     }
   }
 
+  // ใน sw.js
   const options = {
     body: body,
-    icon: icon, // ใช้ไอคอนที่ดึงมา
-    badge: './KClogo.png', 
+    // ตรงนี้คือรูปไอคอนหลักที่โชว์ในกล่องแจ้งเตือน
+    icon: './KCsmartปก.png', 
+    
+    // ตรงนี้คือไอคอนตัวเล็กที่จะโชว์บน Status Bar (บน Android)
+    // แนะนำให้หาไฟล์รูปขนาดเล็ก (เช่น 96x96) มาใส่ครับ
+    badge: './badge.png', 
+    
     vibrate: [200, 100, 200], 
     data: {
       url: '/' 

@@ -81,7 +81,7 @@ async function sendToAllDevices(text) {
       const message = {
         data: {
           // ใช้ data แทน notification
-          title: "📢 มีแจ้งเตือนใหม่จากระบบ!",
+          title: "📢 แจ้งเตือนใหม่จาก KC_broadcast_Bot!",
           body: text,
           icon: "https://kc-smart.smtekc.com/KCsmartปก.png", // ย้ายไอคอนมาไว้ใน data
         },
