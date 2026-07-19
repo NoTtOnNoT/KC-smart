@@ -1,4 +1,27 @@
-const CACHE_NAME = 'kc-smart-v1.1'; // เปลี่ยนเลขเวอร์ชันเวลาอัปเดตรูปใหม่
+// ==========================================
+// 1. นำเข้า Firebase SDK สำหรับ Service Worker
+// ==========================================
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
+
+// Config ของโปรเจกต์ KC SMART
+const firebaseConfig = {
+  apiKey: "AIzaSyA8G5AS0EOAwFSh6krkiZlOrxEZ_pwL2ng",
+  authDomain: "kc-smart.firebaseapp.com",
+  databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kc-smart",
+  storageBucket: "kc-smart.firebasestorage.app",
+  messagingSenderId: "972939980061",
+  appId: "1:972939980061:web:3a114c024c9ed19a4545f4"
+};
+
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+
+// ==========================================
+// 2. ส่วนของ PWA Caching (โค้ดเดิมของคุณ)
+// ==========================================
+const CACHE_NAME = 'kc-smart-v1.2'; // อัปเดตเวอร์ชันเพื่อรีเฟรชระบบ
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,7 +31,6 @@ const ASSETS_TO_CACHE = [
   './KClogo.png',
   './KCsmart.png',
   './KCsmartปก.png',
-  // รายการรูปในโฟลเดอร์
   './KCsmartpic/pic1.webp',
   './KCsmartpic/pic2.webp',
   './KCsmartpic/pic3.webp',
@@ -35,18 +57,16 @@ const ASSETS_TO_CACHE = [
   './KCsmartpic/pic24.webp'
 ];
 
-// 1. ติดตั้งและเก็บไฟล์ลง Cache
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('📦 เคชไฟล์สำเร็จ!');
+      console.log('📦 เคชไฟล์สำเร็จ (v1.2)!');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
-  self.skipWaiting(); // ให้แอปอัปเดตเวอร์ชันใหม่ทันที
+  self.skipWaiting();
 });
 
-// 2. ลบ Cache เก่าทิ้งเมื่อมีการอัปเดตเวอร์ชัน (ป้องกันเครื่องเต็ม)
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -57,30 +77,25 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// 3. ดึงไฟล์จาก Cache มาโชว์ (หัวใจของความเร็ว)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
-      // ถ้ามีใน Cache ให้ใช้เลย ถ้าไม่มีให้ไปดึงจากเน็ต
       return response || fetch(event.request);
     })
   );
 });
 
 // ==========================================
-// 4. ดักจับ Notification (Web Push / FCM)
+// 3. ดักจับ Notification (รองรับทั้ง FCM และ DevTools)
 // ==========================================
 self.addEventListener('push', (event) => {
   let title = '📢 มีแจ้งเตือนใหม่!';
   let body = 'มีข่าวสารใหม่จาก KC_broadcast_Bot';
-  let icon = './KClogo.png'; // ไอคอนที่จะแสดงในแจ้งเตือน
+  let icon = './KClogo.png'; 
 
   if (event.data) {
     try {
-      // แปลงข้อมูลเป็น JSON (กรณีส่งมาจาก Firebase / Node.js)
       const data = event.data.json();
-      
-      // ดักจับโครงสร้างข้อความจาก Firebase Cloud Messaging
       if (data.notification) {
         title = data.notification.title || title;
         body = data.notification.body || body;
@@ -92,7 +107,6 @@ self.addEventListener('push', (event) => {
         body = event.data.text();
       }
     } catch (e) {
-      // ถ้าข้อมูลที่ส่งมาไม่ใช่ JSON ให้มองเป็นข้อความธรรมดา
       body = event.data.text();
     }
   }
@@ -100,10 +114,10 @@ self.addEventListener('push', (event) => {
   const options = {
     body: body,
     icon: icon,
-    badge: './KClogo.png', // ไอคอนเล็กๆ บน Status bar ของแอนดรอยด์
-    vibrate: [200, 100, 200], // รูปแบบการสั่น (สั่น-หยุด-สั่น)
+    badge: './KClogo.png', 
+    vibrate: [200, 100, 200], 
     data: {
-      url: '/' // ลิงก์ที่จะเปิดเมื่อผู้ใช้กดที่ข้อความแจ้งเตือน
+      url: '/' 
     }
   };
 
@@ -112,13 +126,9 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// ==========================================
-// 5. เมื่อผู้ใช้คลิกที่ตัวแจ้งเตือน
-// ==========================================
+// เมื่อผู้ใช้คลิกที่ตัวแจ้งเตือน
 self.addEventListener('notificationclick', (event) => {
-  event.notification.close(); // ปิดแจ้งเตือนเมื่อคลิก
-  
-  // ให้เปิดหน้าเว็บหรือดึงหน้าเว็บเดิมขึ้นมาแสดง
+  event.notification.close(); 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       if (clientList.length > 0) {

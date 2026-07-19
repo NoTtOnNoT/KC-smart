@@ -34,7 +34,7 @@ const apps = [
   },
   {
     n: "รายชื่อนักเรียน",
-    u: "https://namestukc.sadaokc.com/",
+    u: "https://script.google.com/macros/s/AKfycbwjFJ_Sw9fy8ciWUqccQ9ypdJgPsgtJ_c6Ab5cB0ACz21ybMu6lPmcEbuVdVrEhW4gQ/exec",
     img: "KCsmartpic/pic8.webp",
   },
   {
@@ -521,12 +521,59 @@ buttons.forEach((btn) => {
   });
 })();
 
+// โค้ดเดิมของคุณ (ปรับแต่งให้เรียกฟังก์ชันขอสิทธิ์เพิ่ม)
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("sw.js")
-      .then((reg) => console.log("Service Worker Registered!", reg))
+      .then((reg) => {
+        console.log("Service Worker Registered!", reg);
+        
+        // 🎯 เรียกฟังก์ชันขออนุญาตแจ้งเตือนหลังจากลงทะเบียน SW สำเร็จ
+        askNotificationPermission(reg);
+      })
       .catch((err) => console.log("Service Worker Registration Failed:", err));
+  });
+}
+
+// 1. ฟังก์ชันส่งคำขออนุญาตแจ้งเตือน
+function askNotificationPermission(reg) {
+  // ตรวจสอบสิทธิ์ปัจจุบัน ถ้ายังไม่เคยถาม ให้เด้งป๊อปอัปถามทันที
+  if (Notification.permission === "default") {
+    Notification.requestPermission().then((permission) => {
+      if (permission === "granted") {
+        console.log("ผู้ใช้อนุญาตการแจ้งเตือนแล้ว! 🎉");
+        getFCMToken(reg); // ดึง Token ต่อทันที
+      } else {
+        console.warn("ผู้ใช้ปฏิเสธการแจ้งเตือน 😢");
+      }
+    });
+  } else if (Notification.permission === "granted") {
+    // ถ้าผู้ใช้เคยอนุญาตไปแล้วก่อนหน้านี้ ให้ดึง Token มาใช้งานได้เลย
+    getFCMToken(reg);
+  }
+}
+
+// 2. ฟังก์ชันดึง FCM Token (ที่อยู่ของเครื่องนี้) เพื่อเอาไปผูกกับบอท Telegram
+function getFCMToken(reg) {
+  // *หมายเหตุ: ต้องมั่นใจว่าใน script.js มีการประกาศ const messaging = firebase.messaging(); ไว้แล้วนะคร้บ
+  messaging.getToken({ 
+    vapidKey: "YOUR_PUBLIC_VAPID_KEY", // 👈 เอาคู่กุญแจสาธารณะมาจากหน้า Project Settings > Cloud Messaging ใน Firebase Console
+    serviceWorkerRegistration: reg 
+  })
+  .then((currentToken) => {
+    if (currentToken) {
+      console.log("🔥 FCM Token ของเครื่องนี้คือ:", currentToken);
+      
+      // 💡 [จุดสำคัญ] คุณต้องเขียนโค้ดส่ง currentToken นี้ไปเก็บที่ Database ของคุณ 
+      // เพื่อให้ Node.js Bridge หรือ Telegram Bot รู้ว่าจะต้องยิงแจ้งเตือนมาที่เครื่องไหน
+      
+    } else {
+      console.log("ไม่สามารถดึง Token ได้ โปรดเช็กสิทธิ์แจ้งเตือนบนเบราว์เซอร์");
+    }
+  })
+  .catch((err) => {
+    console.error("เกิดข้อผิดพลาดในการดึง Token:", err);
   });
 }
 
@@ -558,15 +605,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // [ส่วนที่ 1] Firebase Configuration (อยู่นอกสุด)
 const firebaseConfig = {
-  apiKey: "AIzaSyDg3OY7bSroS76kKIaB8YxEEvdrZAuhn0Q",
-  authDomain: "kc-smart-6e44d.firebaseapp.com",
-  projectId: "kc-smart-6e44d",
-  // เปลี่ยนบรรทัดนี้เป็นอันใหม่ที่ระบบแจ้งมา:
-  databaseURL:
-    "https://kc-smart-6e44d-default-rtdb.asia-southeast1.firebasedatabase.app",
-  storageBucket: "kc-smart-6e44d.firebasestorage.app",
-  messagingSenderId: "1042713591777",
-  appId: "1:1042713591777:web:33a8400b8e78d1dca55ca0",
+  apiKey: "AIzaSyA8G5AS0EOAwFSh6krkiZlOrxEZ_pwL2ng",
+  authDomain: "kc-smart.firebaseapp.com",
+  databaseURL: "https://kc-smart-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kc-smart",
+  storageBucket: "kc-smart.firebasestorage.app",
+  messagingSenderId: "972939980061",
+  appId: "1:972939980061:web:3a114c024c9ed19a4545f4"
 };
 
 if (!firebase.apps.length) {
