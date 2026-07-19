@@ -49,7 +49,7 @@ const db = admin.database();
 const apiId = 39376007;
 const apiHash = "4bbfdf3c89267e34312cd5cec276442d";
 const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");
-const TARGET_BOT_USERNAME = "KCSmartAlert_bot";
+const TARGET_BOT_USERNAME = "Kc_broadcast_Bot_bot";
 
 // --- ฟังก์ชันส่ง Multicast (Firebase) ---
 // เปลี่ยนจากเดิมในฟังก์ชัน sendToAllDevices เป็นแบบนี้ครับ
@@ -149,7 +149,7 @@ app.get("/ping", (req, res) =>
 
         if (
           username === TARGET_BOT_USERNAME ||
-          username === "KCSmartAlert_bot"
+          username === "Kc_broadcast_Bot_bot"
         ) {
           console.log(
             `🚀 พบข้อความจากบอท กำลังส่งเข้า Firebase: ${message.text}`,
