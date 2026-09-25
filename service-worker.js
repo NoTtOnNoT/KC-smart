@@ -84,6 +84,18 @@ self.addEventListener('activate', event => {
 })
 
 self.addEventListener('fetch', event => {
+    // หน้าและไฟล์โค้ดต้องดึงเวอร์ชันล่าสุดก่อนเมื่อออนไลน์
+    // เพื่อไม่ให้แคชเก่าโหลด script.js ที่ยังไม่มีระบบนับสถิติ
+    const requestUrl = new URL(event.request.url);
+    if (event.request.method === 'GET' && requestUrl.origin === self.location.origin &&
+        (event.request.mode === 'navigate' || /\.(?:js|css|json)$/i.test(requestUrl.pathname))) {
+        const fresh = fetch(event.request, { cache: 'no-store' });
+        event.respondWith(fresh.catch(() => caches.match(event.request)));
+        event.waitUntil(fresh.then(response => {
+            if (response.ok) return caches.open('pwa-cache').then(cache => cache.put(event.request, response.clone()));
+        }).catch(() => {}));
+        return;
+    }
     if (HOSTNAME_WHITELIST.indexOf(new URL(event.request.url).hostname) > -1) {
         const cached = caches.match(event.request)
         const fixedUrl = getFixedUrl(event.request)

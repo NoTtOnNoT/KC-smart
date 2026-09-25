@@ -34,14 +34,13 @@ function bangkokDayKey(time) {
 function countEvent(path) {
   const day = bangkokDayKey(Date.now() + serverTimeOffset);
   const increment = firebase.database.ServerValue.increment(1);
-  // เขียนยอดรวมและรายวันพร้อมกันในคำขอเดียว
-  return statsRef.update({
-    [path]: increment,
-    [`days/${day}/${path}`]: firebase.database.ServerValue.increment(1),
-  })
-    .catch((error) => {
-      console.warn("ไม่สามารถบันทึกสถิติ KC Smart:", error);
-    });
+  // กฎฐานข้อมูลอนุญาตเฉพาะ leaf; ส่ง increment ตรงไปยังแต่ละ leaf
+  return Promise.all([
+    statsRef.child(path).set(increment),
+    statsRef.child(`days/${day}/${path}`).set(firebase.database.ServerValue.increment(1)),
+  ]).catch((error) => {
+    console.warn("บันทึกสถิติ KC Smart ไม่สำเร็จ ตรวจสอบ Database Rules:", error);
+  });
 }
 
 // แสดงยอดเปิดเว็บสะสมในก้อนลอยด้านล่างหน้าแรก
