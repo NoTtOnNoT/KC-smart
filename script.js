@@ -14,6 +14,63 @@ if (!firebase.apps.length) {
 }
 const messaging = firebase.messaging();
 
+// ยอดเปิดหน้าและยอดคลิก 24 ฟังก์ชัน เก็บใน Realtime Database
+// ServerValue.increment ทำงานที่เซิร์ฟเวอร์ จึงไม่ทับยอดของผู้ใช้อื่น
+const statsRef = firebase.database().ref("kcSmartStats");
+let serverTimeOffset = 0;
+firebase.database().ref(".info/serverTimeOffset").on("value", (snapshot) => {
+  serverTimeOffset = Number(snapshot.val()) || 0;
+});
+
+// จัดวันตามเวลาไทยเสมอ แม้เครื่องผู้ใช้จะตั้งโซนเวลาอื่น
+function bangkokDayKey(time) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Bangkok", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(new Date(time));
+  const part = (name) => parts.find((item) => item.type === name).value;
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
+function countEvent(path) {
+  const day = bangkokDayKey(Date.now() + serverTimeOffset);
+  const increment = firebase.database.ServerValue.increment(1);
+  // เขียนยอดรวมและรายวันพร้อมกันในคำขอเดียว
+  return statsRef.update({
+    [path]: increment,
+    [`days/${day}/${path}`]: firebase.database.ServerValue.increment(1),
+  })
+    .catch((error) => {
+      console.warn("ไม่สามารถบันทึกสถิติ KC Smart:", error);
+    });
+}
+
+// แสดงยอดเปิดเว็บสะสมในก้อนลอยด้านล่างหน้าแรก
+document.addEventListener("DOMContentLoaded", () => {
+  const badge = document.getElementById("visitCounter");
+  const number = document.getElementById("visitCount");
+  if (!badge || !number) return;
+  statsRef.child("pageViews").on("value", (snapshot) => {
+    const total = Number(snapshot.val()) || 0;
+    const exact = new Intl.NumberFormat("th-TH").format(total);
+    number.textContent = total >= 10000
+      ? new Intl.NumberFormat("en-US", {notation: "compact", maximumFractionDigits: 1}).format(total)
+      : exact;
+    badge.title = `เปิดเว็บไซต์ทั้งหมด ${exact} ครั้ง`;
+    badge.setAttribute("aria-label", badge.title);
+    badge.classList.remove("updated");
+    // เริ่มอนิเมชันใหม่เมื่อจำนวนเปลี่ยน
+    if (badge.dataset.lastValue !== String(total)) {
+      void badge.offsetWidth;
+      badge.classList.add("updated");
+      badge.dataset.lastValue = String(total);
+    }
+  }, (error) => {
+    number.textContent = "—";
+    badge.title = `ไม่สามารถโหลดยอดเปิดเว็บไซต์: ${error.message}`;
+    badge.setAttribute("aria-label", badge.title);
+  });
+});
+
 let isAppInitialized = false;
 
 // [ส่วนที่ 1] ข้อมูลแอปทั้งหมด
@@ -50,7 +107,7 @@ const apps = [
   },
   {
     n: "รายชื่อนักเรียน",
-    u: "https://namestukc.sadaokc.com/",
+    u: "https://script.google.com/macros/s/AKfycbwjFJ_Sw9fy8ciWUqccQ9ypdJgPsgtJ_c6Ab5cB0ACz21ybMu6lPmcEbuVdVrEhW4gQ/exec",
     img: "KCsmartpic/pic8.webp",
   },
   {
@@ -180,15 +237,25 @@ function createAppGrid() {
     card.addEventListener("click", (e) => {
       if (app.u && app.u !== "#") {
         e.preventDefault();
+        // ป้องกันการแตะรัว ๆ ระหว่างแสดงหน้ากำลังเปิด
+        if (card.dataset.opening === "true") return;
+        card.dataset.opening = "true";
         if (navigator.vibrate) navigator.vibrate(50);
         if (appNameDisplay) appNameDisplay.innerText = `กำลังเปิด ${app.n}...`;
         if (popup) popup.classList.add("active");
 
-        setTimeout(() => {
+        // รอผลบันทึกสั้น ๆ ก่อนออกจากเว็บ แต่ไม่ค้างหน้าเมื่อเครือข่ายช้า
+        Promise.race([
+          countEvent(`apps/app_${String(index + 1).padStart(2, "0")}`),
+          new Promise((resolve) => setTimeout(resolve, 1200)),
+        ]).then(() => {
           window.location.href = app.u;
           // Reset สถานะเผื่อผู้ใช้กดย้อนกลับ
-          setTimeout(() => popup.classList.remove("active"), 2000);
-        }, 400);
+          setTimeout(() => {
+            popup?.classList.remove("active");
+            delete card.dataset.opening;
+          }, 2000);
+        });
       }
     });
     grid.appendChild(card);
@@ -296,6 +363,8 @@ async function initApp() {
 
 // [ส่วนที่ 4] รันระบบ
 document.addEventListener("DOMContentLoaded", () => {
+  // นับหนึ่งครั้งต่อการโหลดหน้าหลัก (รีเฟรช = เปิดอีกครั้ง)
+  countEvent("pageViews");
   // รันเฉพาะ Splash/Init ก่อน เพื่อความเร็วในการตอบสนองแรก
   initApp();
 
@@ -308,6 +377,7 @@ function initSearchControls() {
   const searchToggle = document.getElementById("searchToggle");
   const searchInput = document.getElementById("appSearch");
   const mainFooter = document.querySelector(".special-footer");
+  const footerDock = document.querySelector(".footer-dock");
 
   if (!searchBox || !searchToggle || !searchInput || !mainFooter) {
     console.warn("Search UI หรือ footer ไม่ครบ");
@@ -315,6 +385,7 @@ function initSearchControls() {
   }
 
   const toggleSearch = (show) => {
+    footerDock?.classList.toggle("search-open", show);
     if (show) {
       mainFooter.classList.add("expanded"); // CSS จะทำงานซ่อนปุ่มอื่นทันที
       searchBox.classList.add("active");

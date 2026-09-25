@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>สถิติการใช้งาน | KC SMART</title>
+  <style>
+    :root{font-family:system-ui,"Kanit",sans-serif;color-scheme:dark;background:#100c22;color:#f9f7ff}
+    *{box-sizing:border-box}body{margin:0;padding:24px}main{max-width:1050px;margin:auto}
+    h1{margin:0 0 6px;font-size:clamp(1.6rem,4vw,2.5rem)}.muted{color:#bcb5d3}
+    .panel{background:#201937;border:1px solid #49376c;border-radius:20px;padding:22px;margin:20px 0}
+    input,button{font:inherit;border-radius:10px;padding:11px 14px}
+    input{background:#120e24;color:white;border:1px solid #6a598e;width:100%;margin:5px 0 12px}
+    button{border:0;background:#8b5cf6;color:white;cursor:pointer}button:hover{background:#a681f8}
+    #signout{float:right;background:#49376c}.hidden{display:none}.total{font-size:clamp(2rem,6vw,3.5rem);font-weight:800;margin:0}
+    table{border-collapse:collapse;width:100%}th,td{padding:12px 8px;border-bottom:1px solid #49376c;text-align:left}
+    td:last-child,th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+    .bar{height:7px;background:#8b5cf6;border-radius:10px;margin-top:5px;min-width:2px}
+    .table-wrap{overflow-x:auto}#message{min-height:1.5em;color:#f9b7b7}
+  </style>
+</head>
+<body><main>
+  <h1>KC SMART · สถิติการใช้งาน</h1>
+  <p class="muted">นับตั้งแต่เริ่มติดตั้งระบบ · ยอดเปิดหน้าเป็นจำนวนครั้ง ไม่ใช่จำนวนผู้ใช้</p>
+  <section id="login-panel" class="panel">
+    <h2>เข้าสู่ระบบแอดมิน</h2>
+    <form id="login-form">
+      <label>อีเมล<input id="email" type="email" autocomplete="username" required></label>
+      <label>รหัสผ่าน<input id="password" type="password" autocomplete="current-password" required></label>
+      <button type="submit">เข้าสู่ระบบ</button>
+    </form>
+  </section>
+  <section id="dashboard" class="hidden">
+    <button type="button" id="signout">ออกจากระบบ</button>
+    <div class="panel"><div class="muted">เปิดเว็บไซต์ทั้งหมด</div><p id="page-views" class="total">—</p></div>
+    <div class="panel"><h2>จำนวนคลิกแยกตามฟังก์ชัน</h2><div class="table-wrap">
+      <table><thead><tr><th>ลำดับ</th><th>ฟังก์ชัน</th><th>จำนวนคลิก</th></tr></thead><tbody id="app-stats"></tbody></table>
+    </div></div>
+  </section>
+  <p id="message" role="status"></p>
+</main>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="analytics-admin.js"></script>
+</body></html>

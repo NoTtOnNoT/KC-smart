@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0a051a">
+  <title>สถิติการใช้งาน | KC SMART</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="stats-admin.css">
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="KC SMART กลับหน้าแรก">
+        <span class="brand-mark"><img src="KClogo.png" alt=""></span>
+        <span><strong>KC SMART</strong><small>SADAO KHANCHAI</small></span>
+      </a>
+      <a class="back-link" href="index.html" aria-label="กลับหน้าแรก">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>กลับหน้าแรก</span>
+      </a>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="sparkle" aria-hidden="true">✦</span> INSIGHTS DASHBOARD</div>
+          <h1 id="page-title">ภาพรวมการใช้งาน<span class="gold-dot">.</span></h1>
+          <p>ดูยอดเปิดเว็บไซต์และการกดใช้งานทั้ง 24 ฟังก์ชันของ KC SMART ในที่เดียว</p>
+          <div id="connection" class="connection loading" role="status"><span class="connection-dot"></span><span id="connection-text">กำลังเชื่อมต่อข้อมูล</span></div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="orbit orbit-outer"></div><div class="orbit orbit-inner"></div>
+          <span class="orbit-center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V5m0 14h16M8 15v-4m4 4V7m4 8v-6m4 6v-3" stroke-linecap="round"/></svg></span>
+          <span class="orbit-star star-a">✦</span><span class="orbit-star star-b">✧</span>
+        </div>
+      </section>
+
+      <section class="period-panel" aria-labelledby="period-title">
+        <div class="period-heading">
+          <div><span class="section-kicker">SELECT PERIOD</span><h2 id="period-title">เลือกช่วงเวลาที่ต้องการดู</h2></div>
+          <button id="export-csv" class="export-button" type="button" aria-label="ดาวน์โหลดข้อมูลรายวันเป็น CSV">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 18v2h14v-2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            ส่งออก CSV
+          </button>
+        </div>
+        <div class="period-tabs" role="group" aria-label="ช่วงเวลาสถิติ">
+          <button class="period-tab active" type="button" data-period="all" aria-pressed="true">ทั้งหมด</button>
+          <button class="period-tab" type="button" data-period="today" aria-pressed="false">วันนี้</button>
+          <button class="period-tab" type="button" data-period="seven" aria-pressed="false">7 วันล่าสุด</button>
+          <button class="period-tab" type="button" data-period="week" aria-pressed="false">สัปดาห์นี้</button>
+          <button class="period-tab" type="button" data-period="lastWeek" aria-pressed="false">สัปดาห์ก่อน</button>
+          <button class="period-tab" type="button" data-period="month" aria-pressed="false">เดือนนี้</button>
+          <button class="period-tab" type="button" data-period="lastMonth" aria-pressed="false">เดือนก่อน</button>
+          <button class="period-tab" type="button" data-period="pickWeek" aria-pressed="false">เลือกสัปดาห์</button>
+          <button class="period-tab" type="button" data-period="pickMonth" aria-pressed="false">เลือกเดือน</button>
+          <button class="period-tab" type="button" data-period="custom" aria-pressed="false">กำหนดเอง</button>
+        </div>
+        <div id="week-picker" class="custom-range" hidden><label>สัปดาห์ที่ต้องการ <input id="week-input" type="week"></label></div>
+        <div id="month-picker" class="custom-range" hidden><label>เดือนที่ต้องการ <input id="month-input" type="month"></label></div>
+        <div id="custom-range" class="custom-range" hidden>
+          <label>ตั้งแต่ <input id="date-from" type="date"></label>
+          <label>ถึง <input id="date-to" type="date"></label>
+        </div>
+        <span id="range-error" class="range-error" role="alert"></span>
+        <p id="period-caption" class="period-caption">ยอดสะสมทั้งหมดตั้งแต่เริ่มนับ</p>
+      </section>
+
+      <section class="overview" aria-label="สรุปยอด">
+        <article class="metric metric-primary">
+          <div class="metric-top"><span class="metric-label">ยอดเปิดเว็บไซต์</span><span class="metric-icon" aria-hidden="true">↗</span></div>
+          <p id="page-views" class="metric-number" aria-label="จำนวนครั้งที่เปิดเว็บไซต์">—</p>
+          <p id="views-note" class="metric-foot">นับทุกครั้งที่โหลดหน้าเว็บหลัก</p>
+        </article>
+        <article class="metric">
+          <div class="metric-top"><span class="metric-label">ยอดกดฟังก์ชันรวม</span><span class="metric-icon icon-purple" aria-hidden="true">⌁</span></div>
+          <p id="all-clicks" class="metric-number">—</p>
+          <p id="clicks-note" class="metric-foot">รวมการกดจากทุกฟังก์ชัน</p>
+        </article>
+        <article class="metric">
+          <div class="metric-top"><span class="metric-label">ฟังก์ชันยอดนิยม</span><span class="metric-icon icon-gold" aria-hidden="true">✦</span></div>
+          <p id="top-app" class="metric-feature">—</p>
+          <p id="top-app-count" class="metric-foot">รอข้อมูลการใช้งาน</p>
+        </article>
+      </section>
+
+      <section class="chart-panel" aria-labelledby="chart-title">
+        <div class="chart-heading"><div><span class="section-kicker">ACTIVITY TREND</span><h2 id="chart-title">แนวโน้มการใช้งาน</h2></div>
+          <div class="chart-legend"><span><i class="legend-views"></i>เปิดเว็บไซต์</span><span><i class="legend-clicks"></i>กดฟังก์ชัน</span></div>
+        </div>
+        <p id="chart-range" class="chart-description">กำลังโหลดข้อมูลรายวัน…</p>
+        <div id="chart-container" class="chart-container" role="img" aria-label="กราฟแนวโน้มยอดเปิดเว็บไซต์และยอดกดฟังก์ชันรายช่วงเวลา"></div>
+      </section>
+
+      <section class="usage-panel" aria-labelledby="usage-title">
+        <div class="usage-heading">
+          <div>
+            <span class="section-kicker">EXPLORE 24 FUNCTIONS</span>
+            <h2 id="usage-title">สถิติแต่ละฟังก์ชัน</h2>
+            <p id="list-summary" class="section-description">ดูจำนวนครั้งที่ผู้ใช้กดเปิดแต่ละบริการ</p>
+          </div>
+          <div class="controls">
+            <label class="search-control">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4" stroke-linecap="round"/></svg>
+              <span class="sr-only">ค้นหาฟังก์ชัน</span>
+              <input id="search" type="search" placeholder="ค้นหาฟังก์ชัน..." autocomplete="off">
+            </label>
+            <label class="sort-control"><span class="sr-only">เรียงลำดับรายการ</span><select id="sort">
+              <option value="popular">กดมากที่สุด</option>
+              <option value="original">ลำดับหน้าเว็บ</option>
+              <option value="least">กดน้อยที่สุด</option>
+            </select></label>
+          </div>
+        </div>
+        <div id="app-list" class="app-list" aria-live="polite" aria-busy="true">
+          <div class="loading-placeholder"><span class="loader"></span>กำลังโหลดสถิติ...</div>
+        </div>
+      </section>
+      <p class="privacy-note">ตัวเลขคือจำนวนครั้งที่เปิดและกดใช้งาน ไม่ใช่จำนวนผู้ใช้ที่ไม่ซ้ำกัน</p>
+    </main>
+    <footer>KC SMART <span aria-hidden="true">✦</span> Sadao Khanchai Kamphalanon Anusorn School</footer>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="stats-admin.js"></script>
+</body>
+</html>

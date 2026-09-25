@@ -2367,3 +2367,103 @@ header {
     gap: 0; /* ลดช่องว่างให้เหลือ 0 เพื่อให้ Search Box ชิดขอบที่สุด */
 }
 
+
+/* KC SMART: ก้อนลอยยอดเปิดเว็บไซต์ แยกจากแถบปุ่มเดิม */
+.footer-dock {
+  position: fixed;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: calc(100vw - 20px);
+  z-index: 1000;
+}
+.footer-dock .special-footer {
+  position: relative;
+  bottom: auto !important;
+  left: auto;
+  transform: none;
+  max-width: none;
+  flex: 0 1 auto;
+  white-space: nowrap;
+}
+.footer-dock .install-fab-container {
+  width: 44px;
+  flex: none;
+}
+.visit-counter {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  height: 42px;
+  min-width: 61px;
+  padding: 0 9px;
+  flex: none;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, .36);
+  background: linear-gradient(145deg, rgba(255, 255, 255, .16), rgba(197, 162, 255, .07) 52%, rgba(255, 255, 255, .045));
+  box-shadow: 0 7px 22px rgba(4, 0, 20, .23), inset 0 1px 1px rgba(255, 255, 255, .35), inset 0 -1px rgba(255, 255, 255, .08);
+  backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(1.1);
+  color: #fff7dd;
+  font-family: "Kanit", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  transition: opacity .3s, width .3s, padding .3s, transform .3s;
+}
+.visit-counter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 18% -28%, rgba(255, 255, 255, .62), transparent 60%), linear-gradient(165deg, rgba(255, 255, 255, .1), transparent 45%);
+  opacity: .65;
+}
+.visit-counter svg, .visit-counter span { position: relative; z-index: 1; }
+.visit-counter svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  color: #ffe9a9;
+}
+.visit-counter.updated {
+  animation: kc-counter-pop .38s ease-out;
+}
+@keyframes kc-counter-pop {
+  50% { transform: scale(1.045); }
+}
+/* ขณะพิมพ์ค้นหา ให้พื้นที่กับช่องค้นหาเต็มที่ */
+.footer-dock.search-open .visit-counter {
+  opacity: 0;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  border-width: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+@media (max-width: 430px) {
+  .footer-dock { gap: 5px; }
+  .visit-counter { height: 40px; min-width: 58px; padding: 0 8px; font-size: 10px; gap: 4px; }
+  .visit-counter svg { width: 14px; height: 14px; }
+  .footer-dock .special-footer { gap: 5px; padding: 7px; }
+  .footer-dock .line-button { padding: 7px; }
+  .footer-dock .line-icon-wrapper { margin-right: 5px; }
+}
+@media (max-width: 380px) {
+  .footer-dock .line-button { width: 44px; justify-content: center; }
+  .footer-dock .line-button span { display: none; }
+  .footer-dock .line-icon-wrapper { margin-right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .visit-counter, .visit-counter.updated { animation: none; transition: none; }
+}
