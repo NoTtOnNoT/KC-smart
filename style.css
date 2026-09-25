@@ -2435,13 +2435,6 @@ header {
   height: 15px;
   color: #ffe9a9;
 }
-.special-footer svg, .special-footer span { position: relative; z-index: 1; }
-.special-footer svg {
-  flex: none;
-  width: 15px;
-  height: 42px;
-  color: #ffe9a9;
-}
 .visit-counter.updated {
   animation: kc-counter-pop .38s ease-out;
 }
