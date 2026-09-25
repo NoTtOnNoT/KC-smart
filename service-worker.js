@@ -28,17 +28,15 @@ const messaging = firebase.messaging();
 
 // ฟังก์ชันดักจับข้อความแจ้งเตือนเมื่อแอปอยู่เบื้องหลัง (Background / ปิดหน้าจอ)
 messaging.onBackgroundMessage((payload) => {
-    console.log('🔔 ได้รับการแจ้งเตือนเบื้องหลัง:', payload);
-
-    const notificationTitle = payload.notification.title || "ประกาศจาก KC SMART";
-    const notificationOptions = {
-        body: payload.notification.body || "คุณมีข้อความใหม่",
-        icon: payload.notification.icon || 'KClogo.png', // รูปไอคอนที่จะโชว์ในการแจ้งเตือน
-        badge: 'KClogo.png',                            // ไอคอนเล็กๆ บนแถบสถานะของ Android
-        data: payload.data                              // ส่งข้อมูลแนบไป เผื่อใช้เปิดลิงก์
-    };
-
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    const title = payload.data?.title || payload.notification?.title || "ประกาศจาก KC SMART";
+    const body = payload.data?.body || payload.notification?.body || "คุณมีข้อความใหม่";
+    const url = payload.data?.url || '/';
+    return self.registration.showNotification(title, {
+        body,
+        icon: payload.data?.icon || payload.notification?.icon || '/KCsmartปก.png',
+        badge: '/KClogo.png',
+        data: { url }
+    });
 });
 
 // ฟังก์ชันเมื่อผู้ใช้ "คลิก" ที่การแจ้งเตือน -> ให้เปิดแอป KC SMART ขึ้นมา
@@ -51,7 +49,7 @@ self.addEventListener('notificationclick', (event) => {
             if (clientList.length > 0) {
                 return clientList[0].focus();
             }
-            return clients.openWindow('/');
+            return clients.openWindow(event.notification.data?.url || '/');
         })
     );
 });

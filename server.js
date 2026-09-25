@@ -46,8 +46,11 @@ admin.initializeApp({
 const db = admin.database();
 
 // --- Telegram Configuration ---
-const apiId = 39376007;
-const apiHash = "4bbfdf3c89267e34312cd5cec276442d";
+const apiId = Number(process.env.TELEGRAM_API_ID);
+const apiHash = process.env.TELEGRAM_API_HASH;
+if (!apiId || !apiHash) {
+  throw new Error("ตั้งค่า TELEGRAM_API_ID และ TELEGRAM_API_HASH ใน Environment Variables ก่อนเปิดเซิร์ฟเวอร์");
+}
 const stringSession = new StringSession(process.env.TELEGRAM_SESSION || "");
 const TARGET_BOT_USERNAME = "Kc_broadcast_Bot_bot";
 
@@ -56,65 +59,45 @@ const TARGET_BOT_USERNAME = "Kc_broadcast_Bot_bot";
 async function sendToAllDevices(text) {
   try {
     const snapshot = await db.ref("fcm_tokens").once("value");
-    const data = snapshot.val();
-
-    if (!data) {
-      console.log("⚠️ ไม่มี Token ใน Database เลย ข้ามการส่ง");
-      return;
+    const entries = Object.entries(snapshot.val() || {}).filter(([, item]) =>
+      item && typeof item.token === "string" && item.token.length > 0);
+    const unique = new Map();
+    for (const [key, item] of entries) {
+      if (!unique.has(item.token)) unique.set(item.token, []);
+      unique.get(item.token).push(key);
     }
-
-    const tokens = Object.values(data)
-      .map((item) => item.token)
-      .filter((token) => token);
-
-    if (tokens.length === 0) {
-      console.log("⚠️ ไม่พบข้อมูล Token ภายใน Database");
-      return;
-    }
-
-    console.log(`🚀 กำลังส่งแจ้งเตือนไปยัง ${tokens.length} เครื่อง...`);
-
-    // แบ่งกลุ่มละ 500 ตามเดิม
-    // ใน server.js
-    for (let i = 0; i < tokens.length; i += 500) {
-      const batch = tokens.slice(i, i + 500);
-      const message = {
+    const targets = Array.from(unique, ([token, keys]) => ({ token, keys }));
+    if (!targets.length) return console.log("ไม่มี FCM token ให้ส่ง");
+    const messageText = String(text).slice(0, 2000);
+    for (let i = 0; i < targets.length; i += 500) {
+      const batch = targets.slice(i, i + 500);
+      const response = await admin.messaging().sendEachForMulticast({
         data: {
-          // ใช้ data แทน notification
-          title: "📢 แจ้งเตือนใหม่จาก KC_broadcast_Bot!",
-          body: text,
-          icon: "https://kc-smart.smtekc.com/KCsmartปก.png", // ย้ายไอคอนมาไว้ใน data
+          title: "📢 แจ้งเตือนใหม่จาก KC SMART",
+          body: messageText,
+          icon: "https://kc-smart.smtekc.com/KCsmartปก.png",
+          url: "https://kc-smart.smtekc.com/"
         },
-        tokens: batch,
-      };
-
-      const response = await admin.messaging().sendEachForMulticast(message);
-      console.log(
-        `✅ ส่งสำเร็จ ${response.successCount} เครื่อง, ล้มเหลว ${response.failureCount} เครื่อง`,
-      );
+        tokens: batch.map(item => item.token),
+      });
+      console.log(`FCM ส่งสำเร็จ ${response.successCount}, ล้มเหลว ${response.failureCount}`);
+      const obsolete = [];
+      response.responses.forEach((result, index) => {
+        if (result.success) return;
+        const code = result.error?.code || "unknown";
+        console.warn(`FCM ล้มเหลว: ${code}`);
+        if (["messaging/registration-token-not-registered", "messaging/invalid-registration-token"].includes(code)) {
+          obsolete.push(...batch[index].keys);
+        }
+      });
+      if (obsolete.length) await Promise.all(obsolete.map(key => db.ref(`fcm_tokens/${key}`).remove()));
     }
   } catch (err) {
-    console.error("❌ เกิดข้อผิดพลาดในการส่ง Multicast:", err.message);
+    console.error("ส่งแจ้งเตือน FCM ไม่สำเร็จ:", err);
   }
 }
 
 // --- API Endpoints ---
-app.post("/register-token", async (req, res) => {
-  const { token } = req.body;
-  if (!token) return res.status(400).send("No token provided");
-  try {
-    await db.ref("fcm_tokens/" + Date.now()).set({
-      token: token,
-      device: "Android",
-      timestamp: Date.now(),
-    });
-    res.status(200).send("Token registered");
-  } catch (err) {
-    console.error("Error saving token:", err);
-    res.status(500).send("Error saving token");
-  }
-});
-
 app.get("/ping", (req, res) =>
   res.status(200).send("เซิร์ฟเวอร์ตื่นอยู่จ้า! 🟢"),
 );

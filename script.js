@@ -604,7 +604,7 @@ buttons.forEach((btn) => {
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("sw.js")
+      .register("service-worker.js")
       .then((reg) => {
         console.log("Service Worker Registered!", reg);
         
@@ -619,17 +619,19 @@ if ("serviceWorker" in navigator) {
         }
 
         messaging.onMessage((payload) => {
-          console.log("ได้รับแจ้งเตือนขณะเปิดแอป:", payload);
-          if (payload.notification) {
-            const title = payload.notification.title || "ประกาศจากโรงเรียน";
-            const body = payload.notification.body || "";
-            
-            // เรียกใช้ฟังก์ชัน Toast แจ้งเตือนที่คุณทำไว้
-            if (typeof showStatus === "function") {
-              showStatus(`📢 ${title}: ${body}`, true);
-            } else {
-              alert(`${title}\n${body}`);
-            }
+          const title = payload.data?.title || payload.notification?.title || "ประกาศจาก KC SMART";
+          const body = payload.data?.body || payload.notification?.body || "";
+          const toast = document.getElementById("statusToast");
+          const toastText = document.getElementById("toastMessage");
+          const toastIcon = document.getElementById("toastIcon");
+          if (toast && toastText) {
+            toastText.textContent = `${title}: ${body}`;
+            if (toastIcon) toastIcon.textContent = "🔔";
+            toast.classList.remove("toast-error");
+            toast.classList.add("toast-success", "active");
+            setTimeout(() => toast.classList.remove("active"), 6500);
+          } else {
+            console.info("ได้รับแจ้งเตือน:", title, body);
           }
         });
 
@@ -790,104 +792,55 @@ function closePromptSmoothly(el) {
 
 // 1. ฟังก์ชันส่งคำขออนุญาตแจ้งเตือน
 function askNotificationPermission(reg) {
-  // ตรวจสอบสิทธิ์ปัจจุบัน ถ้ายังไม่เคยถาม ให้เด้งป๊อปอัปถามทันที
   if (Notification.permission === "default") {
-    Notification.requestPermission().then((permission) => {
-      if (permission === "granted") {
-        console.log("ผู้ใช้อนุญาตการแจ้งเตือนแล้ว! 🎉");
-        getFCMToken(reg); // ดึง Token ต่อทันที
-      } else {
-        console.warn("ผู้ใช้ปฏิเสธการแจ้งเตือน 😢");
-      }
+    // Browser ต้องให้ผู้ใช้กดปุ่มก่อนจึงขอสิทธิ์ได้อย่างสม่ำเสมอ
+    if (document.getElementById("enableKcNotifications")) return;
+    const button = document.createElement("button");
+    button.id = "enableKcNotifications";
+    button.type = "button";
+    button.textContent = "🔔 เปิดรับการแจ้งเตือน KC SMART";
+    button.style.cssText = "position:fixed;bottom:calc(88px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:9999;border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:10px 18px;color:white;background:rgba(89,59,161,.85);backdrop-filter:blur(18px);font:500 14px Kanit,sans-serif;box-shadow:0 8px 28px rgba(34,16,71,.3);cursor:pointer;white-space:nowrap";
+    button.addEventListener("click", async () => {
+      const permission = await Notification.requestPermission();
+      button.remove();
+      if (permission === "granted") getFCMToken(reg);
     });
+    document.body.appendChild(button);
   } else if (Notification.permission === "granted") {
     // ถ้าผู้ใช้เคยอนุญาตไปแล้วก่อนหน้านี้ ให้ดึง Token มาใช้งานได้เลย
     getFCMToken(reg);
   }
 }
 
-function getFCMToken(reg) {
-  messaging.getToken({ 
-    vapidKey: "BGJa_Jny-1OLkMSdTNcv-xhkaxGqLnH8RTXWFCDb-mIudG02l4HfwaRRy3frG5DT_fKmTbUn29DkhukOpt07ptw", 
-    serviceWorkerRegistration: reg 
-  })
-  .then((currentToken) => {
-    if (currentToken) {
-      console.log("🔥 FCM Token ของเครื่องนี้คือ:", currentToken);
-      
-      const savedToken = localStorage.getItem("saved_fcm_token");
-      const savedKey = localStorage.getItem("saved_fcm_key");
-
-      // 📦 ฟังก์ชันสำหรับสั่งอัปโหลดข้อมูลใหม่
-      const uploadTokenNew = () => {
-        // 🌟 [แก้ไขจุดที่ 1] ปรับการเช็กอุปกรณ์ iOS/iPadOS ให้แม่นยำขึ้น
-        const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-        
-        const deviceLabel = navigator.userAgent.includes("Android") 
-          ? "Android" 
-          : isIOSDevice 
-            ? "iOS (iPhone/iPad)" 
-            : "PC/Other";
-
-        database.ref("fcm_tokens").push({
-          token: currentToken,
-          device: deviceLabel,
-          timestamp: firebase.database.ServerValue.TIMESTAMP
-        })
-        .then((ref) => {
-          localStorage.setItem("saved_fcm_token", currentToken);
-          localStorage.setItem("saved_fcm_key", ref.key); 
-          console.log("💾 บันทึก Token ลง Firebase เรียบร้อย!");
-        })
-        .catch((dbErr) => {
-          console.error("❌ บันทึก Token ลงฐานข้อมูลไม่สำเร็จ:", dbErr);
-        });
-      };
-
-      // 🔍 [แก้ไขจุดที่ 3] ตรวจสอบความซ้ำซ้อนจากฐานข้อมูลจริง ป้องกันกรณีกดล้างแคชเครื่อง
-      if (savedToken === currentToken && savedKey) {
-        database.ref("fcm_tokens/" + savedKey).once("value")
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            console.log("ℹ️ Token นี้มีอยู่ในระบบฐานข้อมูลแล้ว ไม่ต้องส่งซ้ำ");
-          } else {
-            console.warn("⚠️ พบว่า Token หายไปจากคีย์เดิม! กำลังตรวจสอบระบบซ้ำ...");
-            verifyTokenDirectlyInDB(currentToken, uploadTokenNew);
-          }
-        })
-        .catch(() => uploadTokenNew());
-      } else {
-        // ถ้าค่าใน LocalStorage ไม่มี ให้ไปค้นหาใน DB ก่อนว่าเคยผูกไปหรือยัง ก่อนจะกด Push ใหม่
-        verifyTokenDirectlyInDB(currentToken, uploadTokenNew);
-      }
-      
-    } else {
-      console.log("ไม่สามารถดึง Token ได้ โปรดเช็กสิทธิ์แจ้งเตือนบนเบราว์เซอร์");
+// ใช้แฮชของ token เป็นคีย์ที่คงที่: ไม่ต้องอ่านรายการ token ทั้งหมด และไม่เกิดข้อมูลซ้ำ
+async function getFCMToken(reg) {
+  try {
+    const token = await messaging.getToken({
+      vapidKey: "BGJa_Jny-1OLkMSdTNcv-xhkaxGqLnH8RTXWFCDb-mIudG02l4HfwaRRy3frG5DT_fKmTbUn29DkhukOpt07ptw",
+      serviceWorkerRegistration: reg,
+    });
+    if (!token) return console.warn("ยังไม่ได้รับ FCM token");
+    const bytes = new TextEncoder().encode(token);
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    const tokenId = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+    const savedKey = localStorage.getItem("saved_fcm_key");
+    const device = /Android/.test(navigator.userAgent) ? "Android"
+      : /iPad|iPhone|iPod/.test(navigator.userAgent) ? "iOS" : "PC/Other";
+    // เขียนตรงไปยังโหนดลูก ซึ่งตรงกับกฎ fcm_tokens/$token_id
+    await database.ref(`fcm_tokens/${tokenId}`).set({
+      token, device, timestamp: firebase.database.ServerValue.TIMESTAMP,
+    });
+    localStorage.setItem("saved_fcm_token", token);
+    localStorage.setItem("saved_fcm_key", tokenId);
+    // ลบคีย์เดิมเฉพาะเมื่อเป็นคีย์ที่เคยบันทึกไว้ในเครื่องนี้
+    if (savedKey && savedKey !== tokenId) {
+      database.ref(`fcm_tokens/${savedKey}`).remove().catch(error =>
+        console.warn("ลบ token เก่าไม่สำเร็จ:", error));
     }
-  })
-  .catch((err) => {
-    console.error("เกิดข้อผิดพลาดในการดึง Token:", err);
-  });
-}
-
-function verifyTokenDirectlyInDB(token, uploadCallback) {
-  database.ref("fcm_tokens").orderByChild("token").equalTo(token).once("value")
-  .then((snapshot) => {
-    if (snapshot.exists()) {
-      console.log("ℹ️ เจอ Token ซ้ำในฐานข้อมูลจากประวัติเก่า ดึงคีย์กลับมาบันทึกลงเครื่องให้ใหม่");
-      const existingKey = Object.keys(snapshot.val())[0];
-      localStorage.setItem("saved_fcm_token", token);
-      localStorage.setItem("saved_fcm_key", existingKey);
-    } else {
-      // ถ้าไม่มีในระบบจริง ๆ ค่อยอัปโหลดใหม่
-      uploadCallback();
-    }
-  })
-  .catch(() => {
-    // หากติดสิทธิ์หรือไม่ได้ทำ Indexing ให้สั่งอัปโหลดเซฟไว้ก่อน
-    uploadCallback();
-  });
+    console.info("ลงทะเบียนรับการแจ้งเตือนสำเร็จ");
+  } catch (error) {
+    console.error("ลงทะเบียนแจ้งเตือนไม่สำเร็จ:", error);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
