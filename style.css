@@ -1699,6 +1699,31 @@ header {
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* ประวัติแจ้งเตือนแทนฟอร์มแจ้งปัญหา */
+.notification-modal-open { overflow: hidden; }
+.notification-history-card { max-width: 560px; width: calc(100% - 30px); max-height: min(85vh, 760px); padding: 26px; display: flex; flex-direction: column; text-align: left; border-radius: 26px; background: linear-gradient(150deg,#1d1237,#0e0a1a); border-color: rgba(213,183,255,.32); }
+.notification-history-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 17px; border-bottom: 1px solid rgba(255,255,255,.12); }
+.notification-history-header h2 { color: #fff; font-size: 1.48rem; margin: 3px 0 0; }
+.notification-kicker { color: #eecf83; font-size: .69rem; letter-spacing: .17em; }
+.notification-history-list,.notification-detail { min-height: 140px; overflow-y: auto; padding: 16px 4px 4px; scrollbar-color: #9470c1 transparent; }
+.notification-history-list[hidden],.notification-detail[hidden] { display: none; }
+.notification-history-item { width: 100%; display: flex; gap: 14px; align-items: flex-start; padding: 15px 13px; margin-bottom: 10px; color: #f5efff; background: rgba(255,255,255,.055); border: 1px solid rgba(207,175,255,.13); border-radius: 15px; text-align: left; cursor: pointer; font: inherit; transition: transform .18s, background .18s, border-color .18s; }
+.notification-history-item:hover { transform: translateY(-2px); background: rgba(139,94,218,.18); border-color: rgba(222,189,255,.43); }
+.notification-history-item:focus-visible,.notification-back:focus-visible,.notification-detail-link:focus-visible { outline: 2px solid #ffda76; outline-offset: 3px; }
+.notification-history-icon { flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: rgba(255,217,121,.12); }
+.notification-history-summary { display: grid; min-width: 0; gap: 3px; }
+.notification-history-summary strong { font-size: .98rem; }
+.notification-history-summary > span { color: #d1c5e5; font-size: .83rem; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.notification-history-summary time,.notification-detail-time { color: #ae9acb; font-size: .74rem; }
+.notification-empty { color: #cbbddb; text-align: center; padding: 28px 5px; }
+.notification-back { color: #f6d586; background: none; border: 0; font: inherit; cursor: pointer; padding: 5px 0 18px; }
+.notification-detail-time { display: block; }
+.notification-detail h3 { font-size: 1.32rem; color: #fff; margin: 9px 0; line-height: 1.4; }
+.notification-detail-body { color: #e7ddf4; white-space: pre-wrap; line-height: 1.7; overflow-wrap: anywhere; }
+.notification-detail-image { display: block; max-width: 100%; max-height: 420px; object-fit: contain; border-radius: 13px; margin: 16px 0; }
+.notification-detail-link { display: inline-flex; padding: 10px 16px; border-radius: 12px; background: #f7d881; color: #2e194a; font-weight: 600; margin-top: 12px; text-decoration: none; overflow-wrap: anywhere; }
+@media(max-width:520px) { .notification-history-card { padding: 20px 17px; max-height: 86vh; } .notification-history-header h2 { font-size: 1.2rem; } }
+
 /* --- ส่วนทับพื้นหลัง (Overlay) --- */
 .kc-smart-overlay {
   display: none;

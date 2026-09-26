@@ -35,7 +35,7 @@ messaging.onBackgroundMessage((payload) => {
         body,
         icon: payload.data?.icon || payload.notification?.icon || '/KCsmartปก.png',
         badge: '/KClogo.png',
-        data: { url }
+        data: { url, notificationId: payload.data?.notificationId || null }
     });
 });
 
@@ -45,11 +45,18 @@ self.addEventListener('notificationclick', (event) => {
 
     // สั่งให้เปิดหน้าเว็บ/แอป หรือถ้าเปิดอยู่แล้วให้เด้งไปที่หน้านั้นทันที
     event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-            if (clientList.length > 0) {
-                return clientList[0].focus();
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async (clientList) => {
+            const target = event.notification.data?.url || '/';
+            const existing = clientList.find(client => new URL(client.url).origin === self.location.origin);
+            if (existing) {
+                try {
+                    const navigated = await existing.navigate(target);
+                    if (navigated) return navigated.focus();
+                } catch (error) {
+                    console.warn('เปิดรายละเอียดประกาศในหน้าต่างเดิมไม่ได้:', error);
+                }
             }
-            return clients.openWindow(event.notification.data?.url || '/');
+            return clients.openWindow(target);
         })
     );
 });

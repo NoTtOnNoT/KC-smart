@@ -124,15 +124,13 @@
             </div>
 
             <div class="report-container">
-                <button type="button" class="report-fab" id="openReport"
-                    aria-label="Report Issue">
+                <button type="button" class="report-fab" id="openNotificationHistory"
+                    aria-label="ดูประวัติการแจ้งเตือน" title="ประวัติการแจ้งเตือน">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2.5" stroke-linecap="round"
                         stroke-linejoin="round">
-                        <path
-                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                        <line x1="12" y1="9" x2="12" y2="13"></line>
-                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"></path>
+                        <path d="M10 21h4"></path>
                     </svg>
                 </button>
             </div>
@@ -183,102 +181,19 @@
                 </div>
             </div>
         </div>
-        <div id="reportModal" class="kc-smart-overlay">
-            <div class="kc-smart-modal-card">
-                <div class="kc-smart-modal-header">
-                    <div class="kc-smart-status-dot"></div>
-                    <button id="closeReport"
-                        class="kc-smart-close-btn">&times;</button>
+        <div id="notificationHistoryModal" class="kc-smart-overlay" role="dialog"
+            aria-modal="true" aria-labelledby="notificationHistoryTitle">
+            <div class="kc-smart-modal-card notification-history-card">
+                <div class="notification-history-header">
+                    <div><span class="notification-kicker">KC SMART UPDATES</span>
+                        <h2 id="notificationHistoryTitle">ประวัติการแจ้งเตือน</h2></div>
+                    <button id="closeNotificationHistory" type="button" class="kc-smart-close-btn"
+                        aria-label="ปิดประวัติการแจ้งเตือน">&times;</button>
                 </div>
-
-                <div class="kc-smart-modal-body">
-                    <div id="creditView" class="kc-smart-view active">
-                        <div class="kc-smart-brand-container">
-                            <img src="KClogo.png" alt="School Logo"
-                                class="kc-smart-dev-logo">
-                            <div class="kc-smart-brand-divider"></div>
-                            <img src="KC-smart.png" alt="SMTE Logo"
-                                class="kc-smart-dev-logo">
-                        </div>
-                        <div class="kc-smart-credit-wrapper">
-                            <h2
-                                class="kc-smart-design-label">ออกแบบและพัฒนาโดย</h2>
-                            <h1
-                                class="kc-smart-main-title">นักเรียนโครงการห้องเรียนพิเศษ
-                                SMTE</h1>
-                            <p class="kc-smart-desc-text">Science Mathematics
-                                Technology and Environment</p>
-                        </div>
-                        <div class="kc-smart-horizontal-line"></div>
-                        <div class="kc-smart-action-area">
-                            <button type="button" id="nextToReport"
-                                class="kc-smart-hero-button">
-                                <div class="kc-smart-btn-icon-box">
-                                    <svg viewBox="0 0 24 24" fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.5"><path
-                                            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                                </div>
-                                <div class="kc-smart-btn-content">
-                                    <span class="kc-smart-btn-primary">แจ้งปัญหา
-                                        & เสนอแนะ</span>
-                                    <span class="kc-smart-btn-secondary">Support
-                                        Center</span>
-                                </div>
-                                <svg class="kc-smart-btn-arrow"
-                                    viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="3"><path
-                                        d="M9 18l6-6-6-6"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="reportView" class="kc-smart-view">
-                        <h2 class="kc-smart-form-title">ส่งข้อมูลแจ้งปัญหา</h2>
-                        <form id="reportForm" class="kc-smart-form">
-                            <div class="kc-smart-input-group">
-                                <textarea id="reportDetail"
-                                    placeholder="มีปัญหาอะไรในการใช้เว็บไซต์นี้... บอกเราได้เลยจ้าา"
-                                    required></textarea>
-                            </div>
-                            <div class="kc-smart-form-footer">
-                                <button type="button" id="backToCredit"
-                                    class="kc-smart-back-link">ย้อนกลับ</button>
-                                <div style="display: flex; gap: 10px;">
-                                    <button type="button" id="viewAllReports"
-                                        class="kc-smart-secondary-btn">
-                                        <svg width="20" height="20"
-                                            viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor"
-                                            stroke-width="2"><path
-                                                d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle
-                                                cx="12" cy="12"
-                                                r="3"></circle></svg>
-                                    </button>
-                                    <button type="submit" id="submitBtn"
-                                        class="kc-smart-submit-btn">
-                                        <span>ส่งข้อมูล</span>
-                                        <div class="kc-smart-loader"
-                                            id="loader"></div>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div id="listView" class="kc-smart-view">
-                        <h2 class="kc-smart-form-title">รายการที่มีการแจ้ง</h2>
-                        <div id="reportListContainer"
-                            class="kc-smart-list-container">
-                            <p
-                                style="color: #6a6e82; text-align: center;">กำลังโหลดข้อมูล...</p>
-                        </div>
-                        <div class="kc-smart-form-footer">
-                            <button type="button" id="backToForm"
-                                class="kc-smart-back-link">ย้อนกลับ</button>
-                        </div>
-                    </div>
+                <div id="notificationHistoryList" class="notification-history-list" aria-live="polite">
+                    <p class="notification-empty">กำลังโหลดประกาศ...</p>
                 </div>
+                <div id="notificationHistoryDetail" class="notification-detail" hidden></div>
             </div>
         </div>
         <div id="statusToast" class="status-toast">
@@ -303,14 +218,12 @@
         <!-- 2. ไลบรารี Realtime Database -->
         <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-        <!-- 3. ไลบรารี Cloud Firestore (สำหรับเก็บข้อมูลฟอร์มแจ้งปัญหา) -->
-        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-        <!-- 4. ไลบรารี Firebase Messaging (สำหรับรับการแจ้งเตือน Push Notification) -->
+        <!-- 3. ไลบรารี Firebase Messaging (สำหรับรับการแจ้งเตือน Push Notification) -->
         <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
         <!-- ─── สิ้นสุดชุด Firebase SDK ─── -->
 
-        <script src="script.js?v=20260925-notification-fix"></script>
+        <script src="script.js?v=20260926-history"></script>
+        <script src="notification-history.js?v=20260926-history"></script>
         <script defer src="/_vercel/insights/script.js"></script>
     </body>
 </html>

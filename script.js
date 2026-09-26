@@ -12,7 +12,12 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-const messaging = firebase.messaging();
+let messaging = null;
+try {
+  messaging = firebase.messaging();
+} catch (error) {
+  console.warn("อุปกรณ์นี้ไม่รองรับการแจ้งเตือน FCM:", error);
+}
 
 // ยอดเปิดหน้าและยอดคลิก 24 ฟังก์ชัน เก็บใน Realtime Database
 // ServerValue.increment ทำงานที่เซิร์ฟเวอร์ จึงไม่ทับยอดของผู้ใช้อื่น
@@ -618,7 +623,7 @@ if ("serviceWorker" in navigator) {
           askNotificationPermission(reg);
         }
 
-        messaging.onMessage((payload) => {
+        messaging?.onMessage((payload) => {
           const title = payload.data?.title || payload.notification?.title || "ประกาศจาก KC SMART";
           const body = payload.data?.body || payload.notification?.body || "";
           const toast = document.getElementById("statusToast");
@@ -630,6 +635,12 @@ if ("serviceWorker" in navigator) {
             toast.classList.remove("toast-error");
             toast.classList.add("toast-success", "active");
             setTimeout(() => toast.classList.remove("active"), 6500);
+            if (payload.data?.notificationId) {
+              toast.style.cursor = "pointer";
+              toast.onclick = () => window.dispatchEvent(new CustomEvent("kc-open-notification", {
+                detail: {id: payload.data.notificationId},
+              }));
+            }
           } else {
             console.info("ได้รับแจ้งเตือน:", title, body);
           }
@@ -814,6 +825,7 @@ function askNotificationPermission(reg) {
 
 // ใช้แฮชของ token เป็นคีย์ที่คงที่: ไม่ต้องอ่านรายการ token ทั้งหมด และไม่เกิดข้อมูลซ้ำ
 async function getFCMToken(reg) {
+  if (!messaging) return;
   try {
     const token = await messaging.getToken({
       vapidKey: "BGJa_Jny-1OLkMSdTNcv-xhkaxGqLnH8RTXWFCDb-mIudG02l4HfwaRRy3frG5DT_fKmTbUn29DkhukOpt07ptw",
@@ -871,167 +883,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Global Database Reference
 const database = firebase.database();
-
-// [ส่วนที่ 2] จัดการ UI เมื่อ DOM พร้อม
-document.addEventListener("DOMContentLoaded", () => {
-  // === 1. ตัวแปรอ้างอิง Element ===
-  const reportModal = document.getElementById("reportModal");
-  const openBtn = document.getElementById("openReport");
-  const closeBtn = document.getElementById("closeReport");
-
-  const creditView = document.getElementById("creditView");
-  const reportView = document.getElementById("reportView");
-  const listView = document.getElementById("listView");
-
-  const nextBtn = document.getElementById("nextToReport");
-  const backBtn = document.getElementById("backToCredit");
-  const viewAllBtn = document.getElementById("viewAllReports");
-  const backToFormBtn = document.getElementById("backToForm");
-
-  const reportForm = document.getElementById("reportForm");
-  const reportListContainer = document.getElementById("reportListContainer");
-  const loader = document.getElementById("loader");
-
-  // === 2. ฟังก์ชันการทำงานหลัก ===
-  const showView = (targetView) => {
-    [creditView, reportView, listView].forEach((view) =>
-      view?.classList.remove("active"),
-    );
-    targetView?.classList.add("active");
-  };
-
-  const openModal = () => {
-    if (navigator.vibrate) navigator.vibrate(15); // สั่นเบาๆ เวลาเปิด
-    showView(creditView);
-    reportModal.style.display = "flex";
-    requestAnimationFrame(() => reportModal.classList.add("active"));
-  };
-
-  const closeModal = () => {
-    reportModal.classList.remove("active");
-    setTimeout(() => {
-      reportModal.style.display = "none";
-    }, 300);
-  };
-
-  // === 3. Event Listeners ===
-  openBtn?.addEventListener("click", openModal);
-  closeBtn?.addEventListener("click", closeModal);
-  reportModal?.addEventListener("click", (e) => {
-    if (e.target === reportModal) closeModal();
-  });
-
-  nextBtn?.addEventListener("click", () => showView(reportView));
-  backBtn?.addEventListener("click", () => showView(creditView));
-  viewAllBtn?.addEventListener("click", () => {
-    showView(listView);
-    loadReports();
-  });
-  backToFormBtn?.addEventListener("click", () => showView(reportView));
-
-  function showStatus(message, isSuccess = true) {
-    const toast = document.getElementById("statusToast");
-    const msgEl = document.getElementById("toastMessage");
-    const iconEl = document.getElementById("toastIcon");
-
-    // ล้าง Class เดิมก่อน
-    toast.classList.remove("toast-success", "toast-error");
-
-    // ตั้งค่าตามสถานะ
-    msgEl.innerText = message;
-    iconEl.innerHTML = isSuccess ? "✓" : "✕";
-    toast.classList.add(isSuccess ? "toast-success" : "toast-error");
-
-    // แสดง Toast
-    toast.classList.add("active");
-
-    // Haptic Feedback (สั่นแบบเบาที่สุด ให้ความรู้สึกสมจริง)
-    if (navigator.vibrate) {
-      if (isSuccess) {
-        navigator.vibrate(10); // ตึ้ดเบาๆ 1 ครั้ง
-      } else {
-        navigator.vibrate([40, 30, 40]); // สั่นเตือนเมื่อพลาด
-      }
-    }
-
-    // หายไปเอง
-    setTimeout(() => {
-      toast.classList.remove("active");
-    }, 3500);
-  }
-
-  // === 4. Firebase Interaction (Submit) ===
-  reportForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const detailText = document.getElementById("reportDetail").value.trim();
-    const submitBtn = document.getElementById("submitBtn");
-
-    if (!detailText) return;
-
-    submitBtn.disabled = true;
-    if (loader) loader.style.display = "block";
-
-    try {
-      await database.ref("reports").push({
-        detail: detailText,
-        timestamp: firebase.database.ServerValue.TIMESTAMP,
-      });
-
-      // ใช้ Custom Popup แทน alert
-      showStatus("ส่งข้อมูลเรียบร้อย! 🙏🏼");
-
-      reportForm.reset();
-
-      // รอแป๊บนึงค่อยปิด Modal หลัก เพื่อให้ผู้ใช้เห็นแจ้งเตือนก่อน
-      setTimeout(() => {
-        closeModal();
-      }, 1000);
-    } catch (error) {
-      showStatus("เกิดข้อผิดพลาด: " + error.message, false);
-    } finally {
-      submitBtn.disabled = false;
-      if (loader) loader.style.display = "none";
-    }
-  });
-
-  // === 5. Load Data (View) ===
-  function loadReports() {
-    if (!reportListContainer) return;
-    reportListContainer.innerHTML =
-      '<p style="text-align:center; padding: 20px; color:#6a6e82;">กำลังโหลดข้อมูล...</p>';
-
-    database
-      .ref("reports")
-      .limitToLast(15)
-      .on("value", (snapshot) => {
-        reportListContainer.innerHTML = "";
-        const data = snapshot.val();
-
-        if (!data) {
-          reportListContainer.innerHTML =
-            '<p style="text-align:center; padding: 20px; color:#6a6e82;">ยังไม่มีข้อมูลการแจ้ง</p>';
-          return;
-        }
-
-        Object.keys(data)
-          .reverse()
-          .forEach((key) => {
-            const item = data[key];
-            const date = new Date(item.timestamp).toLocaleString("th-TH", {
-              hour12: false,
-            });
-            const itemDiv = document.createElement("div");
-            itemDiv.innerHTML = `
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid #ff4757; animation: slideIn 0.3s ease;">
-                        <p style="margin: 0 0 8px 0; font-size: 0.95rem; line-height: 1.4;">${item.detail}</p>
-                        <div style="display: flex; align-items: center; gap: 5px; opacity: 0.5; font-size: 0.7rem;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                            <span>${date}</span>
-                        </div>
-                    </div>
-                `;
-            reportListContainer.appendChild(itemDiv);
-          });
-      });
-  }
-});

@@ -399,6 +399,52 @@ const broadcastForm = document.getElementById("broadcast-form");
 const broadcastBody = document.getElementById("broadcast-body");
 const broadcastStatus = document.getElementById("broadcast-status");
 const broadcastSubmit = document.getElementById("broadcast-submit");
+const broadcastImage = document.getElementById("broadcast-image");
+const broadcastPreview = document.getElementById("broadcast-preview");
+let previewUrl = null;
+broadcastImage.addEventListener("change", () => {
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = broadcastImage.files[0] ? URL.createObjectURL(broadcastImage.files[0]) : null;
+  broadcastPreview.hidden = !previewUrl;
+  if (previewUrl) broadcastPreview.src = previewUrl;
+  else broadcastPreview.removeAttribute("src");
+});
+function imageAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve("");
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size > 5 * 1024 * 1024) {
+      return reject(new Error("รูปต้องเป็น JPG, PNG หรือ WebP ขนาดไม่เกิน 5 MB"));
+    }
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      try {
+        const canvas = document.createElement("canvas");
+        const factor = Math.min(1, 1200 / Math.max(image.naturalWidth, image.naturalHeight));
+        canvas.width = Math.max(1, Math.round(image.naturalWidth * factor));
+        canvas.height = Math.max(1, Math.round(image.naturalHeight * factor));
+        const context = canvas.getContext("2d");
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        let data = "";
+        for (let round = 0; round < 8; round++) {
+          data = canvas.toDataURL("image/jpeg", Math.max(.52, .82 - round * .045));
+          if (data.length <= 180000) return resolve(data);
+          canvas.width = Math.max(1, Math.round(canvas.width * .82));
+          canvas.height = Math.max(1, Math.round(canvas.height * .82));
+          context.fillStyle = "#ffffff";
+          context.fillRect(0, 0, canvas.width, canvas.height);
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        }
+        reject(new Error("ย่อรูปไม่สำเร็จ ลองใช้รูปที่เล็กลง"));
+      } catch (error) { reject(error); }
+    };
+    image.onerror = () => { URL.revokeObjectURL(url); reject(new Error("เปิดไฟล์รูปไม่ได้")); };
+    image.src = url;
+  });
+}
 broadcastBody.addEventListener("input", () => {
   document.getElementById("broadcast-length").textContent = `${broadcastBody.value.length} / 500 ตัวอักษร`;
 });
@@ -406,8 +452,14 @@ broadcastForm.addEventListener("submit", async event => {
   event.preventDefault();
   const title = document.getElementById("broadcast-title-input").value.trim();
   const body = broadcastBody.value.trim();
+  const link = document.getElementById("broadcast-link").value.trim();
   const password = document.getElementById("broadcast-password").value;
   if (!title || !body || !password) return;
+  if (link && !/^https?:\/\//i.test(link)) {
+    broadcastStatus.className = "error";
+    broadcastStatus.textContent = "ลิงก์ต้องขึ้นต้นด้วย https:// หรือ http://";
+    return;
+  }
   if (!window.confirm(`ส่งแจ้งเตือนถึงผู้ใช้ทุกเครื่องที่ลงทะเบียน?\n\n${title}\n${body}`)) return;
 
   broadcastSubmit.disabled = true;
@@ -415,20 +467,25 @@ broadcastForm.addEventListener("submit", async event => {
   broadcastStatus.className = "";
   broadcastStatus.textContent = "กำลังส่งถึงผู้ใช้ กรุณารอสักครู่";
   try {
+    const imageData = await imageAsDataUrl(broadcastImage.files[0]);
     const response = await fetch("/api/send-notification", {
       method: "POST",
       headers: {"Content-Type": "application/json", "Authorization": `Bearer ${password}`},
-      body: JSON.stringify({title, body}),
+      body: JSON.stringify({title, body, link, imageData}),
       cache: "no-store",
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || `ส่งไม่สำเร็จ (HTTP ${response.status})`);
     broadcastStatus.className = "success";
     broadcastStatus.textContent = result.total === 0
-      ? "ยังไม่มีอุปกรณ์ลงทะเบียนรับแจ้งเตือน กรุณาให้ผู้ใช้เปิดรับแจ้งเตือนก่อน"
-      : `ส่งสำเร็จ ${result.success} เครื่อง · ล้มเหลว ${result.failure} เครื่อง`;
+      ? "บันทึกในประวัติแล้ว · ยังไม่มีอุปกรณ์ลงทะเบียนรับแจ้งเตือน"
+      : `บันทึกในประวัติแล้ว · ส่งสำเร็จ ${result.success} เครื่อง · ล้มเหลว ${result.failure} เครื่อง`;
     document.getElementById("broadcast-password").value = "";
-    broadcastBody.value = "";
+    broadcastForm.reset();
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    previewUrl = null;
+    broadcastPreview.hidden = true;
+    broadcastPreview.removeAttribute("src");
     document.getElementById("broadcast-length").textContent = "0 / 500 ตัวอักษร";
   } catch (error) {
     broadcastStatus.className = "error";

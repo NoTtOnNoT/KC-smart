@@ -11,6 +11,16 @@
       ".read": true,
       ".write": "newData.hasChildren(['detail', 'timestamp'])"
     },
+    "broadcastHistory": {
+      ".read": true,
+      ".write": false
+    },
+    "broadcastImages": {
+      "$announcementId": {
+        ".read": true,
+        ".write": false
+      }
+    },
     "kcSmartStats": {
       ".read": true,
       "pageViews": {

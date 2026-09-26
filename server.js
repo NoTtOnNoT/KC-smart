@@ -57,7 +57,15 @@ const TARGET_BOT_USERNAME = "Kc_broadcast_Bot_bot";
 // --- ฟังก์ชันส่ง Multicast (Firebase) ---
 // เปลี่ยนจากเดิมในฟังก์ชัน sendToAllDevices เป็นแบบนี้ครับ
 async function sendToAllDevices(text) {
+  let announcement;
   try {
+    const title = "📢 แจ้งเตือนใหม่จาก KC SMART";
+    const messageText = String(text).slice(0, 500);
+    announcement = db.ref("broadcastHistory").push();
+    await announcement.set({
+      title, body: messageText, link: "", hasImage: false,
+      timestamp: admin.database.ServerValue.TIMESTAMP, status: "pending",
+    });
     const snapshot = await db.ref("fcm_tokens").once("value");
     const entries = Object.entries(snapshot.val() || {}).filter(([, item]) =>
       item && typeof item.token === "string" && item.token.length > 0);
@@ -67,20 +75,27 @@ async function sendToAllDevices(text) {
       unique.get(item.token).push(key);
     }
     const targets = Array.from(unique, ([token, keys]) => ({ token, keys }));
-    if (!targets.length) return console.log("ไม่มี FCM token ให้ส่ง");
-    const messageText = String(text).slice(0, 2000);
+    if (!targets.length) {
+      await announcement.update({status: "sent", success: 0, failure: 0});
+      return console.log("บันทึกประกาศแล้ว แต่ไม่มี FCM token ให้ส่ง");
+    }
+    let success = 0;
+    let failure = 0;
     for (let i = 0; i < targets.length; i += 500) {
       const batch = targets.slice(i, i + 500);
       const response = await admin.messaging().sendEachForMulticast({
         data: {
-          title: "📢 แจ้งเตือนใหม่จาก KC SMART",
+          title,
           body: messageText,
+          notificationId: announcement.key,
           icon: "https://kc-smart.smtekc.com/KCsmartปก.png",
-          url: "https://kc-smart.smtekc.com/"
+          url: `https://kc-smart.smtekc.com/?notification=${encodeURIComponent(announcement.key)}`
         },
         tokens: batch.map(item => item.token),
       });
       console.log(`FCM ส่งสำเร็จ ${response.successCount}, ล้มเหลว ${response.failureCount}`);
+      success += response.successCount;
+      failure += response.failureCount;
       const obsolete = [];
       response.responses.forEach((result, index) => {
         if (result.success) return;
@@ -92,8 +107,13 @@ async function sendToAllDevices(text) {
       });
       if (obsolete.length) await Promise.all(obsolete.map(key => db.ref(`fcm_tokens/${key}`).remove()));
     }
+    await announcement.update({status: success ? "sent" : "failed", success, failure});
   } catch (err) {
     console.error("ส่งแจ้งเตือน FCM ไม่สำเร็จ:", err);
+    if (announcement) {
+      try { await announcement.update({status: "failed"}); }
+      catch (updateError) { console.error("บันทึกสถานะประกาศไม่สำเร็จ:", updateError); }
+    }
   }
 }
 

@@ -130,6 +130,9 @@
         <form id="broadcast-form" class="broadcast-form">
           <label>หัวข้อแจ้งเตือน <input id="broadcast-title-input" name="title" type="text" maxlength="80" placeholder="เช่น ประกาศจาก KC SMART" required></label>
           <label>ข้อความ <textarea id="broadcast-body" name="body" maxlength="500" rows="4" placeholder="พิมพ์เนื้อหาที่ต้องการแจ้งผู้ใช้..." required></textarea><small id="broadcast-length">0 / 500 ตัวอักษร</small></label>
+          <label>ลิงก์เพิ่มเติม (ไม่บังคับ) <input id="broadcast-link" name="link" type="url" maxlength="1000" inputmode="url" placeholder="https://example.com/รายละเอียด"></label>
+          <label>รูปประกอบ (ไม่บังคับ) <input id="broadcast-image" name="image" type="file" accept="image/jpeg,image/png,image/webp"><small>เลือกรูปไม่เกิน 5 MB ระบบย่อรูปก่อนบันทึก</small></label>
+          <img id="broadcast-preview" class="broadcast-preview" alt="ตัวอย่างรูปประกอบ" hidden>
           <label>รหัสส่งประกาศ <input id="broadcast-password" name="password" type="password" autocomplete="off" placeholder="รหัสที่ตั้งไว้ใน Environment Variables" required></label>
           <div class="broadcast-actions"><button id="broadcast-submit" type="submit">ส่งแจ้งเตือน</button><span id="broadcast-status" role="status" aria-live="polite"></span></div>
         </form>
@@ -141,6 +144,6 @@
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <script src="stats-admin.js?v=20260926-broadcast"></script>
+  <script src="stats-admin.js?v=20260926-history"></script>
 </body>
 </html>
