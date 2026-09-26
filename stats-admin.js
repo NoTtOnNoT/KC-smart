@@ -394,3 +394,47 @@ fetch("analytics-apps.json", {cache: "no-store"}).then(response => {
   list.textContent = "โหลดรายการฟังก์ชันไม่ได้";
   setConnection("error", error.message);
 });
+
+const broadcastForm = document.getElementById("broadcast-form");
+const broadcastBody = document.getElementById("broadcast-body");
+const broadcastStatus = document.getElementById("broadcast-status");
+const broadcastSubmit = document.getElementById("broadcast-submit");
+broadcastBody.addEventListener("input", () => {
+  document.getElementById("broadcast-length").textContent = `${broadcastBody.value.length} / 500 ตัวอักษร`;
+});
+broadcastForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  const title = document.getElementById("broadcast-title-input").value.trim();
+  const body = broadcastBody.value.trim();
+  const password = document.getElementById("broadcast-password").value;
+  if (!title || !body || !password) return;
+  if (!window.confirm(`ส่งแจ้งเตือนถึงผู้ใช้ทุกเครื่องที่ลงทะเบียน?\n\n${title}\n${body}`)) return;
+
+  broadcastSubmit.disabled = true;
+  broadcastSubmit.textContent = "กำลังส่ง...";
+  broadcastStatus.className = "";
+  broadcastStatus.textContent = "กำลังส่งถึงผู้ใช้ กรุณารอสักครู่";
+  try {
+    const response = await fetch("/api/send-notification", {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "Authorization": `Bearer ${password}`},
+      body: JSON.stringify({title, body}),
+      cache: "no-store",
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `ส่งไม่สำเร็จ (HTTP ${response.status})`);
+    broadcastStatus.className = "success";
+    broadcastStatus.textContent = result.total === 0
+      ? "ยังไม่มีอุปกรณ์ลงทะเบียนรับแจ้งเตือน กรุณาให้ผู้ใช้เปิดรับแจ้งเตือนก่อน"
+      : `ส่งสำเร็จ ${result.success} เครื่อง · ล้มเหลว ${result.failure} เครื่อง`;
+    document.getElementById("broadcast-password").value = "";
+    broadcastBody.value = "";
+    document.getElementById("broadcast-length").textContent = "0 / 500 ตัวอักษร";
+  } catch (error) {
+    broadcastStatus.className = "error";
+    broadcastStatus.textContent = error.message;
+  } finally {
+    broadcastSubmit.disabled = false;
+    broadcastSubmit.textContent = "ส่งแจ้งเตือน";
+  }
+});
