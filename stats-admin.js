@@ -473,6 +473,7 @@ broadcastForm.addEventListener("submit", async event => {
       headers: {"Content-Type": "application/json", "Authorization": `Bearer ${password}`},
       body: JSON.stringify({title, body, link, imageData}),
       cache: "no-store",
+      redirect: "error",
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || `ส่งไม่สำเร็จ (HTTP ${response.status})`);
